@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Post Details</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        .detail-header {
+            border-bottom: 2px solid #28a745;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            border-bottom: 2px solid #28a745;
+            padding-bottom: 5px;
+            margin-bottom: 15px;
+            margin-top: 30px;
+        }
+
+        .info-row {
+            background-color: #f8f9fa;
+            padding: 10px;
+            margin-bottom: 5px;
+        }
+
+        .comment-box {
+            background-color: #f8f9fa;
+            border-left: 4px solid #28a745;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="d-flex">
+        <!-- Sidebar -->
+        <div th:replace="~{common/sidebar :: sidebar(activePage='posts')}"></div>
+
+        <!-- Main Content -->
+        <div class="container-fluid p-4">
+
+            <div th:if="${message}" class="alert alert-success alert-dismissible fade show" role="alert">
+                <span th:text="${message}">Success message</span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+
+            <h3 class="text-primary mb-4">Post Details</h3>
+
+            <div class="card p-4 border-0 shadow-sm">
+
+                <h2 class="fw-bold detail-header text-dark pb-2" th:text="${post.title}">Post Title</h2>
+
+                <div class="info-row">
+                    <strong>ID:</strong> <span th:text="${post.id}">3</span>
+                </div>
+                <div class="info-row">
+                    <strong>Tác giả:</strong>
+                    <span
+                        th:text="${post.author != null ? post.author.fullName + ' (' + post.author.email + ')' : 'Unknown'}">Name</span>
+                </div>
+                <div class="info-row">
+                    <strong>Trạng thái:</strong> <span th:text="${post.status}">DRAFT</span>
+                </div>
+                <div class="info-row">
+                    <strong>Ngày tạo:</strong>
+                    <span
+                        th:text="${post.createdAt != null ? #dates.format(post.createdAt, 'dd/MM/yyyy HH:mm:ss') : 'N/A'}"></span>
+                </div>
+                <div class="info-row">
+                    <strong>Cập nhật lần cuối:</strong>
+                    <span
+                        th:text="${post.updatedAt != null ? #dates.format(post.updatedAt, 'dd/MM/yyyy HH:mm:ss') : 'N/A'}"></span>
+                </div>
+
+                <h4 class="section-title">Nội dung</h4>
+                <div class="p-3 bg-light rounded" th:text="${post.content}">
+                    Content goes here...
+                </div>
+
+                <h4 class="section-title">Comments (<span
+                        th:text="${post.comments != null ? post.comments.size() : 0}">0</span>)</h4>
+
+                <div th:if="${#lists.isEmpty(post.comments)}" class="text-muted">No comments yet.</div>
+
+                <div th:each="cmt : ${post.comments}" class="comment-box">
+                    <div class="d-flex justify-content-between">
+                        <strong>Comment trên bài viết <span th:text="${post.id}"></span></strong>
+                        <a href="#" class="text-primary small text-decoration-none">Xóa</a>
+                    </div>
+                    <div class="small text-muted mb-2">
+                        By: <span th:text="${cmt.user != null ? cmt.user.fullName : 'Unknown'}">User</span> ||
+                        <a href="#" class="text-primary text-decoration-none">Xóa</a>
+                    </div>
+                    <div class="fw-bold" th:text="${'Nội dung comment ' + cmt.id}">Header</div>
+                    <div th:text="${cmt.comment}">Comment content</div>
+                </div>
+
+                <!-- Add Comment Form -->
+                <form th:action="@{/posts/comment/add}" method="post" th:object="${commentDto}"
+                    class="mt-4 p-3 border rounded bg-light">
+                    <h5 class="mb-3">Thêm comment</h5>
+                    <input type="hidden" th:field="*{postId}" />
+
+                    <div class="mb-3">
+                        <label class="form-label">Người comment:</label>
+                        <select th:field="*{userId}" class="form-select"
+                            th:classappend="${#fields.hasErrors('userId')} ? 'is-invalid' : ''">
+                            <option value="">-- Chọn người comment --</option>
+                            <option th:each="u : ${users}" th:value="${u.id}" th:text="${u.fullName}"></option>
+                        </select>
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('userId')}" th:errors="*{userId}">
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Nội dung comment:</label>
+                        <textarea th:field="*{comment}" rows="2" class="form-control"
+                            th:classappend="${#fields.hasErrors('comment')} ? 'is-invalid' : ''"></textarea>
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('comment')}" th:errors="*{comment}">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-success">Thêm comment</button>
+                </form>
+
+                <div class="mt-4">
+                    <a th:href="@{/posts}" class="btn btn-success">Quay lại danh sách</a>
+                    <a th:href="@{/posts/edit/{id}(id=${post.id})}" class="btn btn-success">Sửa bài viết</a>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

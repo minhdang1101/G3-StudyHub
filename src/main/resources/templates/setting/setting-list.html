@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>System Settings</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+</head>
+
+<body>
+<div class="d-flex">
+
+    <div th:replace="~{common/sidebar :: sidebar(activePage='settings')}"></div>
+
+    <div class="container-fluid p-4 bg-light">
+        <h3>System Settings</h3>
+
+        <div th:if="${message}"
+             class="alert alert-dismissible fade show"
+             th:classappend="'alert-' + ${alertType}" role="alert">
+            <span th:text="${message}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <div class="card p-3 mb-3">
+            <form th:action="@{/settings}" method="get" class="row g-2 align-items-center">
+
+                <input type="hidden" name="sortField" th:value="${sortField}">
+                <input type="hidden" name="sortDir" th:value="${sortDir}">
+
+                <div class="col-auto">
+                    <select name="typeId" class="form-select" onchange="this.form.submit()">
+                        <option value="">All setting types</option>
+                        <option th:each="type : ${typeList}"
+                                th:value="${type.id}"
+                                th:text="${type.name}"
+                                th:selected="${type.id == currentTypeId}"></option>
+                    </select>
+                </div>
+
+                <div class="col-auto">
+                    <select name="status" class="form-select" onchange="this.form.submit()">
+                        <option value="">All statuses</option>
+                        <option value="Active" th:selected="${currentStatus == 'Active'}">Active</option>
+                        <option value="Inactive" th:selected="${currentStatus == 'Inactive'}">Inactive</option>
+                    </select>
+                </div>
+
+                <div class="col-auto">
+                    <input type="text" name="keyword" class="form-control"
+                           placeholder="Type setting name to search" th:value="${keyword}">
+                </div>
+
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-light border">Search</button>
+                </div>
+
+                <div class="col text-end">
+                    <a th:href="@{/settings/new}" class="btn btn-link text-decoration-none">Add Setting</a>
+                </div>
+            </form>
+        </div>
+
+        <table class="table table-bordered table-striped bg-white align-middle">
+            <thead class="table-light">
+            <tr>
+                <th>
+                    <a th:href="@{/settings(sortField='id', sortDir=${reverseSortDir}, keyword=${keyword}, typeId=${currentTypeId}, status=${currentStatus})}"
+                       class="text-decoration-none text-dark">
+                        ID
+                        <i th:class="${sortField == 'id' ? (sortDir == 'asc' ? 'bi bi-caret-up-fill' : 'bi bi-caret-down-fill') : 'bi bi-arrow-down-up text-muted'}"></i>
+                    </a>
+                </th>
+                <th>
+                    <a th:href="@{/settings(sortField='typeId', sortDir=${reverseSortDir}, keyword=${keyword}, typeId=${currentTypeId}, status=${currentStatus})}"
+                       class="text-decoration-none text-dark">
+                        Setting Type
+                        <i th:class="${sortField == 'typeId' ? (sortDir == 'asc' ? 'bi bi-caret-up-fill' : 'bi bi-caret-down-fill') : 'bi bi-arrow-down-up text-muted'}"></i>
+                    </a>
+                </th>
+                <th>
+                    <a th:href="@{/settings(sortField='name', sortDir=${reverseSortDir}, keyword=${keyword}, typeId=${currentTypeId}, status=${currentStatus})}"
+                       class="text-decoration-none text-dark">
+                        Name
+                        <i th:class="${sortField == 'name' ? (sortDir == 'asc' ? 'bi bi-caret-up-fill' : 'bi bi-caret-down-fill') : 'bi bi-arrow-down-up text-muted'}"></i>
+                    </a>
+                </th>
+                <th>
+                    <a th:href="@{/settings(sortField='value', sortDir=${reverseSortDir}, keyword=${keyword}, typeId=${currentTypeId}, status=${currentStatus})}"
+                       class="text-decoration-none text-dark">
+                        Value
+                        <i th:class="${sortField == 'value' ? (sortDir == 'asc' ? 'bi bi-caret-up-fill' : 'bi bi-caret-down-fill') : 'bi bi-arrow-down-up text-muted'}"></i>
+                    </a>
+                </th>
+                <th>
+                    <a th:href="@{/settings(sortField='orderIndex', sortDir=${reverseSortDir}, keyword=${keyword}, typeId=${currentTypeId}, status=${currentStatus})}"
+                       class="text-decoration-none text-dark">
+                        Order
+                        <i th:class="${sortField == 'orderIndex' ? (sortDir == 'asc' ? 'bi bi-caret-up-fill' : 'bi bi-caret-down-fill') : 'bi bi-arrow-down-up text-muted'}"></i>
+                    </a>
+                </th>
+                <th>
+                    <a th:href="@{/settings(sortField='status', sortDir=${reverseSortDir}, keyword=${keyword}, typeId=${currentTypeId}, status=${currentStatus})}"
+                       class="text-decoration-none text-dark">
+                        Status
+                        <i th:class="${sortField == 'status' ? (sortDir == 'asc' ? 'bi bi-caret-up-fill' : 'bi bi-caret-down-fill') : 'bi bi-arrow-down-up text-muted'}"></i>
+                    </a>
+                </th>
+                <th>Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="s : ${settings}">
+                <th:block th:if="${s.parent != null}">
+                    <td th:text="${s.id}"></td>
+                    <td class="fw-bold text-secondary" th:text="${s.parent.name}"></td>
+                    <td th:text="${s.name}"></td>
+                    <td th:text="${s.value}"></td>
+                    <td th:text="${s.orderIndex}"></td>
+                    <td>
+                        <span class="badge"
+                              th:text="${s.status}"
+                              th:classappend="${s.status == 'Active'} ? 'text-bg-success' : 'text-bg-secondary'">
+                        </span>
+                    </td>
+                    <td>
+                        <a th:href="@{/settings/edit/{id}(id=${s.id})}" class="text-primary text-decoration-none">Edit</a> |
+
+                        <a th:if="${s.status == 'Active'}"
+                           th:href="@{/settings/status/{id}(id=${s.id}, status='Inactive')}"
+                           class="text-danger text-decoration-none"
+                           onclick="return confirm('Confirm deactivate this setting?');">
+                            Deactivate
+                        </a>
+
+                        <a th:if="${s.status != 'Active'}"
+                           th:href="@{/settings/status/{id}(id=${s.id}, status='Active')}"
+                           class="text-success text-decoration-none"
+                           onclick="return confirm('Confirm activate this setting?');">
+                            Activate
+                        </a>
+                    </td>
+                </th:block>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

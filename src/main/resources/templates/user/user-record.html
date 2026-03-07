@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>User Records</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .section-title {
+            border-bottom: 2px solid #0d6efd; /* Đường gạch chân màu xanh dương */
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            color: #333;
+            font-weight: bold;
+        }
+        .info-row {
+            background-color: #f8f9fa;
+            border-left: 4px solid #0d6efd; /* Viền trái màu xanh dương */
+            padding: 10px;
+            margin-bottom: 8px;
+        }
+        .record-item {
+            background-color: #f8f9fa;
+            border-left: 4px solid #198754; /* Viền trái màu xanh lá cây */
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .record-title {
+            font-weight: bold;
+            color: #333;
+        }
+        .record-meta {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        .record-link {
+            text-decoration: underline;
+            color: #6f42c1; /* Màu tím giống ảnh */
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+
+<body>
+<div class="d-flex">
+
+    <div th:replace="~{common/sidebar :: sidebar(activePage='users')}"></div>
+
+    <div class="container-fluid p-4" style="background-color: white;">
+
+        <div class="row">
+            <div class="col-md-7">
+
+                <h4 class="section-title">Chi tiết người dùng</h4>
+
+                <div class="info-row">
+                    <strong>ID:</strong> <span th:text="${user.id}"></span>
+                </div>
+                <div class="info-row">
+                    <strong>Tên:</strong> <span th:text="${user.fullName}"></span>
+                </div>
+                <div class="info-row">
+                    <strong>Email:</strong> <span th:text="${user.email}"></span>
+                </div>
+                <div class="info-row">
+                    <strong>Ngày tạo:</strong>
+                    <span th:text="${#dates.format(user.lastLogin, 'dd/MM/yyyy HH:mm:ss')}">04/02/2026 07:21:44</span>
+                </div>
+                <div class="info-row">
+                    <strong>Số bài viết:</strong> <span th:text="${postCount}"></span>
+                </div>
+                <div class="info-row">
+                    <strong>Số comments:</strong> <span th:text="${commentCount}"></span>
+                </div>
+
+                <h4 class="section-title mt-4">
+                    Bài viết của <span th:text="${user.fullName}"></span> (<span th:text="${postCount}"></span>)
+                </h4>
+
+                <div th:each="post : ${posts}" class="record-item">
+                    <div class="record-title" th:text="${post.title}">React.js Basics</div>
+                    <div class="record-meta">
+                        Status: <span th:text="${post.status}">DRAFT</span> |
+                        Comments: <span th:text="${post.comments != null ? post.comments.size() : 0}">2</span> |
+                        Created: <span th:text="${#dates.format(post.createdAt, 'dd/MM/yyyy')}"></span>
+                    </div>
+                    <a th:href="@{/posts/view/{id}(id=${post.id})}" class="record-link">Xem chi tiết</a>
+                </div>
+
+                <div th:if="${posts.isEmpty()}" class="text-muted fst-italic mb-3">Người dùng này chưa có bài viết nào.</div>
+
+
+                <h4 class="section-title mt-4">
+                    Comments của <span th:text="${user.fullName}"></span> (<span th:text="${commentCount}"></span>)
+                </h4>
+
+                <div th:each="comment, iStat : ${comments}" class="record-item">
+                    <div class="record-title">
+                        Comment #<span th:text="${iStat.count}">1</span> từ <span th:text="${user.fullName}"></span>
+                    </div>
+                    <div class="record-meta">
+                        On post: <span th:text="${comment.post.title}">Spring Boot Tutorial</span> |
+                    </div>
+                    <div class="text-dark small">
+                        Nội dung: <span th:text="${comment.comment}">Nội dung comment...</span>
+                    </div>
+                </div>
+
+                <div th:if="${comments.isEmpty()}" class="text-muted fst-italic mb-3">Người dùng này chưa có bình luận nào.</div>
+
+                <a th:href="@{/users}" class="btn btn-primary mt-3">Quay lại danh sách</a>
+
+            </div>
+
+            <div class="col-md-5">
+                <div class="border border-dark p-3">
+                    This page show the details of user, the current posts and comments from this user. For the posts and the comments, you need to show the number and the details of posts or comments.
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
