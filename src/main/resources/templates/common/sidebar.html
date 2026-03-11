@@ -1,71 +1,94 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <body>
 
-<div th:fragment="sidebar(activePage)" class="d-flex flex-column flex-shrink-0 p-3 text-white bg-dark" style="width: 250px; min-height: 100vh;">
+    <div th:fragment="sidebar(activePage)" class="d-flex flex-column flex-shrink-0 p-3 text-white bg-dark"
+        style="width: 250px; min-height: 100vh;">
 
-    <a th:href="@{/}" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
-        <span class="fs-4 fw-bold">Assignment 2</span>
-    </a>
-    <hr>
-
-    <ul class="nav nav-pills flex-column mb-auto">
-
-        <li class="nav-item mb-2">
-            <a th:href="@{/dashboard}"
-               class="nav-link text-white"
-               th:classappend="${activePage == 'dashboard'} ? 'active bg-primary' : ''">
-                <i class="bi bi-speedometer2 me-2"></i> Dashboard
-            </a>
-        </li>
-
-        <li class="nav-item mt-3 mb-1">
-            <span class="text-uppercase text-white-50 small fw-bold ms-3">System Administration</span>
-        </li>
-
-        <li>
-            <a th:href="@{/settings}"
-               class="nav-link text-white"
-               th:classappend="${activePage == 'settings'} ? 'active bg-primary' : ''">
-                <i class="bi bi-gear me-2"></i> System Settings
-            </a>
-        </li>
-
-        <li>
-            <a th:href="@{/users}"
-               class="nav-link text-white"
-               th:classappend="${activePage == 'users'} ? 'active bg-primary' : ''">
-                <i class="bi bi-people me-2"></i> User Accounts
-            </a>
-        </li>
-
-        <li class="nav-item mt-3 mb-1">
-            <span class="text-uppercase text-white-50 small fw-bold ms-3">User Contents</span>
-        </li>
-
-        <li>
-            <a th:href="@{/posts}"
-               class="nav-link text-white"
-               th:classappend="${activePage == 'posts'} ? 'active bg-primary' : ''">
-                <i class="bi bi-journal-text me-2"></i> Post Management
-            </a>
-        </li>
-
-    </ul>
-
-    <hr>
-
-    <div class="dropdown">
-        <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
-            <img src="https://ui-avatars.com/api/?name=Admin&background=random" width="32" height="32" class="rounded-circle me-2" alt="Avatar">
-            <strong th:text="${session.user != null ? session.user.fullName : 'Admin User'}">User</strong>
+        <a th:href="@{/}" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+            <span class="fs-4 fw-bold">📚 StudyHub</span>
         </a>
-        <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
-            <li><a class="dropdown-item" th:href="@{/logout}">Logout</a></li>
+        <hr>
+
+        <ul class="nav nav-pills flex-column mb-auto">
+
+            <li class="nav-item mb-2">
+                <a th:href="@{/dashboard}" class="nav-link text-white"
+                    th:classappend="${activePage == 'dashboard'} ? 'active bg-primary' : ''">
+                    <i class="bi bi-speedometer2 me-2"></i> Dashboard
+                </a>
+            </li>
+
+            <li class="nav-item mt-3 mb-1">
+                <span class="text-uppercase text-white-50 small fw-bold ms-3">System Admin</span>
+            </li>
+
+            <li>
+                <a th:href="@{/settings}" class="nav-link text-white"
+                    th:classappend="${activePage == 'settings'} ? 'active bg-primary' : ''">
+                    <i class="bi bi-gear me-2"></i> System Settings
+                </a>
+            </li>
+
+            <li>
+                <a th:href="@{/users}" class="nav-link text-white"
+                    th:classappend="${activePage == 'users'} ? 'active bg-primary' : ''">
+                    <i class="bi bi-people me-2"></i> User Accounts
+                </a>
+            </li>
+
+            <li class="nav-item mt-3 mb-1">
+                <span class="text-uppercase text-white-50 small fw-bold ms-3">User Contents</span>
+            </li>
+
+            <li>
+                <a th:href="@{/posts}" class="nav-link text-white"
+                    th:classappend="${activePage == 'posts'} ? 'active bg-primary' : ''">
+                    <i class="bi bi-journal-text me-2"></i> Post Management
+                </a>
+            </li>
+
+            <li class="nav-item mt-3 mb-1">
+                <span class="text-uppercase text-white-50 small fw-bold ms-3">Course Management</span>
+            </li>
+
+            <li>
+                <a th:href="@{/admin/courses}" class="nav-link text-white"
+                    th:classappend="${activePage == 'courses'} ? 'active bg-primary' : ''">
+                    <i class="bi bi-book me-2"></i> Courses
+                </a>
+            </li>
+
+            <li>
+                <a th:href="@{/admin/enrollments}" class="nav-link text-white"
+                    th:classappend="${activePage == 'enrollments'} ? 'active bg-primary' : ''">
+                    <i class="bi bi-card-list me-2"></i> Enrollments
+                </a>
+            </li>
+
         </ul>
+
+        <hr>
+
+        <div class="dropdown">
+            <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
+                id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                <img src="https://ui-avatars.com/api/?name=Admin&background=random" width="32" height="32"
+                    class="rounded-circle me-2" alt="Avatar">
+                <strong th:text="${session.user != null ? session.user.fullName : 'Admin User'}">User</strong>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
+                <li><a class="dropdown-item" href="#">Profile</a></li>
+                <li>
+                    <hr class="dropdown-divider">
+                </li>
+                <li><a class="dropdown-item" th:href="@{/logout}">Logout</a></li>
+            </ul>
+        </div>
+
     </div>
 
-</div>
-
 </body>
+
 </html>

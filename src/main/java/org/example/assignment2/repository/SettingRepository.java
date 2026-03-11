@@ -14,6 +14,8 @@ public interface SettingRepository extends JpaRepository<Setting, Integer> {
 
     List<Setting> findByParentIsNull();
 
+    List<Setting> findByTypeId(Integer typeId);
+
     @Query("SELECT s FROM Setting s WHERE s.parent.name = 'User Role' AND s.status = 'Active'")
     List<Setting> findActiveRoles();
 

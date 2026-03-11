@@ -43,7 +43,6 @@ public class UserService {
         user.setStatus(userDto.getStatus());
         user.setAvatar(userDto.getAvatar());
 
-        // Xử lý Role (nếu có thay đổi)
         if (userDto.getRoleId() != null) {
             Setting role = settingRepo.findById(userDto.getRoleId()).orElse(null);
             user.setRole(role);
@@ -58,6 +57,13 @@ public class UserService {
         userRepo.save(user);
     }
 
+    @Transactional
+    public void saveUser(User user) {
+        if (user != null) {
+            userRepo.save(user);
+        }
+    }
+
     public boolean isEmailExists(String email) {
         return userRepo.existsByEmail(email);
     }
@@ -68,5 +74,9 @@ public class UserService {
 
     public User getUserById(Integer id) {
         return userRepo.findById(id).orElse(null);
+    }
+
+    public List<User> getAllUsers() {
+        return userRepo.findAll();
     }
 }
