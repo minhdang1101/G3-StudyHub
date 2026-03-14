@@ -184,4 +184,44 @@ public class UserController {
 
         return "user/user-records";
     }
+
+    //
+    @GetMapping("/register")
+    public String showRegister(Model model) {
+
+        model.addAttribute("userDto", new UserDTO());
+
+        return "user/register";
+    }
+
+    //
+    @PostMapping("/register")
+    public String registerUser(
+            @ModelAttribute("userDto") UserDTO userDto,
+            Model model
+    ) {
+
+        // check password confirm
+        if (!userDto.getPassword().equals(userDto.getConfirmPassword())) {
+            model.addAttribute("error", "Password confirm does not match");
+            return "user/register";
+        }
+
+        // check email existed
+        if (userRepository.existsByEmail(userDto.getEmail())) {
+            model.addAttribute("error", "Email already exists");
+            return "user/register";
+        }
+
+        User user = new User();
+
+        user.setFullName(userDto.getFullName());
+        user.setEmail(userDto.getEmail());
+        user.setPassword(userDto.getPassword());
+        user.setStatus("ACTIVE");
+
+        userRepository.save(user);
+
+        return "redirect:/login";
+    }
 }
