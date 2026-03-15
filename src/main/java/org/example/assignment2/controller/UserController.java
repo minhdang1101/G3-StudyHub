@@ -103,9 +103,8 @@ public class UserController {
         dto.setFullName(user.getFullName());
         dto.setEmail(user.getEmail());
         dto.setMobile(user.getMobile());
-        dto.setNote(user.getNote());
         dto.setStatus(user.getStatus());
-        dto.setAvatar(user.getAvatar());
+        dto.setAvatarUrl(user.getAvatarUrl());
 
         if (user.getRole() != null) {
             dto.setRoleId(user.getRole().getId());
@@ -135,12 +134,12 @@ public class UserController {
         if (!file.isEmpty()) {
             String avatarPath = saveFile(file, request);
             if (avatarPath != null) {
-                userDto.setAvatar(avatarPath);
+                userDto.setAvatarUrl(avatarPath);
             }
         } else {
             User oldUser = userService.getUserById(userDto.getId());
             if (oldUser != null) {
-                userDto.setAvatar(oldUser.getAvatar());
+                userDto.setAvatarUrl(oldUser.getAvatarUrl());
             }
         }
 

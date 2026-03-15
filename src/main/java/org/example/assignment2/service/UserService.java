@@ -39,9 +39,9 @@ public class UserService {
         user.setFullName(userDto.getFullName());
         user.setEmail(userDto.getEmail());
         user.setMobile(userDto.getMobile());
-        user.setNote(userDto.getNote());
         user.setStatus(userDto.getStatus());
-        user.setAvatar(userDto.getAvatar());
+        user.setUsername(userDto.getUsername());
+        user.setAvatarUrl(userDto.getAvatarUrl());
 
         // Xử lý Role (nếu có thay đổi)
         if (userDto.getRoleId() != null) {
@@ -69,4 +69,34 @@ public class UserService {
     public User getUserById(Integer id) {
         return userRepo.findById(id).orElse(null);
     }
+
+
+    @Autowired
+    private UserRepository userRepository;
+    public User login(String email,String password){
+
+        User user = userRepository.findByEmail(email).orElse(null);
+
+        if(user == null){
+            return null;
+        }
+
+        if(!user.getPassword().equals(password)){
+            return null;
+        }
+
+        return user;
+    }
+
+    public void resetPassword(String email,String password){
+
+        User user = userRepo.findByEmail(email).orElse(null);
+
+        if(user != null){
+            user.setPassword(password);
+            userRepo.save(user);
+        }
+    }
+
+
 }

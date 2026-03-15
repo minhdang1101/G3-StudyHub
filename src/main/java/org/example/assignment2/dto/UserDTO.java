@@ -12,6 +12,9 @@ public class UserDTO {
     @NotEmpty(message = "Full name is required")
     private String fullName;
 
+    @NotEmpty
+    private String username;
+
     @NotEmpty(message = "Email is required")
     @Email(message = "Invalid email format")
     private String email;
@@ -22,6 +25,5 @@ public class UserDTO {
     private Integer roleId;
 
     private String status;
-    private String avatar;
-    private String note;
+    private String avatarUrl;
 }
