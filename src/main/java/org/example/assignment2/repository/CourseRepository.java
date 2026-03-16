@@ -18,5 +18,7 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
     long countByStatus(String status);
 
     List<Course> findTop7ByOrderByCreatedAtDesc();
+    
+    List<Course> findTop7ByManager_IdOrderByCreatedAtDesc(Long managerId);
 }
 

@@ -1,6 +1,7 @@
 package org.example.assignment2.service;
 
 import org.example.assignment2.model.Course;
+import org.example.assignment2.model.User;
 import org.example.assignment2.repository.CourseRepository;
 import org.example.assignment2.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,15 +20,21 @@ public class DashboardService {
     @Autowired
     private CourseRepository courseRepository;
 
-    public Map<String, Object> getDashboardStats() {
-        Map<String, Object> stats = new HashMap<>();
+    // Trong DashboardService.java
+public Map<String, Object> getDashboardStats(User user) {
+    Map<String, Object> stats = new HashMap<>();
 
-        stats.put("totalUsers", userRepository.count());
-        stats.put("totalCourses", courseRepository.count());
-        stats.put("activeMembers", userRepository.countByRoleIdAndStatus(5, "Active"));
-        stats.put("publishedCourses", courseRepository.countByStatus("Published"));
+    stats.put("totalUsers", userRepository.count());
+    stats.put("totalCourses", courseRepository.count());
+    stats.put("activeMembers", userRepository.countByRoleIdAndStatus(5, "Active"));
+    stats.put("publishedCourses", courseRepository.countByStatus("Published"));
+
+    if ("ROLE_ADMIN".equals(user.getRole().getValue())) {
         stats.put("recentCourses", courseRepository.findTop7ByOrderByCreatedAtDesc());
-
-        return stats;
+    } else {
+        stats.put("recentCourses", courseRepository.findTop7ByManager_IdOrderByCreatedAtDesc(user.getId().longValue()));
     }
+
+    return stats;
+}
 }
