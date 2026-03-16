@@ -1,4 +1,5 @@
 package org.example.assignment2.model;
+
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -21,5 +22,10 @@ public class Course {
     private Double salePrice;
 
     private Integer duration;
+
+    // liên kết category
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private Category category;
 
 }

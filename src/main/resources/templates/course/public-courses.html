@@ -7,52 +7,52 @@
     <style>
 
         body{
-        font-family: Arial;
-        background:#f4f4f4;
+            font-family: Arial;
+            background:#f4f4f4;
         }
 
         .container{
-        width:1200px;
-        margin:auto;
+            width:1200px;
+            margin:auto;
         }
 
         .course-grid{
-        display:grid;
-        grid-template-columns:repeat(3,1fr);
-        gap:20px;
+            display:grid;
+            grid-template-columns:repeat(3,1fr);
+            gap:20px;
         }
 
         .card{
-        background:white;
-        border-radius:6px;
-        box-shadow:0 2px 6px rgba(0,0,0,0.2);
-        overflow:hidden;
+            background:white;
+            border-radius:6px;
+            box-shadow:0 2px 6px rgba(0,0,0,0.2);
+            overflow:hidden;
         }
 
         .card img{
-        width:100%;
-        height:160px;
-        object-fit:cover;
+            width:100%;
+            height:160px;
+            object-fit:cover;
         }
 
         .card-body{
-        padding:15px;
+            padding:15px;
         }
 
         .price{
-        color:red;
-        font-weight:bold;
+            color:red;
+            font-weight:bold;
         }
 
         .btn{
-        display:block;
-        background:#007bff;
-        color:white;
-        text-align:center;
-        padding:8px;
-        border-radius:4px;
-        text-decoration:none;
-        margin-top:10px;
+            display:block;
+            background:#007bff;
+            color:white;
+            text-align:center;
+            padding:8px;
+            border-radius:4px;
+            text-decoration:none;
+            margin-top:10px;
         }
 
     </style>
@@ -62,6 +62,7 @@
 <body>
 
 <div class="container">
+
     <form th:action="@{/courses}" method="get" onsubmit="return validateSearch()">
 
         <div style="display:flex; gap:10px; margin-bottom:20px;">
@@ -78,20 +79,23 @@
                 🔍
             </button>
 
-            <select name="categoryId" onchange="this.form.submit()"
-                    style="padding:10px; border:1px solid #ccc;">
+            <select name="categoryId"
+                    onchange="this.form.submit()"
+                    style="padding:10px; border:1px solid #ccc; border-radius:4px;">
 
                 <option value="">All Categories</option>
-                <option value="1">Programming</option>
-                <option value="2">Business</option>
-                <option value="3">Marketing</option>
+
+                <option th:each="c : ${categories}"
+                        th:value="${c.id}"
+                        th:text="${c.name}"
+                        th:selected="${c.id == selectedCategory}">
+                </option>
 
             </select>
 
         </div>
 
     </form>
-
 
 
     <div class="course-grid">
@@ -107,11 +111,13 @@
                 <p th:text="${course.description}"></p>
 
                 <p>
+
 <span style="text-decoration:line-through"
       th:text="${course.price}"></span>
 
                     <span class="price"
                           th:text="${course.salePrice}"></span>
+
                 </p>
 
                 <a class="btn"
@@ -127,22 +133,23 @@
 
 </div>
 
-</body>
-</html>
-
 <script>
 
     function validateSearch(){
 
-        let input = document.getElementById("searchInput");
+    let input = document.getElementById("searchInput");
 
-        if(input.value.trim() === ""){
-            alert("Vui lòng nhập từ cần tìm vào");
-            input.focus();
-            return false;
-        }
+    if(input.value.trim() === ""){
+    alert("Vui lòng nhập từ cần tìm vào");
+    input.focus();
+    return false;
+    }
 
-        return true;
+    return true;
+
     }
 
 </script>
+
+</body>
+</html>
