@@ -9,7 +9,8 @@ import java.util.List;
 @Repository
 public interface CourseRepository extends JpaRepository<Course, Long> {
 
-    // Search theo title
+    List<Course> findByCategory_Id(Integer categoryId);
+
     List<Course> findByTitleContainingIgnoreCase(String keyword);
 
     List<Course> findByCategoryId(Integer categoryId);
