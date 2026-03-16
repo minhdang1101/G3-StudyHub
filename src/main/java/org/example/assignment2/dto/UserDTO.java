@@ -15,13 +15,14 @@ public class UserDTO {
     @NotEmpty
     private String username;
 
+    private String password;
+
     @NotEmpty(message = "Email is required")
     @Email(message = "Invalid email format")
     private String email;
 
     private String mobile;
 
-    @NotNull(message = "Role is required")
     private Integer roleId;
 
     private String status;

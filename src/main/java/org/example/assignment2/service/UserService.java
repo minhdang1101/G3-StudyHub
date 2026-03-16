@@ -1,5 +1,6 @@
 package org.example.assignment2.service;
 
+import org.example.assignment2.dto.RegisterDTO;
 import org.example.assignment2.dto.UserDTO;
 import org.example.assignment2.model.Setting;
 import org.example.assignment2.model.User;
@@ -96,6 +97,23 @@ public class UserService {
             user.setPassword(password);
             userRepo.save(user);
         }
+    }
+
+    public void register(RegisterDTO dto) {
+
+        User user = new User();
+
+        user.setFullName(dto.getFullName());
+        user.setUsername(dto.getUsername());
+        user.setEmail(dto.getEmail());
+        user.setPassword(dto.getPassword());
+
+        user.setStatus("ACTIVE");
+
+        Setting role = settingRepo.findById(3).orElse(null);
+        user.setRole(role);
+
+        userRepo.save(user);
     }
 
 

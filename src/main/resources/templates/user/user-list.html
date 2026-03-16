@@ -54,69 +54,65 @@
       </form>
     </div>
 
-    <table class="table table-bordered table-striped align-middle">
-      <thead class="table-light">
-      <tr>
-        <th>ID</th>
-        <th>Name</th>
-        <th>Phone</th>
-        <th>Email</th>
-        <th>Role</th>
-        <th>Last Login</th>
-        <th>Status</th>
-        <th>Action</th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr th:each="u : ${users}">
-        <td th:text="${u.id}"></td>
-        <td>
-          <div class="fw-bold" th:text="${u.fullName}"></div>
-        </td>
-        <td th:text="${u.mobile}"></td>
-        <td th:text="${u.email}"></td>
-        <td th:text="${u.role != null ? u.role.name : 'N/A'}"></td>
+      <table class="table table-hover align-middle">
+          <thead class="table-light">
+          <tr>
+              <th>ID</th>
+              <th>Full Name</th>
+              <th>Username</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Status</th>
+              <th class="text-center">Actions</th>
+          </tr>
+          </thead>
 
-        <td>
-                    <span th:if="${u.lastLogin != null}"
-                          th:text="${#dates.format(u.lastLogin, 'dd/MM/yyyy HH:mm')}"></span>
-          <span th:if="${u.lastLogin == null}" class="text-muted small">Never</span>
-        </td>
+          <tbody>
+          <tr th:each="u : ${users}">
+              <td th:text="${u.id}"></td>
 
-        <td>
-          <span th:if="${u.status == 'Active'}" class="badge bg-success">Active</span>
-          <span th:if="${u.status == 'Blocked'}" class="badge bg-danger">Blocked</span>
-          <span th:if="${u.status == 'Pending'}" class="badge bg-warning text-dark">Pending</span>
-        </td>
+              <td th:text="${u.fullName}"></td>
 
-        <td>
-          <a th:href="@{/users/records/{id}(id=${u.id})}"
-             class="text-info text-decoration-none fw-bold"
-             title="View User Records">View</a> |
+              <td th:text="${u.username}"></td>
 
-          <a th:href="@{/users/edit/{id}(id=${u.id})}" class="text-primary text-decoration-none">Edit</a>
+              <td th:text="${u.email}"></td>
 
-          <span th:if="${u.status == 'Pending'}">
-                         | <a th:href="@{/users/approve/{id}(id=${u.id})}"
-                              class="text-success fw-bold text-decoration-none"
-                              onclick="return confirm('Approve this user?');">Approve</a>
-                    </span>
+              <td>
+            <span class="badge bg-primary"
+                  th:text="${u.role != null ? u.role.name : 'N/A'}">
+            </span>
+              </td>
 
-          <span th:if="${u.status == 'Active'}">
-                         | <a th:href="@{/users/block/{id}(id=${u.id})}"
-                              class="text-danger text-decoration-none"
-                              onclick="return confirm('Block this user?');">Block</a>
-                    </span>
+              <td>
+            <span th:if="${u.status == 'Active'}"
+                  class="badge bg-success">Active</span>
 
-          <span th:if="${u.status == 'Blocked'}">
-                         | <a th:href="@{/users/unblock/{id}(id=${u.id})}"
-                              class="text-secondary text-decoration-none"
-                              onclick="return confirm('Unblock this user?');">Unblock</a>
-                    </span>
-        </td>
-      </tr>
-      </tbody>
-    </table>
+                  <span th:if="${u.status == 'Blocked'}"
+                        class="badge bg-danger">Blocked</span>
+
+                  <span th:if="${u.status == 'Pending'}"
+                        class="badge bg-warning text-dark">Pending</span>
+              </td>
+
+              <td class="text-center">
+
+                  <!-- Edit -->
+                  <a th:href="@{/users/edit/{id}(id=${u.id})}"
+                     class="btn btn-outline-primary btn-sm">
+                      <i class="bi bi-pencil"></i>
+                  </a>
+
+                  <!-- Delete -->
+                  <a th:href="@{/users/delete/{id}(id=${u.id})}"
+                     class="btn btn-outline-danger btn-sm"
+                     onclick="return confirm('Delete this user?')">
+                      <i class="bi bi-trash"></i>
+                  </a>
+
+              </td>
+          </tr>
+          </tbody>
+      </table>
   </div>
 </div>
 
@@ -141,19 +137,18 @@
                    th:classappend="${#fields.hasErrors('email')} ? 'is-invalid' : ''">
             <div class="invalid-feedback" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
           </div>
-          <div class="mb-3">
-            <label class="form-label">Mobile</label>
-            <input type="text" class="form-control" th:field="*{mobile}">
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Role*</label>
-            <select class="form-select" th:field="*{roleId}"
-                    th:classappend="${#fields.hasErrors('roleId')} ? 'is-invalid' : ''">
-              <option value="" label="-- Select Role --"></option>
-              <option th:each="r : ${roleList}" th:value="${r.id}" th:text="${r.name}"></option>
-            </select>
-            <div class="invalid-feedback" th:if="${#fields.hasErrors('roleId')}" th:errors="*{roleId}"></div>
-          </div>
+            <div class="mb-3">
+                <label class="form-label">Username*</label>
+
+                <input type="text" class="form-control"
+                       th:field="*{username}"
+                       th:classappend="${#fields.hasErrors('username')} ? 'is-invalid' : ''">
+
+                <div class="invalid-feedback"
+                     th:if="${#fields.hasErrors('username')}"
+                     th:errors="*{username}">
+                </div>
+            </div>
           <div class="text-end">
             <button type="submit" class="btn btn-primary">Submit</button>
           </div>

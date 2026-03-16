@@ -7,6 +7,7 @@ import org.example.assignment2.model.User;
 import org.example.assignment2.repository.CommentRepository;
 import org.example.assignment2.repository.PostRepository;
 import org.example.assignment2.repository.SettingRepository;
+import org.example.assignment2.service.EmailService;
 import org.example.assignment2.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -35,6 +36,8 @@ public class UserController {
     private PostRepository postRepo;
     @Autowired
     private CommentRepository commentRepo;
+    @Autowired
+    private EmailService emailService;
 
     @GetMapping
     public String list(Model model,
@@ -68,7 +71,13 @@ public class UserController {
             model.addAttribute("showModal", true);
             return list(model, null, null, null);
         }
+        userDto.setRoleId(3);
 
+        String randomPassword = UUID.randomUUID().toString().substring(0, 8);
+
+        userDto.setPassword(randomPassword);
+
+        emailService.sendAccountEmail(userDto.getEmail(), randomPassword);
         userService.saveUser(userDto);
         return "redirect:/users";
     }

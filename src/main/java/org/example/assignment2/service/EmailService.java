@@ -21,5 +21,24 @@ public class EmailService {
 
         mailSender.send(message);
     }
+
+    public void sendAccountEmail(String toEmail, String password) {
+
+        SimpleMailMessage message = new SimpleMailMessage();
+
+        message.setTo(toEmail);
+        message.setSubject("Your StudyHub Account");
+
+        message.setText(
+                "Your account has been created successfully.\n\n" +
+                        "Login Information:\n" +
+                        "Email: " + toEmail + "\n" +
+                        "Password: " + password + "\n\n" +
+                        "Please login and change your password.\n\n" +
+                        "StudyHub Team"
+        );
+
+        mailSender.send(message);
+    }
 }
 
