@@ -5,6 +5,8 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import java.util.Date;
+
 @Data
 public class UserDTO {
     private Integer id;
@@ -27,4 +29,6 @@ public class UserDTO {
 
     private String status;
     private String avatarUrl;
+    private Date lastLogin;
+    private Date createdAt;
 }

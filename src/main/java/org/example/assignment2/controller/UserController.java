@@ -71,8 +71,8 @@ public class UserController {
             model.addAttribute("showModal", true);
             return list(model, null, null, null);
         }
+        userDto.setStatus("Pending");
         userDto.setRoleId(3);
-
         String randomPassword = UUID.randomUUID().toString().substring(0, 8);
 
         userDto.setPassword(randomPassword);
@@ -128,7 +128,7 @@ public class UserController {
     @PostMapping("/update")
     public String updateUser(@Valid @ModelAttribute("userDto") UserDTO userDto,
                              BindingResult result,
-                             @RequestParam("imageFile") MultipartFile file,
+                             @RequestParam(value = "imageFile", required = false) MultipartFile file,
                              Model model,
                              HttpServletRequest request) {
         User existingUser = userService.findByEmail(userDto.getEmail());
@@ -191,5 +191,11 @@ public class UserController {
         model.addAttribute("comments", commentRepo.findByUserId(id));
 
         return "user/user-records";
+    }
+
+    @GetMapping("/delete/{id}")
+    public String deleteUser(@PathVariable("id") Integer id) {
+        userService.deleteUser(id);
+        return "redirect:/users";
     }
 }

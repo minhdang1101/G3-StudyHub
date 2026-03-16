@@ -65,4 +65,11 @@ public class SettingService {
     public List<Setting> getAllTypes() {
         return settingRepo.findByParentIsNull();
     }
+
+    public List<Setting> getRoleSettings(){
+        return settingRepo.findByTypeId(1);
+    }
+    public List<Setting> getPageSettings(){
+        return settingRepo.findByTypeId(2);
+    }
 }

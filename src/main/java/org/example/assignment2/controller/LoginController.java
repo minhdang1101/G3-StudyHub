@@ -47,7 +47,7 @@ public class LoginController {
 
         Integer roleId = user.getRole().getId();
 
-        List<Permission> permissions = permissionService.findByUserId(roleId);
+        List<Permission> permissions = permissionService.findByRoleId(roleId);
 
         session.setAttribute("user",user);
         session.setAttribute("permissions",permissions);

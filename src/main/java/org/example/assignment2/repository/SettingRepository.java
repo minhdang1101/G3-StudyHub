@@ -30,5 +30,5 @@ public interface SettingRepository extends JpaRepository<Setting, Integer> {
 
     boolean existsByName(String name);
 
-
+    List<Setting> findByTypeId(Integer typeId);
 }

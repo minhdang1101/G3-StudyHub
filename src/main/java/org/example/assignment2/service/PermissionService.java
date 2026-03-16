@@ -4,7 +4,9 @@ import org.example.assignment2.dto.PermissionDTO;
 import org.example.assignment2.dto.UserDTO;
 import org.example.assignment2.model.Permission;
 import org.example.assignment2.model.PermissionId;
+import org.example.assignment2.model.User;
 import org.example.assignment2.repository.PermissionRepository;
+import org.example.assignment2.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,11 +23,14 @@ public class PermissionService {
     @Autowired
     private PermissionRepository permissionRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
     public List<Permission> findAll(){
         return permissionRepository.findAll();
     }
 
-    public List<Permission> findByUserId(Integer roleId){
+    public List<Permission> findByRoleId(Integer roleId){
         return permissionRepository.findByRoleId(roleId);
     }
 
@@ -88,5 +93,7 @@ public class PermissionService {
         Permission permission = getPermission(roleId, pageId);
         return permission != null && Boolean.TRUE.equals(permission.getCanDelete());
     }
+
+
 }
 
