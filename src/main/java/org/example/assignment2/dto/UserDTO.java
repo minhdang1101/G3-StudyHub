@@ -24,4 +24,6 @@ public class UserDTO {
     private String status;
     private String avatar;
     private String note;
+    private String password;
+    private String confirmPassword;
 }
