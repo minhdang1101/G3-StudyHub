@@ -42,7 +42,7 @@ public class UserService {
         user.setMobile(userDto.getMobile());
         user.setStatus(userDto.getStatus());
         user.setUsername(userDto.getUsername());
-        user.setAvatarUrl(userDto.getAvatar());
+        user.setAvatarUrl(userDto.getAvatarUrl());
 
         if (userDto.getRoleId() != null) {
             Setting role = settingRepo.findById(userDto.getRoleId()).orElse(null);

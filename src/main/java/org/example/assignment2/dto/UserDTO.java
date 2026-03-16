@@ -26,7 +26,7 @@ public class UserDTO {
     private Integer roleId;
 
     private String status;
-    private String avatar;
+    private String avatarUrl;
     private String note;
     private String confirmPassword;
 }
