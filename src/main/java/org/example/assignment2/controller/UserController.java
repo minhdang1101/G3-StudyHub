@@ -71,7 +71,7 @@ public class UserController {
             model.addAttribute("showModal", true);
             return list(model, null, null, null);
         }
-        userDto.setStatus("Pending");
+        userDto.setStatus("Unverified");
         userDto.setRoleId(3);
         String randomPassword = UUID.randomUUID().toString().substring(0, 8);
 
@@ -109,6 +109,7 @@ public class UserController {
 
         UserDTO dto = new UserDTO();
         dto.setId(user.getId());
+        dto.setUsername(user.getUsername());
         dto.setFullName(user.getFullName());
         dto.setEmail(user.getEmail());
         dto.setMobile(user.getMobile());

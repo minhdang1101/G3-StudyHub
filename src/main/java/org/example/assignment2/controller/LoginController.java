@@ -55,7 +55,7 @@ public class LoginController {
 
         if(roleId == 1){
             return "redirect:/dashboard";
-        }else return "redirect:/homepage";  
+        }else return "redirect:/homepage";
 
     }
     @GetMapping("/forgot-password")
