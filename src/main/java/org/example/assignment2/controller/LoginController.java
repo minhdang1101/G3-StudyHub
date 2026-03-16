@@ -50,9 +50,13 @@ public class LoginController {
         List<Permission> permissions = permissionService.findByRoleId(roleId);
 
         session.setAttribute("user",user);
+        session.setAttribute("roleId",roleId);
         session.setAttribute("permissions",permissions);
 
-        return "redirect:/dashboard";
+        if(roleId == 1){
+            return "redirect:/dashboard";
+        }else return "redirect:/homepage";  
+
     }
     @GetMapping("/forgot-password")
     public String forgotPasswordPage(){
