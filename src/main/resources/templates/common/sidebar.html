@@ -51,6 +51,14 @@
             </a>
         </li>
 
+        <li>
+            <a th:href="@{/courses}"
+               class="nav-link text-white"
+               th:classappend="${activePage == 'courses'} ? 'active bg-primary' : ''">
+                <i class="bi bi-book me-2"></i> Course Management
+            </a>
+        </li>
+
     </ul>
 
     <hr>

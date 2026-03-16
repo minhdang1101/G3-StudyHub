@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Course List</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+</head>
+<body>
+<div class="d-flex">
+    <div th:replace="~{common/sidebar :: sidebar(activePage='courses')}"></div>
+
+    <div class="container-fluid p-4">
+        <h2 class="mb-4">Course Management</h2>
+
+        <div th:if="${message}" class="alert" th:classappend="' alert-' + ${alertType}" th:text="${message}"></div>
+
+        <div class="card mb-4">
+            <div class="card-body">
+                <form th:action="@{/courses}" method="get" class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label">Keyword</label>
+                        <input type="text" name="keyword" class="form-control" placeholder="Search by title..."
+                               th:value="${keyword}">
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label">Category</label>
+                        <select name="categoryId" class="form-select">
+                            <option value="">All</option>
+                            <option th:each="c : ${categoryList}"
+                                    th:value="${c.id}"
+                                    th:text="${c.name}"
+                                    th:selected="${currentCategoryId != null and currentCategoryId == c.id}">
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label">Instructor</label>
+                        <select name="instructorId" class="form-select">
+                            <option value="">All</option>
+                            <option th:each="i : ${instructorList}"
+                                    th:value="${i.id}"
+                                    th:text="${i.fullName}"
+                                    th:selected="${currentInstructorId != null and currentInstructorId == i.id}">
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label">Status</label>
+                        <select name="status" class="form-select">
+                            <option value="">All</option>
+                            <option value="1" th:selected="${currentStatus != null and currentStatus == 1}">Active</option>
+                            <option value="0" th:selected="${currentStatus != null and currentStatus == 0}">Inactive</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-3 d-flex align-items-end gap-2">
+                        <button type="submit" class="btn btn-primary">Search</button>
+                        <a th:href="@{/courses}" class="btn btn-secondary">Reset</a>
+                        <a th:href="@{/courses/new}" class="btn btn-success ms-auto">New Course</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-body table-responsive">
+                <table class="table table-bordered table-hover align-middle">
+                    <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>Title</th>
+                        <th>Category</th>
+                        <th>Level</th>
+                        <th>Instructor</th>
+                        <th>Duration</th>
+                        <th>Price</th>
+                        <th>Status</th>
+                        <th width="280">Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:if="${#lists.isEmpty(courses)}">
+                        <td colspan="9" class="text-center text-muted">No courses found</td>
+                    </tr>
+
+                    <tr th:each="course : ${courses}">
+                        <td th:text="${course.courseId}"></td>
+                        <td th:text="${course.title}"></td>
+                        <td th:text="${course.category != null ? course.category.name : ''}"></td>
+                        <td th:text="${course.level != null ? course.level.name : ''}"></td>
+                        <td th:text="${course.instructor != null ? course.instructor.fullName : ''}"></td>
+                        <td th:text="${course.durationHours} + ' h'"></td>
+                        <td th:text="${course.price}"></td>
+                        <td>
+                            <span class="badge bg-success" th:if="${course.status == 1}">Active</span>
+                            <span class="badge bg-secondary" th:if="${course.status != 1}">Inactive</span>
+                        </td>
+                        <td class="d-flex gap-1 flex-wrap">
+                            <a th:href="@{'/courses/edit/' + ${course.courseId}}" class="btn btn-sm btn-warning">Edit</a>
+                            <a th:href="@{'/courses/content/' + ${course.courseId}}" class="btn btn-sm btn-info text-white">Content</a>
+
+                            <a th:if="${course.status == 1}"
+                               th:href="@{'/courses/status/' + ${course.courseId}(status=0)}"
+                               class="btn btn-sm btn-secondary"
+                               onclick="return confirm('Change status of this course?')">
+                                Unpublish
+                            </a>
+
+                            <a th:if="${course.status != 1}"
+                               th:href="@{'/courses/status/' + ${course.courseId}(status=1)}"
+                               class="btn btn-sm btn-success"
+                               onclick="return confirm('Change status of this course?')">
+                                Publish
+                            </a>
+
+                            <a th:href="@{'/courses/delete/' + ${course.courseId}}"
+                               class="btn btn-sm btn-danger"
+                               onclick="return confirm('Are you sure to delete this course?')">
+                                Delete
+                            </a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

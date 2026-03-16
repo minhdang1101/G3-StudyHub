@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Course Content</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+</head>
+<body>
+<div class="d-flex">
+    <div th:replace="~{common/sidebar :: sidebar(activePage='courses')}"></div>
+
+    <div class="container-fluid p-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Course Content</h2>
+            <div class="d-flex gap-2">
+                <a th:href="@{'/courses/edit/' + ${course.courseId}}" class="btn btn-warning">Edit Course</a>
+                <a th:href="@{/courses}" class="btn btn-secondary">Back</a>
+            </div>
+        </div>
+
+        <div th:if="${message}" class="alert" th:classappend="' alert-' + ${alertType}" th:text="${message}"></div>
+
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-8">
+                        <h4 th:text="${course.title}"></h4>
+                        <p class="mb-2" th:text="${course.description}"></p>
+                        <p class="mb-1"><strong>Category:</strong> <span th:text="${course.category != null ? course.category.name : ''}"></span></p>
+                        <p class="mb-1"><strong>Level:</strong> <span th:text="${course.level != null ? course.level.name : ''}"></span></p>
+                        <p class="mb-1"><strong>Instructor:</strong> <span th:text="${course.instructor != null ? course.instructor.fullName : ''}"></span></p>
+                        <p class="mb-1"><strong>Duration:</strong> <span th:text="${course.durationHours} + ' hours'"></span></p>
+                        <p class="mb-1"><strong>Price:</strong> <span th:text="${course.price}"></span></p>
+                    </div>
+                    <div class="col-md-4" th:if="${course.thumbnailUrl != null and !#strings.isEmpty(course.thumbnailUrl)}">
+                        <img th:src="${course.thumbnailUrl}" alt="thumbnail" class="img-fluid rounded border">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <a th:href="@{/courses/chapter/new(courseId=${course.courseId})}" class="btn btn-success">Add Chapter</a>
+        </div>
+
+        <div th:if="${#lists.isEmpty(chapters)}" class="alert alert-info">
+            This course has no chapters yet.
+        </div>
+
+        <div th:each="chapter : ${chapters}" class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div>
+                    <strong th:text="${chapter.orderIndex} + '. ' + ${chapter.title}"></strong>
+                    <span class="badge bg-success ms-2" th:if="${chapter.status == 1}">Active</span>
+                    <span class="badge bg-secondary ms-2" th:if="${chapter.status != 1}">Inactive</span>
+                </div>
+                <div class="d-flex gap-2">
+                    <a th:href="@{/courses/lesson/new(chapterId=${chapter.chapterId})}" class="btn btn-sm btn-success">Add Lesson</a>
+                    <a th:href="@{'/courses/chapter/edit/' + ${chapter.chapterId}}" class="btn btn-sm btn-warning">Edit</a>
+                    <a th:href="@{'/courses/chapter/delete/' + ${chapter.chapterId}}"
+                       class="btn btn-sm btn-danger"
+                       onclick="return confirm('Delete this chapter?')">Delete</a>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <p th:text="${chapter.description}"></p>
+
+                <div class="table-responsive">
+                    <table class="table table-bordered align-middle">
+                        <thead class="table-light">
+                        <tr>
+                            <th>Order</th>
+                            <th>Title</th>
+                            <th>Content Type</th>
+                            <th>Duration</th>
+                            <th>Preview</th>
+                            <th>Status</th>
+                            <th width="180">Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:if="${#lists.isEmpty(lessonMap[chapter.chapterId])}">
+                            <td colspan="7" class="text-center text-muted">No lessons in this chapter</td>
+                        </tr>
+
+                        <tr th:each="lesson : ${lessonMap[chapter.chapterId]}">
+                            <td th:text="${lesson.orderIndex}"></td>
+                            <td th:text="${lesson.title}"></td>
+                            <td th:text="${lesson.contentType}"></td>
+                            <td th:text="${lesson.durationMinutes} + ' min'"></td>
+                            <td th:text="${lesson.isPreview ? 'Yes' : 'No'}"></td>
+                            <td>
+                                <span class="badge bg-success" th:if="${lesson.status == 1}">Active</span>
+                                <span class="badge bg-secondary" th:if="${lesson.status != 1}">Inactive</span>
+                            </td>
+                            <td class="d-flex gap-1">
+                                <a th:href="@{'/courses/lesson/edit/' + ${lesson.lessonId}}" class="btn btn-sm btn-warning">Edit</a>
+                                <a th:href="@{'/courses/lesson/delete/' + ${lesson.lessonId}}"
+                                   class="btn btn-sm btn-danger"
+                                   onclick="return confirm('Delete this lesson?')">Delete</a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
