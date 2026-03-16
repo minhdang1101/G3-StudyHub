@@ -41,6 +41,9 @@ public class EmailService {
         }
         
         text.append("Chúc bạn học tốt!");
+
+        message.setText(text.toString()); 
+
         mailSender.send(message);
     }
 

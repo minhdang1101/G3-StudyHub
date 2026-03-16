@@ -13,4 +13,9 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
     List<Course> findByTitleContainingIgnoreCase(String keyword);
 
     List<Course> findByCategoryId(Integer categoryId);
+
+    long countByStatus(String status);
+
+    List<Course> findTop7ByOrderByCreatedAtDesc();
 }
+

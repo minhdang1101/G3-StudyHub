@@ -9,160 +9,150 @@
 </head>
 
 <body>
-<div class="d-flex">
+  <div class="d-flex">
 
-  <div th:replace="~{common/sidebar :: sidebar(activePage='users')}"></div>
+    <div th:replace="~{common/sidebar :: sidebar(activePage='users')}"></div>
 
-  <div class="container-fluid p-4">
-    <h3>User List</h3>
+    <div class="container-fluid p-4">
+      <h3>User List</h3>
 
-    <div class="card p-3 mb-3 bg-light">
-      <form th:action="@{/users}" method="get" class="row g-2 align-items-center">
-        <div class="col-auto">
-          <select name="roleId" class="form-select" onchange="this.form.submit()">
-            <option value="">All roles</option>
-            <option th:each="r : ${roleList}"
-                    th:value="${r.id}"
-                    th:text="${r.name}"
-                    th:selected="${r.id == currentRoleId}"></option>
-          </select>
-        </div>
-
-        <div class="col-auto">
-          <select name="status" class="form-select" onchange="this.form.submit()">
-            <option value="">All Statuses</option>
-            <option value="Active" th:selected="${currentStatus == 'Active'}">Active</option>
-            <option value="Blocked" th:selected="${currentStatus == 'Blocked'}">Blocked</option>
-            <option value="Pending" th:selected="${currentStatus == 'Pending'}">Pending</option>
-          </select>
-        </div>
-
-        <div class="col-auto">
-          <input type="text" name="keyword" class="form-control" placeholder="Type name, email..."
-                 th:value="${keyword}">
-        </div>
-
-        <div class="col-auto">
-          <button type="submit" class="btn btn-secondary">Search</button>
-        </div>
-
-        <div class="col text-end">
-          <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#userModal">
-            <i class="bi bi-plus-lg"></i> Add User
-          </button>
-        </div>
-      </form>
-    </div>
-
-      <table class="table table-hover align-middle">
-          <thead class="table-light">
-          <tr>
-              <th>ID</th>
-              <th>Full Name</th>
-              <th>Username</th>
-              <th>Email</th>
-              <th>Role</th>
-              <th>Status</th>
-              <th class="text-center">Actions</th>
-          </tr>
-          </thead>
-
-          <tbody>
-          <tr th:each="u : ${users}">
-              <td th:text="${u.id}"></td>
-
-              <td th:text="${u.fullName}"></td>
-
-              <td th:text="${u.username}"></td>
-
-              <td th:text="${u.email}"></td>
-
-              <td>
-            <span class="badge bg-primary"
-                  th:text="${u.role != null ? u.role.name : 'N/A'}">
-            </span>
-              </td>
-
-              <td>
-            <span th:if="${u.status == 'Active'}"
-                  class="badge bg-success">Active</span>
-
-                  <span th:if="${u.status == 'Blocked'}"
-                        class="badge bg-danger">Blocked</span>
-
-                  <span th:if="${u.status == 'Pending'}"
-                        class="badge bg-warning text-dark">Pending</span>
-              </td>
-
-              <td class="text-center">
-
-                  <!-- Edit -->
-                  <a th:href="@{/users/edit/{id}(id=${u.id})}"
-                     class="btn btn-outline-primary btn-sm">
-                      <i class="bi bi-pencil"></i>
-                  </a>
-
-                  <!-- Delete -->
-                  <a th:href="@{/users/delete/{id}(id=${u.id})}"
-                     class="btn btn-outline-danger btn-sm"
-                     onclick="return confirm('Delete this user?')">
-                      <i class="bi bi-trash"></i>
-                  </a>
-
-              </td>
-          </tr>
-          </tbody>
-      </table>
-  </div>
-</div>
-
-<div class="modal fade" id="userModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header bg-primary text-white">
-        <h5 class="modal-title">New User</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body">
-        <form th:action="@{/users/save}" method="post" th:object="${newUser}">
-          <div class="mb-3">
-            <label class="form-label">Full Name*</label>
-            <input type="text" class="form-control" th:field="*{fullName}"
-                   th:classappend="${#fields.hasErrors('fullName')} ? 'is-invalid' : ''">
-            <div class="invalid-feedback" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}"></div>
+      <div class="card p-3 mb-3 bg-light">
+        <form th:action="@{/users}" method="get" class="row g-2 align-items-center">
+          <div class="col-auto">
+            <select name="roleId" class="form-select" onchange="this.form.submit()">
+              <option value="">All roles</option>
+              <option th:each="r : ${roleList}" th:value="${r.id}" th:text="${r.name}"
+                th:selected="${r.id == currentRoleId}"></option>
+            </select>
           </div>
-          <div class="mb-3">
-            <label class="form-label">Email*</label>
-            <input type="email" class="form-control" th:field="*{email}"
-                   th:classappend="${#fields.hasErrors('email')} ? 'is-invalid' : ''">
-            <div class="invalid-feedback" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+
+          <div class="col-auto">
+            <select name="status" class="form-select" onchange="this.form.submit()">
+              <option value="">All Statuses</option>
+              <option value="Active" th:selected="${currentStatus == 'Active'}">Active</option>
+              <option value="Inactive" th:selected="${currentStatus == 'Inactive'}">Inactive</option>
+              <option value="Unverified" th:selected="${currentStatus == 'Unverified'}">Unverified</option>
+            </select>
           </div>
-            <div class="mb-3">
-                <label class="form-label">Username*</label>
 
-                <input type="text" class="form-control"
-                       th:field="*{username}"
-                       th:classappend="${#fields.hasErrors('username')} ? 'is-invalid' : ''">
+          <div class="col-auto">
+            <input type="text" name="keyword" class="form-control" placeholder="Type name, email..."
+              th:value="${keyword}">
+          </div>
 
-                <div class="invalid-feedback"
-                     th:if="${#fields.hasErrors('username')}"
-                     th:errors="*{username}">
-                </div>
-            </div>
-          <div class="text-end">
-            <button type="submit" class="btn btn-primary">Submit</button>
+          <div class="col-auto">
+            <button type="submit" class="btn btn-secondary">Search</button>
+          </div>
+
+          <div class="col text-end">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#userModal">
+              <i class="bi bi-plus-lg"></i> Add User
+            </button>
           </div>
         </form>
       </div>
+
+      <table class="table table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>ID</th>
+            <th>Full Name</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th class="text-center">Actions</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr th:each="u : ${users}">
+            <td th:text="${u.id}"></td>
+
+            <td th:text="${u.fullName}"></td>
+
+            <td th:text="${u.username}"></td>
+
+            <td th:text="${u.email}"></td>
+
+            <td>
+              <span class="badge bg-primary" th:text="${u.role != null ? u.role.name : 'N/A'}">
+              </span>
+            </td>
+
+            <td>
+              <span th:if="${u.status == 'Active'}" class="badge bg-success">Active</span>
+
+              <span th:if="${u.status == 'Inactive'}" class="badge bg-danger">Inactive</span>
+
+              <span th:if="${u.status == 'Unverified'}" class="badge bg-warning text-dark">Unverified</span>
+            </td>
+
+            <td class="text-center">
+
+              <!-- Edit -->
+              <a th:href="@{/users/edit/{id}(id=${u.id})}" class="btn btn-outline-primary btn-sm">
+                <i class="bi bi-pencil"></i>
+              </a>
+
+              <!-- Delete -->
+              <a th:href="@{/users/delete/{id}(id=${u.id})}" class="btn btn-outline-danger btn-sm"
+                onclick="return confirm('Delete this user?')">
+                <i class="bi bi-trash"></i>
+              </a>
+
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
-</div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script th:if="${showModal}">
-  var myModal = new bootstrap.Modal(document.getElementById('userModal'));
-  myModal.show();
-</script>
+  <div class="modal fade" id="userModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title">New User</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form th:action="@{/users/save}" method="post" th:object="${newUser}">
+            <div class="mb-3">
+              <label class="form-label">Full Name*</label>
+              <input type="text" class="form-control" th:field="*{fullName}"
+                th:classappend="${#fields.hasErrors('fullName')} ? 'is-invalid' : ''">
+              <div class="invalid-feedback" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}"></div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Email*</label>
+              <input type="email" class="form-control" th:field="*{email}"
+                th:classappend="${#fields.hasErrors('email')} ? 'is-invalid' : ''">
+              <div class="invalid-feedback" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Username*</label>
+
+              <input type="text" class="form-control" th:field="*{username}"
+                th:classappend="${#fields.hasErrors('username')} ? 'is-invalid' : ''">
+
+              <div class="invalid-feedback" th:if="${#fields.hasErrors('username')}" th:errors="*{username}">
+              </div>
+            </div>
+            <div class="text-end">
+              <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script th:if="${showModal}">
+    var myModal = new bootstrap.Modal(document.getElementById('userModal'));
+    myModal.show();
+  </script>
 
 </body>
+
 </html>

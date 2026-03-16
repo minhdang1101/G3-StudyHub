@@ -4,6 +4,8 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import java.util.Date;
+
 
 @Data
 public class UserDTO {
@@ -29,4 +31,7 @@ public class UserDTO {
     private String avatarUrl;
     private String note;
     private String confirmPassword;
-}
+
+    private Date createdAt;
+    private Date lastLogin;
+}

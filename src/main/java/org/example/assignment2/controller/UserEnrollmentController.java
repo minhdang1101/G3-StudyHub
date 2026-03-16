@@ -50,16 +50,30 @@ public class UserEnrollmentController {
 
     @PostMapping("/enroll/submit")
     public String submitEnrollment(@ModelAttribute Enrollment enrollment, @RequestParam("courseId") Long courseId, HttpSession session) {
+        User currentUser = (User) session.getAttribute("user");
+        
+        // Save initial enrollment details first
         enrollmentService.processEnrollmentSubmission(enrollment, courseId);
-
-        if ("Internet Banking".equals(enrollment.getPaymentMethod()) || "VNPay".equals(enrollment.getPaymentMethod())) {
-            return "redirect:/payment/vnpay/" + enrollment.getId();
+        
+        // If guest, create account and send email
+        if (currentUser == null) {
+            processAutoRegistrationAndEmail(enrollment);
         } else {
-            return "redirect:/payment/payos/" + enrollment.getId();
+            enrollment.setUser(currentUser);
+            enrollmentService.updateEnrollment(enrollment);
+        }
+
+        if ("Internet Banking".equals(enrollment.getPaymentMethod()) || "VNPay".equals(enrollment.getPaymentMethod()) || "VNPAY".equals(enrollment.getPaymentMethod())) {
+            return "redirect:/payment/vnpay/checkout?id=" + enrollment.getId();
+        } else {
+            return "redirect:/payment/payos/checkout?id=" + enrollment.getId();
         }
     }
 
-    @PostMapping("/payment/payos/checkout")
+
+
+    @GetMapping("/payment/payos/checkout")
+
     public String createPayOSLink(@RequestParam("id") Long id, HttpServletRequest request) {
         try {
             String checkoutUrl = payOSService.createPayOSCheckoutUrl(id, request);
@@ -86,7 +100,8 @@ public class UserEnrollmentController {
     }
     
 
-    @PostMapping("/payment/vnpay/checkout")
+    @GetMapping("/payment/vnpay/checkout")
+
     public String createVnPayLink(@RequestParam("id") Long id, HttpServletRequest request) {
         try {
             String vnpayUrl = vnPayService.createOrder(id, request);
@@ -110,12 +125,17 @@ public class UserEnrollmentController {
     }
 
     @GetMapping("/my-enrollments")
-    public String showMyEnrollments(Model model) {
-        Long currentUserId = 2L;
-        List<Enrollment> enrollments = enrollmentService.getEnrollmentsByUserId(currentUserId);
+    public String showMyEnrollments(Model model, HttpSession session) {
+        User currentUser = (User) session.getAttribute("user");
+        if (currentUser == null) {
+            return "redirect:/login";
+        }
+        
+        List<Enrollment> enrollments = enrollmentService.getEnrollmentsByUserId(currentUser.getId().longValue());
         model.addAttribute("enrollments", enrollments);
         return "enrollment/my-enrollments";
     }
+
 
     public void markEnrollmentAsPaid(Long enrollmentId) {
         Enrollment enrollment = enrollmentService.getEnrollmentById(enrollmentId);
@@ -131,8 +151,6 @@ public class UserEnrollmentController {
 
     private void processAutoRegistrationAndEmail(Enrollment enrollment) {
         String learnerEmail = enrollment.getEmail(); 
-        User buyer = enrollment.getUser(); 
-
         User existingLearner = userService.findByEmail(learnerEmail);
         String generatedPassword = null;
 
@@ -141,16 +159,29 @@ public class UserEnrollmentController {
             newLearner.setEmail(learnerEmail);
             newLearner.setFullName(enrollment.getFullName());
             newLearner.setMobile(enrollment.getMobile());
+            newLearner.setStatus("Active");
             generatedPassword = UUID.randomUUID().toString().substring(0, 8) + "@1A";
             newLearner.setPassword(generatedPassword); 
+            
+            // Set default role (3 - Member/Learner)
+            org.example.assignment2.model.Setting role = new org.example.assignment2.model.Setting();
+            role.setId(3);
+            newLearner.setRole(role);
 
             userService.saveUser(newLearner);
+            enrollment.setUser(newLearner);
+        } else {
+            enrollment.setUser(existingLearner);
         }
+        
+        enrollmentService.updateEnrollment(enrollment);
 
         emailService.sendAccessInfoToLearner(learnerEmail, enrollment, generatedPassword);
 
+        User buyer = enrollment.getUser(); // Usually the same as learner for guests
         if (buyer != null && buyer.getEmail() != null && !buyer.getEmail().equalsIgnoreCase(learnerEmail)) {
             emailService.sendReceiptToBuyer(buyer.getEmail(), enrollment);
         }
     }
+
 }

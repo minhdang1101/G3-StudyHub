@@ -91,6 +91,7 @@ public class EnrollmentService {
         enrollmentRepository.save(enrollment);
     }
 
+
     public void updateEnrollmentStatus(Long id, String status, String rejectNotes) {
         Enrollment existing = getEnrollmentById(id);
         if (existing != null) {

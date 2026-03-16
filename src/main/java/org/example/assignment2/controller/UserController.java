@@ -85,21 +85,9 @@ public class UserController {
         return "redirect:/users";
     }
 
-    @GetMapping("/approve/{id}")
-    public String approveUser(@PathVariable("id") Integer id) {
-        userService.updateUserStatus(id, "Active");
-        return "redirect:/users";
-    }
-
-    @GetMapping("/block/{id}")
-    public String blockUser(@PathVariable("id") Integer id) {
-        userService.updateUserStatus(id, "Blocked");
-        return "redirect:/users";
-    }
-
-    @GetMapping("/unblock/{id}")
-    public String unblockUser(@PathVariable("id") Integer id) {
-        userService.updateUserStatus(id, "Active");
+    @GetMapping("/delete/{id}")
+    public String deleteUser(@PathVariable("id") Integer id) {
+        userService.deleteUser(id);
         return "redirect:/users";
     }
 
@@ -117,6 +105,9 @@ public class UserController {
         dto.setMobile(user.getMobile());
         dto.setStatus(user.getStatus());
         dto.setAvatarUrl(user.getAvatarUrl());
+        dto.setCreatedAt(user.getCreatedAt());
+        dto.setLastLogin(user.getLastLogin());
+
 
         if (user.getRole() != null) {
             dto.setRoleId(user.getRole().getId());

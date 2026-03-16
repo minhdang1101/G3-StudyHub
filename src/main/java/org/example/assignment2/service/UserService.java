@@ -43,10 +43,16 @@ public class UserService {
         user.setStatus(userDto.getStatus());
         user.setUsername(userDto.getUsername());
         user.setAvatarUrl(userDto.getAvatarUrl());
+        user.setPassword(userDto.getPassword());
+        user.setCreatedAt(userDto.getCreatedAt());
 
+        // Xử lý Role (nếu có thay đổi)
         if (userDto.getRoleId() != null) {
             Setting role = settingRepo.findById(userDto.getRoleId()).orElse(null);
             user.setRole(role);
+        }
+        if(user.getStatus() == null){
+            user.setStatus("Pending");
         }
         userRepo.save(user);
     }
@@ -111,7 +117,7 @@ public class UserService {
         user.setEmail(dto.getEmail());
         user.setPassword(dto.getPassword());
 
-        user.setStatus("ACTIVE");
+        user.setStatus("Active");
 
         Setting role = settingRepo.findById(3).orElse(null);
         user.setRole(role);
@@ -119,7 +125,9 @@ public class UserService {
         userRepo.save(user);
     }
 
-
+    public void deleteUser(Integer id) {
+        userRepo.deleteById(id);
+    }
 
     public List<User> getAllUsers() {
         return userRepo.findAll();
