@@ -1,5 +1,6 @@
 package org.example.assignment2.service;
 
+import org.example.assignment2.dto.RegisterDTO;
 import org.example.assignment2.dto.UserDTO;
 import org.example.assignment2.model.Setting;
 import org.example.assignment2.model.User;
@@ -39,9 +40,9 @@ public class UserService {
         user.setFullName(userDto.getFullName());
         user.setEmail(userDto.getEmail());
         user.setMobile(userDto.getMobile());
-        user.setNote(userDto.getNote());
         user.setStatus(userDto.getStatus());
-        user.setAvatar(userDto.getAvatar());
+        user.setUsername(userDto.getUsername());
+        user.setAvatarUrl(userDto.getAvatar());
 
         if (userDto.getRoleId() != null) {
             Setting role = settingRepo.findById(userDto.getRoleId()).orElse(null);
@@ -75,6 +76,50 @@ public class UserService {
     public User getUserById(Integer id) {
         return userRepo.findById(id).orElse(null);
     }
+
+    public User login(String email,String password){
+
+        User user = userRepo.findByEmail(email).orElse(null);
+
+        if(user == null){
+            return null;
+        }
+
+        if(!user.getPassword().equals(password)){
+            return null;
+        }
+
+        return user;
+    }
+
+    public void resetPassword(String email,String password){
+
+        User user = userRepo.findByEmail(email).orElse(null);
+
+        if(user != null){
+            user.setPassword(password);
+            userRepo.save(user);
+        }
+    }
+
+    public void register(RegisterDTO dto) {
+
+        User user = new User();
+
+        user.setFullName(dto.getFullName());
+        user.setUsername(dto.getUsername());
+        user.setEmail(dto.getEmail());
+        user.setPassword(dto.getPassword());
+
+        user.setStatus("ACTIVE");
+
+        Setting role = settingRepo.findById(3).orElse(null);
+        user.setRole(role);
+
+        userRepo.save(user);
+    }
+
+
 
     public List<User> getAllUsers() {
         return userRepo.findAll();

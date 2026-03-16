@@ -7,6 +7,7 @@ import org.example.assignment2.model.User;
 import org.example.assignment2.repository.CommentRepository;
 import org.example.assignment2.repository.PostRepository;
 import org.example.assignment2.repository.SettingRepository;
+import org.example.assignment2.service.EmailService;
 import org.example.assignment2.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -36,6 +37,8 @@ public class UserController {
     private PostRepository postRepo;
     @Autowired
     private CommentRepository commentRepo;
+    @Autowired
+    private EmailService emailService;
     @Autowired
     private UserRepository userRepository;
 
@@ -71,7 +74,13 @@ public class UserController {
             model.addAttribute("showModal", true);
             return list(model, null, null, null);
         }
+        userDto.setRoleId(3);
 
+        String randomPassword = UUID.randomUUID().toString().substring(0, 8);
+
+        userDto.setPassword(randomPassword);
+
+        emailService.sendAccountEmail(userDto.getEmail(), randomPassword);
         userService.saveUser(userDto);
         return "redirect:/users";
     }
@@ -106,9 +115,8 @@ public class UserController {
         dto.setFullName(user.getFullName());
         dto.setEmail(user.getEmail());
         dto.setMobile(user.getMobile());
-        dto.setNote(user.getNote());
         dto.setStatus(user.getStatus());
-        dto.setAvatar(user.getAvatar());
+        dto.setAvatar(user.getAvatarUrl());
 
         if (user.getRole() != null) {
             dto.setRoleId(user.getRole().getId());
@@ -143,7 +151,7 @@ public class UserController {
         } else {
             User oldUser = userService.getUserById(userDto.getId());
             if (oldUser != null) {
-                userDto.setAvatar(oldUser.getAvatar());
+                userDto.setAvatar(oldUser.getAvatarUrl());
             }
         }
 
