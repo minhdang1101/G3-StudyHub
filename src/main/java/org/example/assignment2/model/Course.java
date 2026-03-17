@@ -3,6 +3,8 @@ package org.example.assignment2.model;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
@@ -39,12 +41,14 @@ public class Course {
     @JoinColumn(name = "category_id")
     private Setting category;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "instructor_id")
+    @NotFound(action = NotFoundAction.IGNORE)
     private User instructor;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "manager_id")
+    @NotFound(action = NotFoundAction.IGNORE)
     private User manager;
 
     @Column(name = "status")

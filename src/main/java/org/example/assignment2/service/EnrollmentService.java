@@ -36,6 +36,14 @@ public class EnrollmentService {
         return enrollmentRepository.findByUser_Id(userId);
     }
 
+    public Page<Enrollment> getEnrollmentsByUserIdPaged(Long userId, Pageable pageable) {
+        return enrollmentRepository.findByUser_IdOrderByEnrolledAtDesc(userId, pageable);
+    }
+
+    public boolean isAlreadyEnrolled(Long userId, Long courseId) {
+        return enrollmentRepository.existsActiveEnrollment(userId, courseId);
+    }
+
     public Enrollment getEnrollmentById(Long id) {
         return enrollmentRepository.findById(id).orElse(null);
     }
@@ -163,6 +171,11 @@ public class EnrollmentService {
 
         if (course == null || user == null) {
             throw new RuntimeException("Khóa học hoặc User không tồn tại!");
+        }
+
+        // Check trùng enrollment
+        if (isAlreadyEnrolled(userId, courseId)) {
+            throw new RuntimeException("user đã đăng kí khóa học này rồi");
         }
 
         // Check quyền Manager: Chỉ được thêm học viên vào khóa của mình

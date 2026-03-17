@@ -20,5 +20,11 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
     List<Course> findTop7ByOrderByCreatedAtDesc();
     
     List<Course> findTop7ByManager_IdOrderByCreatedAtDesc(Long managerId);
+
+    long countByManager_Id(Integer managerId);
+
+    long countByManager_IdAndStatus(Integer managerId, String status);
+
+    List<Course> findByManager_Id(Integer managerId);
 }
 

@@ -1,6 +1,7 @@
 package org.example.assignment2.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.example.assignment2.dto.UserDTO;
 import org.example.assignment2.model.User;
@@ -23,6 +24,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
 import java.util.UUID;
 
 @Controller
@@ -46,9 +48,25 @@ public class UserController {
     public String list(Model model,
                        @RequestParam(name = "roleId", required = false) Integer roleId,
                        @RequestParam(name = "status", required = false) String status,
-                       @RequestParam(name = "keyword", required = false) String keyword) {
+                       @RequestParam(name = "keyword", required = false) String keyword,
+                       HttpSession session) {
 
-        model.addAttribute("users", userService.getUsers(roleId, status, keyword));
+        User currentUser = (User) session.getAttribute("user");
+        List<org.example.assignment2.model.User> users;
+
+        if (currentUser != null && currentUser.getRole() != null) {
+            String roleValue = currentUser.getRole().getValue();
+            if ("MANAGER".equalsIgnoreCase(roleValue) || "ROLE_MANAGER".equalsIgnoreCase(roleValue)) {
+                // Manager: only users enrolled in their courses
+                users = userService.getUsersByManagerCourses(currentUser.getId());
+            } else {
+                users = userService.getUsers(roleId, status, keyword);
+            }
+        } else {
+            users = userService.getUsers(roleId, status, keyword);
+        }
+
+        model.addAttribute("users", users);
         model.addAttribute("roleList", settingRepo.findActiveRoles());
         model.addAttribute("currentRoleId", roleId);
         model.addAttribute("currentStatus", status);
@@ -72,7 +90,7 @@ public class UserController {
 
         if (result.hasErrors()) {
             model.addAttribute("showModal", true);
-            return list(model, null, null, null);
+            return "redirect:/users?showModal=true";
         }
         userDto.setRoleId(3);
 

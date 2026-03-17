@@ -16,6 +16,21 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
 
     List<Enrollment> findByUser_Id(Long userId); 
 
+    Page<Enrollment> findByUser_IdOrderByEnrolledAtDesc(Long userId, Pageable pageable);
+
+    @Query("SELECT COUNT(e) > 0 FROM Enrollment e WHERE e.user.id = :userId AND e.course.courseId = :courseId " +
+           "AND e.status NOT IN ('Cancelled', 'Rejected')")
+    boolean existsActiveEnrollment(@Param("userId") Long userId, @Param("courseId") Long courseId);
+
+    // Manager-scoped: total distinct users enrolled in manager's courses
+    @Query("SELECT COUNT(DISTINCT e.user.id) FROM Enrollment e WHERE e.course.manager.id = :managerId")
+    long countDistinctUsersByManagerId(@Param("managerId") Integer managerId);
+
+    // Manager-scoped: distinct active members (Paid/Approved) in manager's courses
+    @Query("SELECT COUNT(DISTINCT e.user.id) FROM Enrollment e WHERE e.course.manager.id = :managerId " +
+           "AND e.status IN ('Paid', 'Approved')")
+    long countDistinctActiveMembersByManagerId(@Param("managerId") Integer managerId);
+
     @Query("SELECT e FROM Enrollment e WHERE " +
            "(:courseId IS NULL OR e.course.id = :courseId) AND " +
            "(:userId IS NULL OR e.user.id = :userId) AND " +

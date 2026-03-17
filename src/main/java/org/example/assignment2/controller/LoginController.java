@@ -52,6 +52,10 @@ public class LoginController {
         session.setAttribute("user",user);
         session.setAttribute("permissions",permissions);
 
+        String roleValue = user.getRole() != null ? user.getRole().getValue() : "";
+        if ("ROLE_MEMBER".equalsIgnoreCase(roleValue)) {
+            return "redirect:/courses";
+        }
         return "redirect:/dashboard";
     }
     @GetMapping("/forgot-password")
