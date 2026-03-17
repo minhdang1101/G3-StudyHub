@@ -125,14 +125,46 @@ public class UserEnrollmentController {
     }
 
     @GetMapping("/my-enrollments")
-    public String showMyEnrollments(Model model, HttpSession session) {
-        User currentUser = (User) session.getAttribute("user");
-        if (currentUser == null) {
-            return "redirect:/login";
+public String showMyEnrollments(Model model, HttpSession session, @RequestParam(required = false) String role) {
+    
+    if (role != null || session.getAttribute("user") == null) {
+        User mockUser = new User();
+        org.example.assignment2.model.Setting mockRole = new org.example.assignment2.model.Setting();
+        
+        if ("manager".equalsIgnoreCase(role)) {
+            mockUser.setId(2); 
+            mockUser.setFullName("Nguyễn Quản Lý (Mock)");
+            mockRole.setId(8); 
+            mockRole.setValue("ROLE_MANAGER");
+        } else if ("admin".equalsIgnoreCase(role)) {
+            mockUser.setId(1);
+            mockUser.setFullName("Hệ thống Admin (Mock)");
+            mockRole.setId(3); 
+            mockRole.setValue("ROLE_ADMIN");
+        } else {
+            mockUser.setId(14); 
+            mockUser.setFullName("Học viên User (Mock)");
+            mockRole.setId(5); 
+            mockRole.setValue("ROLE_MEMBER"); 
         }
         
-        List<Enrollment> enrollments = enrollmentService.getEnrollmentsByUserId(currentUser.getId().longValue());
+        mockUser.setRole(mockRole);
+        session.setAttribute("user", mockUser);
+    }
+
+    User user = (User) session.getAttribute("user");
+    List<Enrollment> enrollments;
+
+    if ("ROLE_ADMIN".equals(user.getRole().getValue())) {
+        enrollments = enrollmentService.getAllEnrollments();
+    } else {
+        enrollments = enrollmentService.getEnrollmentsByUserId(user.getId().longValue());
+    }
+    
+    
         model.addAttribute("enrollments", enrollments);
+        model.addAttribute("currentUser", user);
+    
         return "enrollment/my-enrollments";
     }
 
@@ -182,6 +214,24 @@ public class UserEnrollmentController {
         if (buyer != null && buyer.getEmail() != null && !buyer.getEmail().equalsIgnoreCase(learnerEmail)) {
             emailService.sendReceiptToBuyer(buyer.getEmail(), enrollment);
         }
+    }
+
+    @GetMapping("/enroll/edit/{id}")
+    public String editEnrollment(@PathVariable("id") Long id, Model model, HttpSession session) {
+        User currentUser = (User) session.getAttribute("user");
+        if (currentUser == null) {
+            return "redirect:/login";
+        }
+
+        Enrollment enrollment = enrollmentService.getEnrollmentById(id);
+        
+        if (enrollment == null || !enrollment.getUser().getId().equals(currentUser.getId())) {
+            return "redirect:/my-enrollments?error=access_denied";
+        }
+        model.addAttribute("enrollment", enrollment);
+        model.addAttribute("course", enrollment.getCourse());
+        
+        return "enrollment/learning-enroll";
     }
 
 }

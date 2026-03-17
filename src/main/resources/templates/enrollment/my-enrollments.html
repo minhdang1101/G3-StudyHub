@@ -18,7 +18,6 @@
             background: #f0f2f5;
         }
 
-        /* ===== PAGE CONTENT ===== */
         .content-area {
             padding: 2rem;
             animation: fadeInUp 0.5s ease-out;
@@ -48,7 +47,6 @@
             }
         }
 
-        /* ===== PAGE HEADER ===== */
         .page-title {
             font-size: 1.75rem;
             font-weight: 800;
@@ -62,7 +60,6 @@
             font-weight: 400;
         }
 
-        /* ===== STATS CARDS ===== */
         .stat-card {
             background: #fff;
             border-radius: 16px;
@@ -130,7 +127,6 @@
             letter-spacing: 0.5px;
         }
 
-        /* ===== TABLE CARD ===== */
         .table-card {
             background: #fff;
             border-radius: 16px;
@@ -172,7 +168,6 @@
             background: linear-gradient(90deg, rgba(99, 102, 241, 0.03) 0%, rgba(99, 102, 241, 0.06) 100%);
         }
 
-        /* ===== COURSE CELL ===== */
         .course-name {
             font-weight: 700;
             color: #1e1b4b;
@@ -180,7 +175,6 @@
             line-height: 1.3;
         }
 
-        /* ===== USER CELL ===== */
         .user-cell-name {
             font-weight: 600;
             color: #1e1b4b;
@@ -192,7 +186,6 @@
             color: #9ca3af;
         }
 
-        /* ===== DATE CELL ===== */
         .date-text {
             font-size: 0.82rem;
             color: #6b7280;
@@ -200,14 +193,12 @@
             font-variant-numeric: tabular-nums;
         }
 
-        /* ===== FEE CELL ===== */
         .fee-text {
             font-weight: 700;
             color: #1e1b4b;
             font-variant-numeric: tabular-nums;
         }
 
-        /* ===== STATUS BADGES ===== */
         .status-pill {
             display: inline-flex;
             align-items: center;
@@ -254,7 +245,6 @@
             background: #ef4444;
         }
 
-        /* ===== ACTION BUTTONS ===== */
         .btn-pay {
             border: none;
             padding: 0.45rem 1rem;
@@ -271,10 +261,6 @@
         .btn-pay:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        }
-
-        .btn-pay:active {
-            transform: translateY(0);
         }
 
         .btn-payos {
@@ -318,7 +304,6 @@
             color: white;
         }
 
-        /* ===== EMPTY STATE ===== */
         .empty-state {
             padding: 3rem;
             text-align: center;
@@ -335,7 +320,6 @@
             font-weight: 500;
         }
 
-        /* ===== ALERT ===== */
         .alert-modern {
             border: none;
             border-radius: 12px;
@@ -347,7 +331,6 @@
 </head>
 
 <body>
-
     <div class="container-fluid p-0">
         <div class="row g-0">
             <div class="col-auto">
@@ -356,8 +339,6 @@
 
             <div class="col">
                 <div class="content-area">
-
-                    <!-- Page Header -->
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <div>
                             <h1 class="page-title mb-1">My Enrollments</h1>
@@ -365,7 +346,6 @@
                         </div>
                     </div>
 
-                    <!-- Alerts -->
                     <div th:if="${param.payment == 'success'}"
                         class="alert alert-success alert-modern alert-dismissible fade show" role="alert">
                         <i class="bi bi-check-circle-fill me-2"></i> Payment successful! You can now access your course.
@@ -377,13 +357,10 @@
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
 
-                    <!-- Stats Row -->
                     <div class="row g-3 mb-4">
                         <div class="col-md-4">
                             <div class="stat-card d-flex align-items-center gap-3">
-                                <div class="stat-icon total">
-                                    <i class="bi bi-layers"></i>
-                                </div>
+                                <div class="stat-icon total"><i class="bi bi-layers"></i></div>
                                 <div>
                                     <div class="stat-value" th:text="${enrollments != null ? enrollments.size() : 0}">0
                                     </div>
@@ -393,9 +370,7 @@
                         </div>
                         <div class="col-md-4">
                             <div class="stat-card d-flex align-items-center gap-3">
-                                <div class="stat-icon pending">
-                                    <i class="bi bi-hourglass-split"></i>
-                                </div>
+                                <div class="stat-icon pending"><i class="bi bi-hourglass-split"></i></div>
                                 <div>
                                     <div class="stat-value"
                                         th:text="${enrollments != null ? #lists.size(enrollments.?[status == 'Pending']) : 0}">
@@ -406,9 +381,7 @@
                         </div>
                         <div class="col-md-4">
                             <div class="stat-card d-flex align-items-center gap-3">
-                                <div class="stat-icon approved">
-                                    <i class="bi bi-check2-circle"></i>
-                                </div>
+                                <div class="stat-icon approved"><i class="bi bi-check2-circle"></i></div>
                                 <div>
                                     <div class="stat-value"
                                         th:text="${enrollments != null ? #lists.size(enrollments.?[status == 'Approved' or status == 'Paid']) : 0}">
@@ -419,7 +392,6 @@
                         </div>
                     </div>
 
-                    <!-- Table -->
                     <div class="table-card">
                         <div class="table-responsive">
                             <table class="table">
@@ -436,16 +408,12 @@
                                 </thead>
                                 <tbody>
                                     <tr th:each="en, stat : ${enrollments}">
-                                        <td>
-                                            <span class="fw-bold text-muted" th:text="${en.id}">#</span>
-                                        </td>
-                                        <td>
-                                            <span class="course-name" th:text="${en.course.title}">Course</span>
-                                        </td>
+                                        <td><span class="fw-bold text-muted" th:text="${en.id}">#</span></td>
+                                        <td><span class="course-name" th:text="${en.course.title}">Course</span></td>
                                         <td>
                                             <div class="user-cell-name"
-                                                th:text="${en.fullName != null ? en.fullName : en.user.fullName}">
-                                                Name</div>
+                                                th:text="${en.fullName != null ? en.fullName : en.user.fullName}">Name
+                                            </div>
                                             <div class="user-cell-email"
                                                 th:text="${en.email != null ? en.email : en.user.email}">email</div>
                                         </td>
@@ -458,28 +426,40 @@
                                             <span class="fee-text"
                                                 th:text="${#numbers.formatDecimal(en.fee, 0, 'COMMA', 0, 'POINT')}">0</span>
                                         </td>
+
                                         <td>
                                             <span class="status-pill status-pending"
                                                 th:if="${en.status == 'Pending'}">Pending</span>
                                             <span class="status-pill status-paid"
                                                 th:if="${en.status == 'Paid' or en.status == 'Approved'}">Active</span>
                                             <span class="status-pill status-cancelled"
-                                                th:if="${en.status == 'Cancelled' or en.status == 'Rejected'}">Cancelled</span>
+                                                th:if="${en.status == 'Cancelled' or en.status == 'Rejected'}"
+                                                th:text="${en.status}">Cancelled</span>
                                         </td>
+
                                         <td>
-                                            <div th:if="${en.status == 'Pending'}" class="d-flex gap-2">
-                                                <form th:action="@{/payment/payos/checkout}" method="post">
-                                                    <input type="hidden" name="id" th:value="${en.id}">
-                                                    <button type="submit" class="btn-pay btn-payos">
-                                                        <i class="bi bi-credit-card"></i> PayOS
-                                                    </button>
-                                                </form>
-                                                <form th:action="@{/payment/vnpay/checkout}" method="post">
-                                                    <input type="hidden" name="id" th:value="${en.id}">
-                                                    <button type="submit" class="btn-pay btn-vnpay">
-                                                        <i class="bi bi-wallet2"></i> VNPay
-                                                    </button>
-                                                </form>
+                                            <div th:if="${en.status == 'Pending' or en.status == 'Rejected'}"
+                                                class="d-flex gap-2 align-items-center flex-wrap">
+                                                <a th:href="@{/enroll/edit/{id}(id=${en.id})}"
+                                                    class="btn-pay text-decoration-none"
+                                                    style="background: #4b5563; color: white;"
+                                                    title="View Notes & Update">
+                                                    <i class="bi bi-pencil-square"></i> Details & Update
+                                                </a>
+                                                <th:block th:if="${en.status == 'Pending'}">
+                                                    <form th:action="@{/payment/payos/checkout}" method="post"
+                                                        class="m-0">
+                                                        <input type="hidden" name="id" th:value="${en.id}">
+                                                        <button type="submit" class="btn-pay btn-payos"><i
+                                                                class="bi bi-credit-card"></i> PayOS</button>
+                                                    </form>
+                                                    <form th:action="@{/payment/vnpay/checkout}" method="post"
+                                                        class="m-0">
+                                                        <input type="hidden" name="id" th:value="${en.id}">
+                                                        <button type="submit" class="btn-pay btn-vnpay"><i
+                                                                class="bi bi-wallet2"></i> VNPay</button>
+                                                    </form>
+                                                </th:block>
                                             </div>
 
                                             <a th:if="${en.status == 'Paid' or en.status == 'Approved'}"
@@ -487,7 +467,7 @@
                                                 <i class="bi bi-play-circle-fill"></i> Study Now
                                             </a>
 
-                                            <span th:if="${en.status == 'Cancelled' or en.status == 'Rejected'}"
+                                            <span th:if="${en.status == 'Cancelled'}"
                                                 class="text-muted small fw-medium">
                                                 <i class="bi bi-info-circle"></i> Closed
                                             </span>
@@ -509,12 +489,10 @@
                             </table>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
     </div>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 

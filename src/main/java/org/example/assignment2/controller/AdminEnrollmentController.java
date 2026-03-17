@@ -23,6 +23,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
@@ -113,8 +115,8 @@ public class AdminEnrollmentController {
         if (enrollment == null) return "redirect:/admin/enrollments"; 
 
         if ("MANAGER".equalsIgnoreCase(currentUser.getRole().getValue())) {
-            if (!enrollment.getCourse().getManager().getId().equals(currentUser.getId())) {
-                throw new RuntimeException("Bạn không có quyền quản lý khóa học này!");
+            if (enrollment.getCourse().getManager() == null || !enrollment.getCourse().getManager().getId().equals(currentUser.getId())) {
+                throw new RuntimeException("Bạn không có quyền thêm học viên vào khóa học này vì khóa học chưa có quản lý hoặc không thuộc quyền của bạn!");
             }
         }
         
@@ -147,7 +149,8 @@ public class AdminEnrollmentController {
             }
             return "redirect:/admin/enrollments?success=saved";
         } catch (Exception e) {
-            return "redirect:/admin/enrollments?error=" + e.getMessage();
+            String encodedMessage = URLEncoder.encode(e.getMessage(), StandardCharsets.UTF_8);
+            return "redirect:/admin/enrollments?error=" + encodedMessage;
         }
     }
 
@@ -210,8 +213,8 @@ public class AdminEnrollmentController {
 
         // Manager can only import to their assigned courses
         if ("MANAGER".equalsIgnoreCase(currentUser.getRole().getValue())) {
-            if (!course.getManager().getId().equals(currentUser.getId())) {
-                redirectAttributes.addFlashAttribute("error", "You don't have permission to import for this course!");
+            if (course.getManager() == null || !course.getManager().getId().equals(currentUser.getId())) {
+                redirectAttributes.addFlashAttribute("error", "You don't have permission to import for this course or the course has no assigned manager!");
                 return "redirect:/admin/enrollments";
             }
         }
@@ -271,16 +274,18 @@ public class AdminEnrollmentController {
             enrollmentService.updateEnrollmentStatusAndNotes(id, status, rejectNotes, currentUser);
             return "redirect:/admin/enrollments?success=updated";
         } catch (Exception e) {
-            return "redirect:/admin/enrollments?error=" + e.getMessage();
+            String encodedMessage = URLEncoder.encode(e.getMessage(), StandardCharsets.UTF_8);
+            return "redirect:/admin/enrollments?error=" + encodedMessage;
         }
     }
 
     private User getCurrentUser(HttpServletRequest request, HttpSession session) {
         User mockManager = new User();
-        mockManager.setId(2); // ID của Manager trong DB
+        mockManager.setId(2); 
         mockManager.setFullName("Test Manager");
     
         Setting role = new Setting();
+        role.setId(2);
         role.setValue("MANAGER"); 
         role.setName("MANAGER");
         mockManager.setRole(role);

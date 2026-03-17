@@ -142,9 +142,9 @@ public class EnrollmentService {
         Enrollment enrollment = getEnrollmentById(enrollmentId);
         if (enrollment == null) throw new RuntimeException("Không tìm thấy đơn đăng ký");
 
-        if ("MANAGER".equalsIgnoreCase(currentUser.getRole().getName())) {
-            if (enrollment.getCourse().getManager(  ).getId() != currentUser.getId()) {
-                throw new RuntimeException("Bạn không có quyền duyệt đơn của khóa học này!");
+        if ("MANAGER".equalsIgnoreCase(currentUser.getRole().getValue())) {
+            if (enrollment.getCourse().getManager() == null || !enrollment.getCourse().getManager().getId().equals(currentUser.getId())) {
+                throw new RuntimeException("Bạn không có quyền duyệt đơn của khóa học này hoặc khóa học chưa có quản lý!");
             }
         }
 
@@ -152,6 +152,7 @@ public class EnrollmentService {
         enrollment.setStatus(newStatus);
         enrollment.setNotes(notes);
         enrollment.setLastUpdated(LocalDateTime.now());
+        enrollment.setRejectNotes(notes);
         
         updateEnrollment(enrollment);
     }
@@ -166,8 +167,8 @@ public class EnrollmentService {
 
         // Check quyền Manager: Chỉ được thêm học viên vào khóa của mình
         if ("MANAGER".equalsIgnoreCase(currentUser.getRole().getValue())) {
-            if (!course.getManager().getId().equals(currentUser.getId())) {
-                throw new RuntimeException("Bạn không có quyền thêm học viên vào khóa học này!");
+            if (course.getManager() == null || !course.getManager().getId().equals(currentUser.getId())) {
+                throw new RuntimeException("Bạn không có quyền thêm học viên vào khóa học này hoặc khóa học chưa có quản lý!");
             }
         }
 
@@ -181,6 +182,7 @@ public class EnrollmentService {
         enrollment.setNotes(rejectNotes); 
         enrollment.setProgress(0.0);
         enrollment.setEnrolledAt(LocalDateTime.now());
+        enrollment.setRejectNotes(rejectNotes);
 
         enrollmentRepository.save(enrollment);
     }
@@ -192,8 +194,8 @@ public class EnrollmentService {
         }
 
         if ("MANAGER".equalsIgnoreCase(currentUser.getRole().getValue())) {
-            if (!enrollment.getCourse().getManager().getId().equals(currentUser.getId())) {
-                throw new RuntimeException("You don't have permission to delete this enrollment!");
+            if (enrollment.getCourse().getManager() == null || !enrollment.getCourse().getManager().getId().equals(currentUser.getId())) {
+                throw new RuntimeException("You don't have permission to delete this enrollment or the course has no assigned manager!");
             }
         }
 
