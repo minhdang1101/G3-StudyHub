@@ -6,322 +6,675 @@
     <title>Courses Management</title>
     <style>
         :root {
-            --primary: #0d6efd;
-            --primary-dark: #0b5ed7;
-            --secondary: #6c757d;
-            --success: #198754;
-            --danger: #dc3545;
-            --info: #0dcaf0;
-            --border: #dee2e6;
-            --text: #212529;
-            --muted: #6c757d;
-            --bg-row: #f3f3f3;
-            --shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --primary-soft: #eef2ff;
+            --success: #16a34a;
+            --success-soft: #dcfce7;
+            --warning: #f59e0b;
+            --warning-soft: #fef3c7;
+            --danger: #ef4444;
+            --danger-soft: #fee2e2;
+            --info: #06b6d4;
+            --info-soft: #cffafe;
+
+            --text: #0f172a;
+            --muted: #64748b;
+            --border: #e2e8f0;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --row-hover: #f8faff;
+
+            --shadow-sm: 0 4px 10px rgba(15, 23, 42, 0.06);
+            --shadow-md: 0 12px 30px rgba(15, 23, 42, 0.08);
+            --radius-xl: 24px;
+            --radius-lg: 18px;
+            --radius-md: 14px;
+            --radius-sm: 10px;
         }
 
-        * { box-sizing: border-box; }
+        * {
+            box-sizing: border-box;
+        }
 
         body {
             margin: 0;
-            padding: 10px;
-            font-family: Arial, Helvetica, sans-serif;
+            font-family: Inter, Arial, Helvetica, sans-serif;
             color: var(--text);
-            background: #fff;
+            background:
+                    radial-gradient(circle at top left, rgba(79, 70, 229, 0.10), transparent 28%),
+                    radial-gradient(circle at top right, rgba(6, 182, 212, 0.08), transparent 24%),
+                    var(--bg);
         }
 
-        .container {
-            border: 2px solid #2b6fe2;
-            padding: 12px;
-            min-height: calc(100vh - 20px);
-            background: #fff;
+        .page {
+            max-width: 1360px;
+            margin: 0 auto;
+            padding: 28px 20px 40px;
         }
 
-        .page-header {
+        .hero {
+            background: linear-gradient(135deg, #4338ca, #2563eb 55%, #06b6d4);
+            color: #fff;
+            border-radius: 28px;
+            padding: 28px;
+            box-shadow: var(--shadow-md);
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 22px;
+        }
+
+        .hero::before,
+        .hero::after {
+            content: "";
+            position: absolute;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.10);
+        }
+
+        .hero::before {
+            width: 260px;
+            height: 260px;
+            right: -70px;
+            top: -80px;
+        }
+
+        .hero::after {
+            width: 150px;
+            height: 150px;
+            bottom: -55px;
+            left: 42%;
+        }
+
+        .hero-top {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 16px;
+            align-items: flex-start;
+            gap: 18px;
+            position: relative;
+            z-index: 1;
             flex-wrap: wrap;
         }
 
-        .page-header h1 {
+        .hero-title-wrap h1 {
             margin: 0;
-            font-size: 28px;
-            font-weight: 700;
+            font-size: 34px;
+            font-weight: 800;
+            letter-spacing: -0.4px;
+        }
+
+        .hero-title-wrap p {
+            margin: 10px 0 0;
+            color: rgba(255,255,255,0.92);
+            font-size: 15px;
+            max-width: 680px;
+            line-height: 1.6;
         }
 
         .btn {
             display: inline-flex;
             align-items: center;
             justify-content: center;
+            gap: 8px;
+            border: none;
             text-decoration: none;
-            border: 1px solid transparent;
-            border-radius: 4px;
-            padding: 8px 14px;
+            border-radius: 14px;
+            padding: 12px 18px;
             font-size: 14px;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
-            box-shadow: var(--shadow);
+            transition: all 0.22s ease;
         }
 
         .btn-primary {
-            background: var(--primary);
-            color: #fff;
+            background: #fff;
+            color: var(--primary);
+            box-shadow: 0 10px 18px rgba(255,255,255,0.18);
         }
 
         .btn-primary:hover {
-            background: var(--primary-dark);
+            transform: translateY(-1px);
+            background: #f8faff;
         }
 
-        .card {
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(140px, 1fr));
+            gap: 14px;
+            margin-top: 22px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .stat-card {
+            background: rgba(255,255,255,0.16);
+            border: 1px solid rgba(255,255,255,0.18);
+            border-radius: 18px;
+            padding: 16px 18px;
+            backdrop-filter: blur(8px);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: rgba(255,255,255,0.85);
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 800;
+            color: #fff;
+        }
+
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+
+        .toolbar-left {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .search-box,
+        .filter-box {
+            background: var(--card);
             border: 1px solid var(--border);
-            background: #fff;
+            border-radius: 14px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .search-box {
+            min-width: 300px;
+            display: flex;
+            align-items: center;
+            padding: 0 14px;
+        }
+
+        .search-box span {
+            color: var(--muted);
+            margin-right: 8px;
+            font-size: 15px;
+        }
+
+        .search-box input {
+            width: 100%;
+            border: none;
+            outline: none;
+            background: transparent;
+            padding: 13px 0;
+            font-size: 14px;
+            color: var(--text);
+        }
+
+        .filter-box select {
+            border: none;
+            outline: none;
+            background: transparent;
+            padding: 13px 14px;
+            min-width: 160px;
+            font-size: 14px;
+            color: var(--text);
+            cursor: pointer;
+        }
+
+        .btn-add {
+            background: linear-gradient(135deg, var(--primary), #2563eb);
+            color: #fff;
+            box-shadow: 0 10px 20px rgba(79, 70, 229, 0.22);
+        }
+
+        .btn-add:hover {
+            transform: translateY(-1px);
+            background: linear-gradient(135deg, var(--primary-dark), #1d4ed8);
+        }
+
+        .table-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+        }
+
+        .table-wrap {
             overflow-x: auto;
         }
 
         table {
             width: 100%;
-            border-collapse: collapse;
-            min-width: 1050px;
-        }
-
-        th, td {
-            padding: 12px 10px;
-            text-align: left;
-            font-size: 14px;
-            vertical-align: top;
+            border-collapse: separate;
+            border-spacing: 0;
+            min-width: 1120px;
         }
 
         thead th {
-            border-bottom: 2px solid #666;
-            font-weight: 700;
+            background: #f8fafc;
+            color: #334155;
+            text-align: left;
+            font-size: 13px;
+            font-weight: 800;
+            letter-spacing: 0.2px;
+            padding: 18px 16px;
+            border-bottom: 1px solid var(--border);
             white-space: nowrap;
         }
 
-        tbody tr:nth-child(odd) {
-            background: var(--bg-row);
-        }
-
         tbody td {
-            border-top: 1px solid #efefef;
+            padding: 18px 16px;
+            border-bottom: 1px solid #eef2f7;
+            vertical-align: top;
+            font-size: 14px;
         }
 
-        .course-title {
-            font-size: 16px;
-            font-weight: 700;
-            margin-bottom: 6px;
-            line-height: 1.35;
+        tbody tr:hover {
+            background: var(--row-hover);
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .id-pill {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 38px;
+            height: 30px;
+            padding: 0 10px;
+            background: var(--primary-soft);
+            color: var(--primary);
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .course-info {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            min-width: 280px;
         }
 
         .thumb {
-            width: 50px;
-            height: 28px;
-            display: block;
-            border: 1px solid #d9d9d9;
-            border-radius: 2px;
-            background: linear-gradient(135deg, #21409a, #41b6e6);
+            width: 84px;
+            height: 52px;
+            flex-shrink: 0;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #4338ca, #2563eb 55%, #06b6d4);
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.15);
             position: relative;
             overflow: hidden;
         }
 
-        .thumb::after {
-            content: "IMG";
+        .thumb::before {
+            content: "";
             position: absolute;
-            right: 4px;
-            bottom: 2px;
-            font-size: 8px;
-            color: #fff;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.18);
+            right: -8px;
+            top: -10px;
+        }
+
+        .thumb::after {
+            content: "COURSE";
+            position: absolute;
+            left: 10px;
+            bottom: 8px;
+            font-size: 10px;
+            letter-spacing: 0.8px;
+            color: rgba(255,255,255,0.92);
+            font-weight: 800;
+        }
+
+        .course-title {
+            font-size: 16px;
+            font-weight: 800;
+            line-height: 1.45;
+            margin: 0 0 6px;
+            color: var(--text);
+        }
+
+        .course-meta {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .meta-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #f8fafc;
+            border: 1px solid #e8edf5;
+            border-radius: 999px;
+            padding: 6px 10px;
+        }
+
+        .manager-cell,
+        .category-cell,
+        .created-cell {
+            color: #334155;
+            font-weight: 600;
+        }
+
+        .price-box {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .price-main {
+            font-weight: 800;
+            color: var(--text);
+            font-size: 15px;
+        }
+
+        .price-sale {
+            font-size: 12px;
+            color: var(--success);
             font-weight: 700;
         }
 
         .status-badge {
-            display: inline-block;
-            background: var(--success);
-            color: #fff;
-            font-size: 11px;
-            font-weight: 700;
-            padding: 4px 9px;
-            border-radius: 3px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .status-badge::before {
+            content: "";
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        .status-published {
+            background: var(--success-soft);
+            color: var(--success);
         }
 
         .status-draft {
-            background: var(--secondary);
+            background: var(--warning-soft);
+            color: var(--warning);
         }
 
         .action-group {
-            display: inline-flex;
-            border-radius: 3px;
-            overflow: hidden;
+            display: flex;
+            gap: 8px;
+            flex-wrap: nowrap;
         }
 
         .icon-btn {
-            width: 30px;
-            height: 30px;
+            width: 38px;
+            height: 38px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: #fff;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            background: #fff;
-            border: 1px solid;
-            text-decoration: none;
             cursor: pointer;
-            font-size: 14px;
-            padding: 0;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            font-size: 15px;
+            font-weight: 700;
         }
 
-        .icon-btn + .icon-btn {
-            border-left: none;
+        .icon-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-sm);
         }
 
         .icon-edit {
             color: var(--primary);
-            border-color: #b6d4fe;
+            background: var(--primary-soft);
+            border-color: #dbe3ff;
         }
 
         .icon-list {
-            color: #0a8ba6;
-            border-color: #9eeaf9;
+            color: var(--info);
+            background: var(--info-soft);
+            border-color: #b8edf7;
         }
 
         .icon-delete {
             color: var(--danger);
-            border-color: #f1b8bf;
+            background: var(--danger-soft);
+            border-color: #fecdd3;
         }
 
         .empty-state {
+            padding: 42px 18px;
             text-align: center;
-            padding: 30px 16px;
             color: var(--muted);
+        }
+
+        .empty-state .emoji {
+            font-size: 42px;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .empty-state strong {
+            display: block;
+            color: var(--text);
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        .table-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            padding: 16px 20px;
+            border-top: 1px solid var(--border);
+            background: #fcfdff;
+        }
+
+        .footer-note {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        @media (max-width: 900px) {
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .search-box {
+                min-width: 100%;
+            }
+
+            .toolbar {
+                align-items: stretch;
+            }
+
+            .toolbar-left {
+                width: 100%;
+            }
+
+            .filter-box,
+            .filter-box select {
+                width: 100%;
+            }
+
+            .btn-add {
+                width: 100%;
+            }
+
+            .hero-title-wrap h1 {
+                font-size: 28px;
+            }
         }
     </style>
 </head>
 <body>
-<div class="container">
-    <div class="page-header">
-        <h1>Courses Management</h1>
-        <a href="course-detail.html?mode=add" class="btn btn-primary">+ Add New Course</a>
+<div class="page">
+    <section class="hero">
+        <div class="hero-top">
+            <div class="hero-title-wrap">
+                <h1>Courses Management</h1>
+                <p>Quản lý danh sách khóa học, chỉnh sửa nội dung, theo dõi trạng thái xuất bản và giữ mọi thứ gọn gàng thay vì để nó trông như biên bản họp tổ dân phố.</p>
+            </div>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-label">Tổng số khóa học</div>
+                <div class="stat-value" id="statTotal">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Đã xuất bản</div>
+                <div class="stat-value" id="statPublished">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Bản nháp</div>
+                <div class="stat-value" id="statDraft">0</div>
+            </div>
+        </div>
+    </section>
+
+    <div class="toolbar">
+        <div class="toolbar-left">
+            <div class="search-box">
+                <span>🔎</span>
+                <input type="text" id="searchInput" placeholder="Tìm theo tiêu đề, manager, category...">
+            </div>
+
+            <div class="filter-box">
+                <select id="statusFilter">
+                    <option value="all">Tất cả trạng thái</option>
+                    <option value="published">Published</option>
+                    <option value="draft">Draft</option>
+                </select>
+            </div>
+        </div>
+
+        <a th:href="@{/courses/new}" class="btn btn-add">＋ Add New Course</a>
     </div>
 
-    <div class="card">
-        <table>
-            <thead>
-            <tr>
-                <th style="width: 60px;">ID</th>
-                <th>Title</th>
-                <th style="width: 160px;">Manager</th>
-                <th style="width: 150px;">Category</th>
-                <th style="width: 100px;">Price</th>
-                <th style="width: 110px;">Status</th>
-                <th style="width: 210px;">Created</th>
-                <th style="width: 140px;">Actions</th>
-            </tr>
-            </thead>
-            <tbody id="courseTableBody"></tbody>
-        </table>
+    <div class="table-card">
+        <div class="table-wrap">
+            <table>
+                <thead>
+                <tr>
+                    <th style="width: 80px;">ID</th>
+                    <th>Course</th>
+                    <th style="width: 180px;">Manager</th>
+                    <th style="width: 160px;">Category</th>
+                    <th style="width: 130px;">Price</th>
+                    <th style="width: 140px;">Status</th>
+                    <th style="width: 180px;">Created</th>
+                    <th style="width: 150px;">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if="${#lists.isEmpty(courses)}">
+                    <td colspan="8">
+                        <div class="empty-state">
+                            <span class="emoji">📚</span>
+                            <strong>Không tìm thấy khóa học phù hợp</strong>
+                            <div>Thử đổi từ khóa tìm kiếm hoặc bộ lọc trạng thái.</div>
+                        </div>
+                    </td>
+                </tr>
+
+                <tr th:each="course : ${courses}">
+                    <td>
+                        <span class="id-pill" th:text="'#' + ${course.courseId}">#1</span>
+                    </td>
+
+                    <td>
+                        <div class="course-info">
+                            <div class="thumb"></div>
+                            <div>
+                                <div class="course-title" th:text="${course.title}">Course Title</div>
+                                <div class="course-meta">
+                                    <span class="meta-badge">🧩 0 chapters</span>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+
+                    <td class="manager-cell"
+                        th:text="${course.instructor != null ? course.instructor.managerName : 'Administrator'}">
+                        Administrator
+                    </td>
+
+                    <td class="category-cell"
+                        th:text="${course.category != null ? course.category.name : ''}">
+                        Category
+                    </td>
+
+                    <td>
+                        <div class="price-box">
+                            <div class="price-main" th:text="${course.price}">0.00</div>
+                        </div>
+                    </td>
+
+                    <td>
+        <span class="status-badge"
+              th:classappend="${course.status == 1} ? ' status-published' : ' status-draft'"
+              th:text="${course.status == 1} ? 'Published' : 'Draft'">
+            Published
+        </span>
+                    </td>
+
+                    <td class="created-cell" th:text="${course.createdAt}">2025-01-01</td>
+
+                    <td>
+                        <div class="action-group">
+                            <a th:href="@{/courses/edit/{id}(id=${course.courseId})}"
+                               class="icon-btn icon-edit"
+                               title="Edit">✎</a>
+
+                            <a th:href="@{/courses/content/{id}(id=${course.courseId})}"
+                               class="icon-btn icon-list"
+                               title="Content">☰</a>
+
+                            <a th:href="@{/courses/delete/{id}(id=${course.courseId})}"
+                               class="icon-btn icon-delete"
+                               title="Delete"
+                               onclick="return confirm('Delete this course?')">
+                                🗑
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="table-footer">
+            <div class="footer-note" id="resultCount">Hiển thị 0 khóa học</div>
+            <div class="footer-note">StudyHub • Courses dashboard</div>
+        </div>
     </div>
 </div>
 
 <script>
     const STORAGE_KEY = "course_management_data";
 
-    function getDefaultData() {
-        return {
-            courses: [
-                {
-                    id: 1,
-                    title: "Tiêu đề course 1",
-                    manager: "Kien Nguyen8",
-                    category: "Business",
-                    level: "Beginner",
-                    duration: "6 giờ",
-                    listedPrice: 0,
-                    salePrice: 0,
-                    status: true,
-                    featured: false,
-                    description: "Mô tả khóa học số 1.",
-                    createdAt: "2025-08-07 08:42:55",
-                    chapters: []
-                },
-                {
-                    id: 2,
-                    title: "Course số 2",
-                    manager: "Kien Nguyen8",
-                    category: "Data Science",
-                    level: "Beginner",
-                    duration: "8 giờ",
-                    listedPrice: 15,
-                    salePrice: 12,
-                    status: true,
-                    featured: false,
-                    description: "Khóa học mẫu để quản lý chapter và lesson.",
-                    createdAt: "2025-08-07 10:07:30",
-                    chapters: [
-                        {
-                            id: 1,
-                            title: "Chương 2.1 - Tổng quan",
-                            description: "Mô tả tổng quan bài học",
-                            order: 1,
-                            lessons: [
-                                {
-                                    id: 1,
-                                    title: "Bài học tổng quan 2.1.1",
-                                    contentType: "Video",
-                                    contentValue: "https://www.youtube.com/watch?v=TzT5NI5V_lA",
-                                    duration: 0,
-                                    order: 1,
-                                    preview: false
-                                },
-                                {
-                                    id: 2,
-                                    title: "Bài học 2.1.2 updated6",
-                                    contentType: "PDF",
-                                    contentValue: "document.pdf",
-                                    duration: 0,
-                                    order: 2,
-                                    preview: false
-                                },
-                                {
-                                    id: 3,
-                                    title: "Bài học YouTube2",
-                                    contentType: "Video",
-                                    contentValue: "https://www.youtube.com/watch?v=TzT5NI5V_lA",
-                                    duration: 30,
-                                    order: 3,
-                                    preview: false
-                                }
-                            ]
-                        },
-                        {
-                            id: 2,
-                            title: "Chương 2.2. Nội dung chi tiết đầu",
-                            description: "Mô tả chương nội dung chi tiết đầu",
-                            order: 2,
-                            lessons: [
-                                {
-                                    id: 1,
-                                    title: "Bài 2.2.1 - Nội dung rich text",
-                                    contentType: "Text",
-                                    contentValue: "Nội dung lesson dạng text",
-                                    duration: 0,
-                                    order: 1,
-                                    preview: false
-                                },
-                                {
-                                    id: 2,
-                                    title: "Bài học PDF #2",
-                                    contentType: "PDF",
-                                    contentValue: "tailieu.pdf",
-                                    duration: 0,
-                                    order: 2,
-                                    preview: false
-                                }
-                            ]
-                        }
-                    ]
-                }
-            ]
-        };
-    }
+
 
     function loadData() {
         const raw = localStorage.getItem(STORAGE_KEY);
@@ -342,45 +695,117 @@
     }
 
     function statusClass(value) {
-        return value ? "status-badge" : "status-badge status-draft";
+        return value ? "status-badge status-published" : "status-badge status-draft";
+    }
+
+    function formatMoney(value) {
+        return Number(value || 0).toFixed(2);
+    }
+
+    function updateStats(courses) {
+        const total = courses.length;
+        const published = courses.filter(c => c.status).length;
+        const draft = total - published;
+
+        document.getElementById("statTotal").textContent = total;
+        document.getElementById("statPublished").textContent = published;
+        document.getElementById("statDraft").textContent = draft;
+    }
+
+    function getFilteredCourses(courses) {
+        const keyword = document.getElementById("searchInput").value.trim().toLowerCase();
+        const status = document.getElementById("statusFilter").value;
+
+        return courses.filter(course => {
+            const matchesKeyword =
+                course.title.toLowerCase().includes(keyword) ||
+                course.manager.toLowerCase().includes(keyword) ||
+                course.category.toLowerCase().includes(keyword);
+
+            const matchesStatus =
+                status === "all" ||
+                (status === "published" && course.status) ||
+                (status === "draft" && !course.status);
+
+            return matchesKeyword && matchesStatus;
+        });
     }
 
     function renderCourses() {
         const data = loadData();
         const tbody = document.getElementById("courseTableBody");
-        const courses = [...data.courses].sort((a, b) => b.id - a.id);
+        const allCourses = [...data.courses].sort((a, b) => b.id - a.id);
+
+        updateStats(allCourses);
+
+        const courses = getFilteredCourses(allCourses);
+        document.getElementById("resultCount").textContent = `Hiển thị ${courses.length} khóa học`;
 
         if (!courses.length) {
             tbody.innerHTML = `
-        <tr>
-          <td colspan="8" class="empty-state">Chưa có khóa học nào.</td>
-        </tr>
-      `;
+                <tr>
+                    <td colspan="8">
+                        <div class="empty-state">
+                            <span class="emoji">📚</span>
+                            <strong>Không tìm thấy khóa học phù hợp</strong>
+                            <div>Thử đổi từ khóa tìm kiếm hoặc bộ lọc trạng thái.</div>
+                        </div>
+                    </td>
+                </tr>
+            `;
             return;
         }
 
         tbody.innerHTML = courses.map(course => `
-      <tr>
-        <td>${course.id}</td>
+    <tr>
         <td>
-          <div class="course-title">${course.title}</div>
-          <span class="thumb"></span>
+            <span class="id-pill">#${course.id}</span>
         </td>
-        <td>${course.manager}</td>
-        <td>${course.category}</td>
-        <td>${Number(course.listedPrice || 0).toFixed(2)}</td>
-        <td><span class="${statusClass(course.status)}">${formatStatus(course.status)}</span></td>
-        <td>${course.createdAt || ""}</td>
         <td>
-          <div class="action-group">
-            <a href="course-detail.html?mode=edit&id=${course.id}" class="icon-btn icon-edit" title="Edit">✎</a>
-            <a href="course-content.html?courseId=${course.id}" class="icon-btn icon-list" title="Content">☰</a>
-            <button type="button" class="icon-btn icon-delete" title="Delete" onclick="deleteCourse(${course.id})">🗑</button>
-          </div>
+            <div class="course-info">
+                <div class="thumb"></div>
+                <div>
+                    <div class="course-title">${course.title}</div>
+                    <div class="course-meta">
+                        <span class="meta-badge">🧩 ${(course.chapters || []).length} chapters</span>
+                    </div>
+                </div>
+            </div>
         </td>
-      </tr>
-    `).join("");
-    }
+        <td class="manager-cell">${course.manager}</td>
+        <td class="category-cell">${course.category}</td>
+        <td>
+            <div class="price-box">
+                <div class="price-main">${formatMoney(course.listedPrice)}</div>
+                ${Number(course.salePrice || 0) > 0 && Number(course.salePrice) < Number(course.listedPrice)
+            ? `<div class="price-sale">Sale: ${formatMoney(course.salePrice)}</div>`
+            : ``}
+            </div>
+        </td>
+        <td>
+            <span class="${statusClass(course.status)}">${formatStatus(course.status)}</span>
+        </td>
+        <td class="created-cell">${course.createdAt || ""}</td>
+        <td>
+            <div class="action-group">
+                <a th:href="@{/courses/edit/{id}(id=${course.courseId})}"
+                   class="icon-btn icon-edit"
+                   title="Edit">✎</a>
+
+                <a href="/courses/content/${course.id}"
+                   class="icon-btn icon-list"
+                   title="Content">☰</a>
+
+                <a href="/courses/delete/${course.id}"
+                   class="icon-btn icon-delete"
+                   title="Delete"
+                   onclick="return confirm('Delete this course?')">
+                   🗑
+                </a>
+            </div>
+        </td>
+    </tr>
+`).join("");
 
     function deleteCourse(id) {
         const data = loadData();
@@ -394,6 +819,9 @@
         saveData(data);
         renderCourses();
     }
+
+    document.getElementById("searchInput").addEventListener("input", renderCourses);
+    document.getElementById("statusFilter").addEventListener("change", renderCourses);
 
     renderCourses();
 </script>

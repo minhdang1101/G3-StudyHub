@@ -1,17 +1,15 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Course Content</title>
+    <title th:text="${course.id == null} ? 'Course Detail' : 'Edit Course'">Course Detail</title>
+
     <style>
         :root {
             --primary: #0d6efd;
             --primary-dark: #0b5ed7;
             --secondary: #6c757d;
-            --success: #198754;
-            --danger: #dc3545;
-            --info: #0dcaf0;
             --border: #dee2e6;
             --text: #212529;
             --muted: #6c757d;
@@ -44,16 +42,15 @@
             margin-bottom: 16px;
         }
 
-        .page-header h2 {
+        .page-header h1 {
             margin: 0;
-            font-size: 24px;
+            font-size: 28px;
             font-weight: 700;
         }
 
         .btn-group {
             display: flex;
             gap: 8px;
-            align-items: center;
             flex-wrap: wrap;
         }
 
@@ -71,208 +68,190 @@
             box-shadow: var(--shadow);
         }
 
-        .btn-sm {
-            padding: 5px 10px;
-            font-size: 12px;
-        }
-
-        .btn-primary {
-            background: var(--primary);
-            color: #fff;
-        }
-
-        .btn-primary:hover {
-            background: var(--primary-dark);
-        }
-
         .btn-secondary {
             background: var(--secondary);
             color: #fff;
         }
 
-        .btn-outline-primary {
-            background: #fff;
-            color: var(--primary);
-            border-color: #b6d4fe;
+        .btn-light {
+            background: #f8f9fa;
+            border-color: var(--border);
+            color: #495057;
         }
 
         .card {
             border: 1px solid var(--border);
             background: #fff;
-            overflow: hidden;
-        }
-
-        .card-header {
-            background: #f8f9fa;
-            border-bottom: 1px solid var(--border);
-            padding: 10px 12px;
-            font-size: 16px;
-            font-weight: 700;
         }
 
         .card-body {
-            padding: 12px;
+            padding: 14px;
         }
 
-        .content-layout {
+        .form-grid {
             display: grid;
-            grid-template-columns: 300px 1fr;
-            gap: 16px;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 18px 34px;
             align-items: start;
         }
 
-        .info-list {
-            display: grid;
-            gap: 12px;
-            font-size: 14px;
+        .full-width {
+            grid-column: 1 / -1;
         }
 
-        .status-badge {
+        .row-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px 44px;
+        }
+
+        label {
             display: inline-block;
-            background: var(--success);
-            color: #fff;
-            font-size: 11px;
-            font-weight: 700;
-            padding: 4px 9px;
-            border-radius: 3px;
-        }
-
-        .status-draft {
-            background: var(--secondary);
-        }
-
-        .chapter-card {
-            border: 1px solid #e7e7e7;
-            border-radius: 4px;
-            margin-bottom: 14px;
-            overflow: hidden;
-            background: #fff;
-        }
-
-        .chapter-header {
-            background: #f8f9fa;
-            padding: 10px 12px;
-            border-bottom: 1px solid #ececec;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 12px;
-            flex-wrap: wrap;
-            font-size: 14px;
-            font-weight: 700;
-        }
-
-        .chapter-title::before {
-            content: "📁 ";
-            font-size: 13px;
-        }
-
-        .chapter-desc {
-            padding: 12px 12px 4px;
-            color: #6b6b6b;
-            font-size: 14px;
-        }
-
-        .lesson-list {
-            padding: 0 12px 12px;
-            display: grid;
-            gap: 10px;
-        }
-
-        .lesson-item {
-            display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            gap: 10px;
-            border-top: 1px solid #f0f0f0;
-            padding-top: 10px;
-            flex-wrap: wrap;
-        }
-
-        .lesson-main {
-            display: flex;
-            gap: 10px;
-            align-items: flex-start;
-        }
-
-        .lesson-number {
-            width: 18px;
-            text-align: center;
+            margin-bottom: 6px;
             font-size: 15px;
-            font-weight: 700;
-            color: #1f6feb;
-            flex-shrink: 0;
+            color: #444;
         }
 
-        .lesson-number.pdf {
-            color: #dc3545;
+        .required::after {
+            content: "*";
+            color: #444;
         }
 
-        .lesson-number.text {
-            color: #0dcaf0;
-        }
-
-        .lesson-text {
-            font-size: 14px;
-            line-height: 1.35;
-        }
-
-        .lesson-text .meta {
-            display: block;
-            font-size: 11px;
-            color: #8a8a8a;
-            text-transform: uppercase;
-            margin-top: 2px;
-        }
-
-        .lesson-text .duration {
-            font-size: 11px;
-            color: #8a8a8a;
-            margin-left: 4px;
-        }
-
-        .action-group {
-            display: inline-flex;
+        input[type="text"],
+        input[type="number"],
+        input[type="file"],
+        select,
+        textarea {
+            width: 100%;
+            border: 1px solid #b7b7b7;
             border-radius: 3px;
-            overflow: hidden;
+            font-size: 15px;
+            padding: 10px 12px;
+            outline: none;
+            background: #fff;
+            font-family: inherit;
         }
 
-        .icon-btn {
-            width: 30px;
+        textarea {
+            resize: vertical;
+            min-height: 220px;
+        }
+
+        .thumbnail-box {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: flex-start;
+        }
+
+        .thumb-large {
+            width: 265px;
+            height: 160px;
+            border: 1px solid var(--border);
+            background: #f8f9fa;
+            overflow: hidden;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .thumb-large img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .thumbnail-placeholder {
+            color: var(--muted);
+            font-size: 14px;
+            text-align: center;
+            padding: 10px;
+        }
+
+        .checkbox-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-top: 18px;
+            font-size: 15px;
+        }
+
+        .checkbox-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .checkbox-row input {
+            width: 16px;
+            height: 16px;
+        }
+
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2px;
+            padding: 8px;
+            border: 1px solid var(--border);
+            border-bottom: none;
+            background: #f8f9fa;
+            border-radius: 3px 3px 0 0;
+        }
+
+        .tool-btn {
+            min-width: 34px;
             height: 30px;
+            border: 1px solid #cfcfcf;
+            background: #fff;
+            border-radius: 2px;
+            font-size: 16px;
+            font-weight: 700;
+            color: #333;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            background: #fff;
-            border: 1px solid;
-            text-decoration: none;
-            cursor: pointer;
-            font-size: 14px;
-            padding: 0;
+            padding: 0 8px;
         }
 
-        .icon-btn + .icon-btn {
-            border-left: none;
+        .editor textarea {
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
+            background: #fcfcfc;
         }
 
-        .icon-edit {
-            color: var(--primary);
-            border-color: #b6d4fe;
+        .actions {
+            margin-top: 18px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
         }
 
-        .icon-delete {
-            color: var(--danger);
-            border-color: #f1b8bf;
-        }
-
-        .empty {
+        .hint {
             color: var(--muted);
-            padding: 10px 0;
+            font-size: 13px;
+            margin-top: 4px;
         }
 
-        @media (max-width: 1000px) {
-            .content-layout {
+        .error-text {
+            color: red;
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        @media (max-width: 1100px) {
+            .form-grid {
                 grid-template-columns: 1fr;
+            }
+
+            .row-2,
+            .checkbox-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .thumb-large {
+                width: 100%;
+                max-width: 320px;
             }
         }
     </style>
@@ -280,268 +259,136 @@
 <body>
 <div class="container">
     <div class="page-header">
-        <h2 id="contentTitle">Course Content Management</h2>
+        <h1 th:text="${course.id == null} ? 'Course Details' : 'Edit Course'">Course Details</h1>
         <div class="btn-group">
-            <a id="addChapterBtn" href="#" class="btn btn-primary btn-sm">+ Add Chapter</a>
-            <a href="course-list.html" class="btn btn-secondary btn-sm">← Back to Courses</a>
+            <a th:href="@{/courses}" class="btn btn-secondary">← Back to Courses</a>
         </div>
     </div>
 
-    <div class="content-layout">
-        <div class="card">
-            <div class="card-header">Course Information</div>
-            <div class="card-body">
-                <div class="info-list">
-                    <div><b>Title:</b> <span id="courseTitle"></span></div>
-                    <div><b>Category:</b> <span id="courseCategory"></span></div>
-                    <div><b>Instructor:</b> <span id="courseManager"></span></div>
-                    <div><b>Level:</b> <span id="courseLevel"></span></div>
-                    <div><b>Price:</b> <span id="coursePrice"></span></div>
-                    <div><b>Status:</b> <span id="courseStatus"></span></div>
-                </div>
-            </div>
-        </div>
+    <div class="card">
+        <div class="card-body">
+            <form th:action="@{/courses/save}" th:object="${course}" method="post" enctype="multipart/form-data">
+                <input type="hidden" th:field="*{courseId}"/>
 
-        <div class="card">
-            <div class="card-header">Course Content</div>
-            <div class="card-body" id="chapterList"></div>
+                <div class="form-grid">
+                    <div class="full-width">
+                        <label for="title" class="required">Title</label>
+                        <input type="text" id="title" th:field="*{title}">
+                        <div class="error-text" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></div>
+                    </div>
+
+                    <div>
+                        <div class="row-2">
+                            <div>
+                                <label for="category">Category</label>
+                                <select id="category" th:field="*{category}">
+                                    <option value="Programming">Lập trình</option>
+                                    <option value="Business">Business</option>
+                                    <option value="Data Science">Data Science</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label for="manager">Manager</label>
+                                <select id="manager" th:field="*{instructor}">
+                                    <option value="Administrator">Administrator</option>
+                                    <option value="Manager Name">Manager Name</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label for="level">Level</label>
+                                <select id="level" th:field="*{level}">
+                                    <option value="Beginner">Beginner</option>
+                                    <option value="Intermediate">Intermediate</option>
+                                    <option value="Advanced">Advanced</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label for="duration" class="required">Duration</label>
+                                <input type="text" id="duration" th:field="*{durationHours}" placeholder="Ví dụ: 8 giờ">
+                                <div class="error-text" th:if="${#fields.hasErrors('duration')}" th:errors="*{durationHours}"></div>
+                            </div>
+
+                            <div>
+                                <label for="listedPrice" class="required">Listed Price</label>
+                                <input type="number" id="listedPrice" th:field="*{price}" min="0" step="0.01">
+                                <div class="error-text" th:if="${#fields.hasErrors('listedPrice')}" th:errors="*{price}"></div>
+                            </div>
+
+                            <div>
+                                <label for="salePrice">Sale Price</label>
+                                <input type="number" id="salePrice" th:field="*{price}" min="0" step="0.01">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="thumbnail-box">
+                            <label for="thumbnailFile">Thumbnail</label>
+
+                            <div class="thumb-large">
+                                <img th:if="${course.thumbnail != null and !#strings.isEmpty(course.thumbnail)}"
+                                     th:src="@{${course.thumbnail}}"
+                                     alt="Thumbnail">
+                                <div class="thumbnail-placeholder"
+                                     th:if="${course.thumbnail == null or #strings.isEmpty(course.thumbnail)}">
+                                    No image selected
+                                </div>
+                            </div>
+
+                            <input type="file" id="thumbnailFile" name="thumbnailFile" accept="image/*">
+                            <div class="hint">Chọn ảnh từ máy để tải lên. Không có preview phía client vì đã bỏ JavaScript.</div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label style="display:block; margin-bottom:12px;">Status</label>
+                        <div class="checkbox-grid">
+                            <label class="checkbox-row">
+                                <input type="checkbox" th:field="*{status}">
+                                Published
+                            </label>
+                            <label class="checkbox-row">
+                                <input type="checkbox" >
+                                Featured Post
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="full-width editor">
+                        <label for="description">Description</label>
+                        <div class="toolbar">
+                            <span class="tool-btn">B</span>
+                            <span class="tool-btn"><i>I</i></span>
+                            <span class="tool-btn"><u>U</u></span>
+                            <span class="tool-btn">S̶</span>
+                            <span class="tool-btn">▣</span>
+                            <span class="tool-btn">≣</span>
+                            <span class="tool-btn">≡</span>
+                            <span class="tool-btn">☰</span>
+                            <span class="tool-btn">▦</span>
+                            <span class="tool-btn">🔗</span>
+                            <span class="tool-btn">🖼</span>
+                            <span class="tool-btn">⤢</span>
+                            <span class="tool-btn">&lt;/&gt;</span>
+                            <span class="tool-btn">?</span>
+                        </div>
+                        <textarea id="description" th:field="*{description}"></textarea>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <button type="submit"
+                            class="btn btn-light"
+                            th:text="${course.id == null} ? 'Submit' : 'Update Course'">
+                        Submit
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
-
-<script>
-    const STORAGE_KEY = "course_management_data";
-
-    function getDefaultData() {
-        return {
-            courses: [
-                {
-                    id: 1,
-                    title: "Tiêu đề course 1",
-                    manager: "Kien Nguyen8",
-                    category: "Business",
-                    level: "Beginner",
-                    duration: "6 giờ",
-                    listedPrice: 0,
-                    salePrice: 0,
-                    status: true,
-                    featured: false,
-                    description: "Mô tả khóa học số 1.",
-                    createdAt: "2025-08-07 08:42:55",
-                    chapters: []
-                },
-                {
-                    id: 2,
-                    title: "Course số 2",
-                    manager: "Kien Nguyen8",
-                    category: "Data Science",
-                    level: "Beginner",
-                    duration: "8 giờ",
-                    listedPrice: 15,
-                    salePrice: 12,
-                    status: true,
-                    featured: false,
-                    description: "Khóa học mẫu để quản lý chapter và lesson.",
-                    createdAt: "2025-08-07 10:07:30",
-                    chapters: [
-                        {
-                            id: 1,
-                            title: "Chương 2.1 - Tổng quan",
-                            description: "Mô tả tổng quan bài học",
-                            order: 1,
-                            lessons: [
-                                {
-                                    id: 1,
-                                    title: "Bài học tổng quan 2.1.1",
-                                    contentType: "Video",
-                                    contentValue: "https://www.youtube.com/watch?v=TzT5NI5V_lA",
-                                    duration: 0,
-                                    order: 1,
-                                    preview: false
-                                },
-                                {
-                                    id: 2,
-                                    title: "Bài học 2.1.2 updated6",
-                                    contentType: "PDF",
-                                    contentValue: "document.pdf",
-                                    duration: 0,
-                                    order: 2,
-                                    preview: false
-                                },
-                                {
-                                    id: 3,
-                                    title: "Bài học YouTube2",
-                                    contentType: "Video",
-                                    contentValue: "https://www.youtube.com/watch?v=TzT5NI5V_lA",
-                                    duration: 30,
-                                    order: 3,
-                                    preview: false
-                                }
-                            ]
-                        },
-                        {
-                            id: 2,
-                            title: "Chương 2.2. Nội dung chi tiết đầu",
-                            description: "Mô tả chương nội dung chi tiết đầu",
-                            order: 2,
-                            lessons: [
-                                {
-                                    id: 1,
-                                    title: "Bài 2.2.1 - Nội dung rich text",
-                                    contentType: "Text",
-                                    contentValue: "Nội dung lesson dạng text",
-                                    duration: 0,
-                                    order: 1,
-                                    preview: false
-                                },
-                                {
-                                    id: 2,
-                                    title: "Bài học PDF #2",
-                                    contentType: "PDF",
-                                    contentValue: "tailieu.pdf",
-                                    duration: 0,
-                                    order: 2,
-                                    preview: false
-                                }
-                            ]
-                        }
-                    ]
-                }
-            ]
-        };
-    }
-
-    function loadData() {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) {
-            const seed = getDefaultData();
-            saveData(seed);
-            return seed;
-        }
-        return JSON.parse(raw);
-    }
-
-    function saveData(data) {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-    }
-
-    function getQueryParam(name) {
-        const params = new URLSearchParams(window.location.search);
-        return params.get(name);
-    }
-
-    function formatStatus(value) {
-        return value ? "Published" : "Draft";
-    }
-
-    function statusClass(value) {
-        return value ? "status-badge" : "status-badge status-draft";
-    }
-
-    function getLessonClass(contentType) {
-        if (contentType === "PDF") return "lesson-number pdf";
-        if (contentType === "Text") return "lesson-number text";
-        return "lesson-number";
-    }
-
-    const data = loadData();
-    const courseId = Number(getQueryParam("courseId"));
-    const course = data.courses.find(c => c.id === courseId);
-
-    if (!course) {
-        alert("Không tìm thấy khóa học.");
-        window.location.href = "course-list.html";
-    }
-
-    document.getElementById("contentTitle").textContent = (course ? course.title : "") + " - Content Management";
-    document.getElementById("courseTitle").textContent = course.title;
-    document.getElementById("courseCategory").textContent = course.category;
-    document.getElementById("courseManager").textContent = course.manager;
-    document.getElementById("courseLevel").textContent = (course.level || "").toUpperCase();
-    document.getElementById("coursePrice").textContent = course.listedPrice;
-    document.getElementById("courseStatus").innerHTML = '<span class="' + statusClass(course.status) + '">' + formatStatus(course.status) + '</span>';
-    document.getElementById("addChapterBtn").href = "chapter-detail.html?mode=add&courseId=" + course.id;
-
-    function renderChapters() {
-        const container = document.getElementById("chapterList");
-        const chapters = [...(course.chapters || [])].sort((a, b) => a.order - b.order);
-
-        if (!chapters.length) {
-            container.innerHTML = '<div class="empty">Chưa có chapter nào. Nhấn "+ Add Chapter" để thêm mới.</div>';
-            return;
-        }
-
-        container.innerHTML = chapters.map(chapter => `
-      <div class="chapter-card">
-        <div class="chapter-header">
-          <div class="chapter-title">Chapter ${chapter.order}: ${chapter.title}</div>
-          <div class="btn-group">
-            <a href="lesson-detail.html?mode=add&courseId=${course.id}&chapterId=${chapter.id}" class="btn btn-outline-primary btn-sm">+ Add Lesson</a>
-            <div class="action-group">
-              <a href="chapter-detail.html?mode=edit&courseId=${course.id}&chapterId=${chapter.id}" class="icon-btn icon-edit" title="Edit Chapter">✎</a>
-              <button type="button" class="icon-btn icon-delete" title="Delete Chapter" onclick="deleteChapter(${chapter.id})">🗑</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="chapter-desc">${chapter.description || ""}</div>
-
-        <div class="lesson-list">
-          ${(chapter.lessons && chapter.lessons.length)
-            ? [...chapter.lessons].sort((a, b) => a.order - b.order).map(lesson => `
-              <div class="lesson-item">
-                <div class="lesson-main">
-                  <div class="${getLessonClass(lesson.contentType)}">${lesson.order}</div>
-                  <div class="lesson-text">
-                    ${lesson.title}
-                    <span class="meta">
-                      ${lesson.contentType}
-                      ${lesson.duration ? `<span class="duration">• ${lesson.duration} min</span>` : ""}
-                      ${lesson.preview ? `<span class="duration">• preview</span>` : ""}
-                    </span>
-                  </div>
-                </div>
-                <div class="action-group">
-                  <a href="lesson-detail.html?mode=edit&courseId=${course.id}&chapterId=${chapter.id}&lessonId=${lesson.id}" class="icon-btn icon-edit" title="Edit Lesson">✎</a>
-                  <button type="button" class="icon-btn icon-delete" title="Delete Lesson" onclick="deleteLesson(${chapter.id}, ${lesson.id})">🗑</button>
-                </div>
-              </div>
-            `).join("")
-            : `<div class="empty">Chưa có lesson nào trong chapter này.</div>`
-        }
-        </div>
-      </div>
-    `).join("");
-    }
-
-    function deleteChapter(chapterId) {
-        const chapter = course.chapters.find(ch => ch.id === chapterId);
-        if (!chapter) return;
-
-        const ok = confirm('Bạn có chắc muốn xoá chapter "' + chapter.title + '" không?');
-        if (!ok) return;
-
-        course.chapters = course.chapters.filter(ch => ch.id !== chapterId);
-        saveData(data);
-        renderChapters();
-    }
-
-    function deleteLesson(chapterId, lessonId) {
-        const chapter = course.chapters.find(ch => ch.id === chapterId);
-        if (!chapter) return;
-
-        const lesson = chapter.lessons.find(ls => ls.id === lessonId);
-        if (!lesson) return;
-
-        const ok = confirm('Bạn có chắc muốn xoá lesson "' + lesson.title + '" không?');
-        if (!ok) return;
-
-        chapter.lessons = chapter.lessons.filter(ls => ls.id !== lessonId);
-        saveData(data);
-        renderChapters();
-    }
-
-    renderChapters();
-</script>
 </body>
 </html>

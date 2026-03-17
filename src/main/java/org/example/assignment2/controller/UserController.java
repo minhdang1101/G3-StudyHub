@@ -193,6 +193,6 @@ public class UserController {
             session.invalidate();
         }
 
-        return "redirect:/";
+        return "redirect:/home";
     }
 }
