@@ -57,7 +57,6 @@ public class UserController {
         if (currentUser != null && currentUser.getRole() != null) {
             String roleValue = currentUser.getRole().getValue();
             if ("MANAGER".equalsIgnoreCase(roleValue) || "ROLE_MANAGER".equalsIgnoreCase(roleValue)) {
-                // Manager: only users enrolled in their courses
                 users = userService.getUsersByManagerCourses(currentUser.getId());
             } else {
                 users = userService.getUsers(roleId, status, keyword);
@@ -194,18 +193,15 @@ public class UserController {
 
         model.addAttribute("user", user);
 
-        // Thống kê số liệu [cite: 196, 197]
         model.addAttribute("postCount", postRepo.countByAuthorId(id));
         model.addAttribute("commentCount", commentRepo.countByUserId(id));
 
-        // Danh sách bài viết và comment [cite: 198, 202]
         model.addAttribute("posts", postRepo.findByAuthorId(id));
         model.addAttribute("comments", commentRepo.findByUserId(id));
 
         return "user/user-records";
     }
 
-    //
     @GetMapping("/register")
     public String showRegister(Model model) {
 
@@ -214,20 +210,18 @@ public class UserController {
         return "user/register";
     }
 
-    //
+    
     @PostMapping("/register")
     public String registerUser(
             @ModelAttribute("userDto") UserDTO userDto,
             Model model
     ) {
 
-        // check password confirm
         if (!userDto.getPassword().equals(userDto.getConfirmPassword())) {
             model.addAttribute("error", "Password confirm does not match");
             return "user/register";
         }
 
-        // check email existed
         if (userRepository.existsByEmail(userDto.getEmail())) {
             model.addAttribute("error", "Email already exists");
             return "user/register";
