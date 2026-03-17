@@ -9,6 +9,7 @@ import java.util.List;
 
 public interface CourseRepository extends JpaRepository<Course, Integer> {
     List<Course> findTop6ByStatusOrderByCreatedAtDesc(Integer status);
+    List<Course> findByStatusOrderByCreatedAtDesc(Integer status);
     @Query("""
         SELECT c FROM Course c
         WHERE (:keyword IS NULL OR :keyword = '' OR LOWER(c.title) LIKE LOWER(CONCAT('%', :keyword, '%')))

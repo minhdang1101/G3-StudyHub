@@ -17,4 +17,10 @@ public class HomeController {
         model.addAttribute("featuredCourses", courseService.getFeaturedCourses());
         return "home";
     }
+
+    @GetMapping("/public-courses")
+    public String publicCourses(Model model) {
+        model.addAttribute("courses", courseService.getPublicCourses());
+        return "public-courses";
+    }
 }

@@ -41,6 +41,10 @@ public class CourseService {
         return courseRepo.findTop6ByStatusOrderByCreatedAtDesc(1);
     }
 
+    public List<Course> getPublicCourses() {
+        return courseRepo.findByStatusOrderByCreatedAtDesc(1);
+    }
+
 
     // =========================================================
     // GROUP 1: LIST / FORM DATA

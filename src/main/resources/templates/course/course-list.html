@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Courses Management</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #4f46e5;
@@ -35,16 +36,13 @@
 
         * {
             box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
         }
 
         body {
             margin: 0;
-            font-family: Inter, Arial, Helvetica, sans-serif;
             color: var(--text);
-            background:
-                    radial-gradient(circle at top left, rgba(79, 70, 229, 0.10), transparent 28%),
-                    radial-gradient(circle at top right, rgba(6, 182, 212, 0.08), transparent 24%),
-                    var(--bg);
+            background: #f0f2f5;
         }
 
         .page {
@@ -540,37 +538,43 @@
         <div class="stats">
             <div class="stat-card">
                 <div class="stat-label">Tổng số khóa học</div>
-                <div class="stat-value" id="statTotal">0</div>
+                <div class="stat-value" id="statTotal" th:text="${#lists.size(courses)}">0</div>
             </div>
             <div class="stat-card">
                 <div class="stat-label">Đã xuất bản</div>
-                <div class="stat-value" id="statPublished">0</div>
+                <div class="stat-value" id="statPublished" th:text="${#lists.size(courses.?[status == 1])}">0</div>
             </div>
             <div class="stat-card">
                 <div class="stat-label">Bản nháp</div>
-                <div class="stat-value" id="statDraft">0</div>
+                <div class="stat-value" id="statDraft" th:text="${#lists.size(courses.?[status != 1])}">0</div>
             </div>
         </div>
     </section>
 
-    <div class="toolbar">
+    <form class="toolbar" th:action="@{/courses}" method="get">
         <div class="toolbar-left">
             <div class="search-box">
                 <span>🔎</span>
-                <input type="text" id="searchInput" placeholder="Tìm theo tiêu đề, manager, category...">
+                <input type="text"
+                       name="keyword"
+                       th:value="${keyword}"
+                       placeholder="Tìm theo tiêu đề khóa học...">
             </div>
 
             <div class="filter-box">
-                <select id="statusFilter">
-                    <option value="all">Tất cả trạng thái</option>
-                    <option value="published">Published</option>
-                    <option value="draft">Draft</option>
+                <select name="status">
+                    <option th:value="${null}" th:selected="${currentStatus == null}">Tất cả trạng thái</option>
+                    <option value="1" th:selected="${currentStatus == 1}">Published</option>
+                    <option value="0" th:selected="${currentStatus == 0}">Draft</option>
                 </select>
             </div>
         </div>
 
-        <a th:href="@{/courses/new}" class="btn btn-add">＋ Add New Course</a>
-    </div>
+        <div class="toolbar-left">
+            <button type="submit" class="btn btn-add">Apply Filter</button>
+            <a th:href="@{/courses/new}" class="btn btn-add">＋ Add New Course</a>
+        </div>
+    </form>
 
     <div class="table-card">
         <div class="table-wrap">
@@ -600,7 +604,7 @@
 
                 <tr th:each="course : ${courses}">
                     <td>
-                        <span class="id-pill" th:text="'#' + ${course.courseId}">#1</span>
+                        <span class="id-pill" th:text="|#${course.courseId}|">#1</span>
                     </td>
 
                     <td>
@@ -616,7 +620,7 @@
                     </td>
 
                     <td class="manager-cell"
-                        th:text="${course.instructor != null ? course.instructor.managerName : 'Administrator'}">
+                        th:text="${course.instructor != null ? course.instructor.fullName : 'Administrator'}">
                         Administrator
                     </td>
 
@@ -665,165 +669,10 @@
         </div>
 
         <div class="table-footer">
-            <div class="footer-note" id="resultCount">Hiển thị 0 khóa học</div>
+            <div class="footer-note" id="resultCount" th:text="|Hiển thị ${#lists.size(courses)} khóa học|">Hiển thị 0 khóa học</div>
             <div class="footer-note">StudyHub • Courses dashboard</div>
         </div>
     </div>
 </div>
-
-<script>
-    const STORAGE_KEY = "course_management_data";
-
-
-
-    function loadData() {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) {
-            const seed = getDefaultData();
-            saveData(seed);
-            return seed;
-        }
-        return JSON.parse(raw);
-    }
-
-    function saveData(data) {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-    }
-
-    function formatStatus(value) {
-        return value ? "Published" : "Draft";
-    }
-
-    function statusClass(value) {
-        return value ? "status-badge status-published" : "status-badge status-draft";
-    }
-
-    function formatMoney(value) {
-        return Number(value || 0).toFixed(2);
-    }
-
-    function updateStats(courses) {
-        const total = courses.length;
-        const published = courses.filter(c => c.status).length;
-        const draft = total - published;
-
-        document.getElementById("statTotal").textContent = total;
-        document.getElementById("statPublished").textContent = published;
-        document.getElementById("statDraft").textContent = draft;
-    }
-
-    function getFilteredCourses(courses) {
-        const keyword = document.getElementById("searchInput").value.trim().toLowerCase();
-        const status = document.getElementById("statusFilter").value;
-
-        return courses.filter(course => {
-            const matchesKeyword =
-                course.title.toLowerCase().includes(keyword) ||
-                course.manager.toLowerCase().includes(keyword) ||
-                course.category.toLowerCase().includes(keyword);
-
-            const matchesStatus =
-                status === "all" ||
-                (status === "published" && course.status) ||
-                (status === "draft" && !course.status);
-
-            return matchesKeyword && matchesStatus;
-        });
-    }
-
-    function renderCourses() {
-        const data = loadData();
-        const tbody = document.getElementById("courseTableBody");
-        const allCourses = [...data.courses].sort((a, b) => b.id - a.id);
-
-        updateStats(allCourses);
-
-        const courses = getFilteredCourses(allCourses);
-        document.getElementById("resultCount").textContent = `Hiển thị ${courses.length} khóa học`;
-
-        if (!courses.length) {
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="8">
-                        <div class="empty-state">
-                            <span class="emoji">📚</span>
-                            <strong>Không tìm thấy khóa học phù hợp</strong>
-                            <div>Thử đổi từ khóa tìm kiếm hoặc bộ lọc trạng thái.</div>
-                        </div>
-                    </td>
-                </tr>
-            `;
-            return;
-        }
-
-        tbody.innerHTML = courses.map(course => `
-    <tr>
-        <td>
-            <span class="id-pill">#${course.id}</span>
-        </td>
-        <td>
-            <div class="course-info">
-                <div class="thumb"></div>
-                <div>
-                    <div class="course-title">${course.title}</div>
-                    <div class="course-meta">
-                        <span class="meta-badge">🧩 ${(course.chapters || []).length} chapters</span>
-                    </div>
-                </div>
-            </div>
-        </td>
-        <td class="manager-cell">${course.manager}</td>
-        <td class="category-cell">${course.category}</td>
-        <td>
-            <div class="price-box">
-                <div class="price-main">${formatMoney(course.listedPrice)}</div>
-                ${Number(course.salePrice || 0) > 0 && Number(course.salePrice) < Number(course.listedPrice)
-            ? `<div class="price-sale">Sale: ${formatMoney(course.salePrice)}</div>`
-            : ``}
-            </div>
-        </td>
-        <td>
-            <span class="${statusClass(course.status)}">${formatStatus(course.status)}</span>
-        </td>
-        <td class="created-cell">${course.createdAt || ""}</td>
-        <td>
-            <div class="action-group">
-                <a th:href="@{/courses/edit/{id}(id=${course.courseId})}"
-                   class="icon-btn icon-edit"
-                   title="Edit">✎</a>
-
-                <a href="/courses/content/${course.id}"
-                   class="icon-btn icon-list"
-                   title="Content">☰</a>
-
-                <a href="/courses/delete/${course.id}"
-                   class="icon-btn icon-delete"
-                   title="Delete"
-                   onclick="return confirm('Delete this course?')">
-                   🗑
-                </a>
-            </div>
-        </td>
-    </tr>
-`).join("");
-
-    function deleteCourse(id) {
-        const data = loadData();
-        const course = data.courses.find(c => c.id === id);
-        if (!course) return;
-
-        const ok = confirm('Bạn có chắc muốn xoá "' + course.title + '" không?');
-        if (!ok) return;
-
-        data.courses = data.courses.filter(c => c.id !== id);
-        saveData(data);
-        renderCourses();
-    }
-
-    document.getElementById("searchInput").addEventListener("input", renderCourses);
-    document.getElementById("statusFilter").addEventListener("change", renderCourses);
-
-    renderCourses();
-</script>
 </body>
 </html>

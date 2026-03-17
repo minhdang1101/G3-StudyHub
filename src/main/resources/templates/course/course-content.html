@@ -3,392 +3,257 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${course.id == null} ? 'Course Detail' : 'Edit Course'">Course Detail</title>
-
+    <title>Course Content</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --primary: #0d6efd;
-            --primary-dark: #0b5ed7;
-            --secondary: #6c757d;
-            --border: #dee2e6;
-            --text: #212529;
-            --muted: #6c757d;
-            --shadow: 0 1px 2px rgba(0,0,0,0.08);
+        body { margin: 0; padding: 16px; font-family: 'Plus Jakarta Sans', sans-serif; background: #f0f2f5; color: #212529; }
+        .container { border: 2px solid #2b6fe2; padding: 12px; }
+        .header { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+        .header h1 { margin: 0; font-size: 30px; }
+        .btn-wrap { display: flex; gap: 8px; flex-wrap: wrap; }
+        .btn { display: inline-block; text-decoration: none; border: 1px solid #ced4da; border-radius: 4px; padding: 8px 12px; font-size: 14px; font-weight: 600; }
+        .btn-primary { background: linear-gradient(135deg, #6366f1, #818cf8); color: #fff; border-color: transparent; }
+        .btn-secondary { background: #6c757d; color: #fff; border-color: #6c757d; }
+        .card-grid { display: grid; grid-template-columns: 320px 1fr; gap: 12px; }
+        .card { border: none; border-radius: 16px; padding: 12px; background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.06); }
+        .card h3 { margin-top: 0; margin-bottom: 10px; font-size: 18px; }
+        .meta-item { margin-bottom: 8px; font-size: 14px; }
+        .chapter { border: 1px solid rgba(0,0,0,0.06); border-radius: 14px; margin-bottom: 12px; overflow: hidden; }
+        .chapter-header { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; padding: 10px 12px; background: #f6f7ff; border-bottom: 1px solid rgba(0,0,0,0.06); }
+        .chapter-title { font-size: 15px; font-weight: 700; }
+        .chapter-desc { padding: 8px 10px; font-size: 14px; color: #495057; border-bottom: 1px solid #f1f3f5; }
+        .lesson-list { padding: 8px 10px; }
+        .lesson { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; border-bottom: 1px dashed #e9ecef; padding: 8px 0; }
+        .lesson:last-child { border-bottom: none; }
+        .lesson-main { display: flex; align-items: flex-start; gap: 8px; }
+        .lesson-icon { width: 18px; height: 18px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; color: #fff; font-size: 11px; line-height: 1; margin-top: 2px; }
+        .icon-video { background: #2563eb; }
+        .icon-pdf { background: #ef4444; }
+        .icon-text { background: #06b6d4; }
+        .lesson-title { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+        .lesson-meta { font-size: 12px; color: #6c757d; }
+        .action-inline { display: flex; gap: 6px; flex-wrap: wrap; }
+        .action-inline a { font-size: 12px; text-decoration: none; border: 1px solid rgba(0,0,0,0.10); border-radius: 999px; padding: 4px 10px; color: #4f46e5; background: #fff; }
+        .empty { padding: 10px; font-size: 14px; color: #6c757d; }
+        .play-link { cursor: pointer; }
+
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.55);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
         }
 
-        * { box-sizing: border-box; }
-
-        body {
-            margin: 0;
+        .modal-content {
+            background: #000;
+            border-radius: 6px;
             padding: 10px;
-            font-family: Arial, Helvetica, sans-serif;
-            background: #fff;
-            color: var(--text);
+            max-width: 900px;
+            width: 95%;
         }
 
-        .container {
-            border: 2px solid #2b6fe2;
-            padding: 12px;
-            min-height: calc(100vh - 20px);
-            background: #fff;
-        }
-
-        .page-header {
+        .modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 12px;
-            flex-wrap: wrap;
-            margin-bottom: 16px;
-        }
-
-        .page-header h1 {
-            margin: 0;
-            font-size: 28px;
-            font-weight: 700;
-        }
-
-        .btn-group {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            text-decoration: none;
-            border: 1px solid transparent;
-            border-radius: 4px;
-            padding: 8px 14px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            box-shadow: var(--shadow);
-        }
-
-        .btn-secondary {
-            background: var(--secondary);
             color: #fff;
+            margin-bottom: 8px;
+            font-size: 14px;
         }
 
-        .btn-light {
-            background: #f8f9fa;
-            border-color: var(--border);
-            color: #495057;
+        .modal-close {
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            color: #fff;
+            font-size: 20px;
+            line-height: 1;
         }
 
-        .card {
-            border: 1px solid var(--border);
-            background: #fff;
-        }
-
-        .card-body {
-            padding: 14px;
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr 1fr;
-            gap: 18px 34px;
-            align-items: start;
-        }
-
-        .full-width {
-            grid-column: 1 / -1;
-        }
-
-        .row-2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 18px 44px;
-        }
-
-        label {
-            display: inline-block;
-            margin-bottom: 6px;
-            font-size: 15px;
-            color: #444;
-        }
-
-        .required::after {
-            content: "*";
-            color: #444;
-        }
-
-        input[type="text"],
-        input[type="number"],
-        input[type="file"],
-        select,
-        textarea {
+        .modal-body {
             width: 100%;
-            border: 1px solid #b7b7b7;
-            border-radius: 3px;
-            font-size: 15px;
-            padding: 10px 12px;
-            outline: none;
-            background: #fff;
-            font-family: inherit;
+            aspect-ratio: 16 / 9;
+            background: #000;
         }
 
-        textarea {
-            resize: vertical;
-            min-height: 220px;
-        }
-
-        .thumbnail-box {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            align-items: flex-start;
-        }
-
-        .thumb-large {
-            width: 265px;
-            height: 160px;
-            border: 1px solid var(--border);
-            background: #f8f9fa;
-            overflow: hidden;
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .thumb-large img {
+        .modal-body iframe,
+        .modal-body video {
             width: 100%;
             height: 100%;
-            object-fit: cover;
         }
 
-        .thumbnail-placeholder {
-            color: var(--muted);
-            font-size: 14px;
-            text-align: center;
-            padding: 10px;
-        }
-
-        .checkbox-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 14px;
-            margin-top: 18px;
-            font-size: 15px;
-        }
-
-        .checkbox-row {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .checkbox-row input {
-            width: 16px;
-            height: 16px;
-        }
-
-        .toolbar {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 2px;
-            padding: 8px;
-            border: 1px solid var(--border);
-            border-bottom: none;
-            background: #f8f9fa;
-            border-radius: 3px 3px 0 0;
-        }
-
-        .tool-btn {
-            min-width: 34px;
-            height: 30px;
-            border: 1px solid #cfcfcf;
-            background: #fff;
-            border-radius: 2px;
-            font-size: 16px;
-            font-weight: 700;
-            color: #333;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0 8px;
-        }
-
-        .editor textarea {
-            border-top-left-radius: 0;
-            border-top-right-radius: 0;
-            background: #fcfcfc;
-        }
-
-        .actions {
-            margin-top: 18px;
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .hint {
-            color: var(--muted);
-            font-size: 13px;
-            margin-top: 4px;
-        }
-
-        .error-text {
-            color: red;
-            font-size: 13px;
-            margin-top: 4px;
-        }
-
-        @media (max-width: 1100px) {
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .row-2,
-            .checkbox-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .thumb-large {
-                width: 100%;
-                max-width: 320px;
-            }
+        @media (max-width: 900px) {
+            .card-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
 <div class="container">
-    <div class="page-header">
-        <h1 th:text="${course.id == null} ? 'Course Details' : 'Edit Course'">Course Details</h1>
-        <div class="btn-group">
-            <a th:href="@{/courses}" class="btn btn-secondary">← Back to Courses</a>
+    <div class="header">
+        <h1 th:text="${course.title} + ' - Content Management'">Course - Content Management</h1>
+        <div class="btn-wrap">
+            <a class="btn btn-primary" th:href="@{/courses/chapter/new(courseId=${course.courseId})}">+ Add Chapter</a>
+            <a class="btn btn-secondary" th:href="@{/courses}">&larr; Back to Courses</a>
         </div>
     </div>
 
-    <div class="card">
-        <div class="card-body">
-            <form th:action="@{/courses/save}" th:object="${course}" method="post" enctype="multipart/form-data">
-                <input type="hidden" th:field="*{courseId}"/>
+    <div class="card-grid">
+        <div class="card">
+            <h3>Course Information</h3>
+            <div class="meta-item"><strong>Title:</strong> <span th:text="${course.title}">Course</span></div>
+            <div class="meta-item"><strong>Category:</strong> <span th:text="${course.category != null ? course.category.name : ''}"></span></div>
+            <div class="meta-item"><strong>Instructor:</strong> <span th:text="${course.instructor != null ? course.instructor.fullName : 'Administrator'}">Administrator</span></div>
+            <div class="meta-item"><strong>Level:</strong> <span th:text="${course.level != null ? course.level.name : ''}"></span></div>
+            <div class="meta-item"><strong>Price:</strong> <span th:text="${course.price}">0</span></div>
+            <div class="meta-item"><strong>Status:</strong> <span th:text="${course.status == 1 ? 'Published' : 'Draft'}">Published</span></div>
+        </div>
 
-                <div class="form-grid">
-                    <div class="full-width">
-                        <label for="title" class="required">Title</label>
-                        <input type="text" id="title" th:field="*{title}">
-                        <div class="error-text" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></div>
+        <div class="card">
+            <h3>Course Content</h3>
+
+            <div th:if="${#lists.isEmpty(chapters)}" class="empty">
+                Chưa có chapter nào. Bấm <strong>Add Chapter</strong> để bắt đầu.
+            </div>
+
+            <div th:each="chapter : ${chapters}" class="chapter">
+                <div class="chapter-header">
+                    <div class="chapter-title"
+                         th:text="|Chapter ${chapter.orderIndex}: ${chapter.title}|">
+                        Chapter 1: Intro
+                    </div>
+                    <div class="action-inline">
+                        <a th:href="@{/courses/lesson/new(chapterId=${chapter.chapterId})}">+ Add Lesson</a>
+                        <a th:href="@{/courses/chapter/edit/{id}(id=${chapter.chapterId})}">Edit</a>
+                        <a th:href="@{/courses/chapter/delete/{id}(id=${chapter.chapterId})}"
+                           onclick="return confirm('Delete this chapter?')">Delete</a>
+                    </div>
+                </div>
+
+                <div class="chapter-desc" th:text="${chapter.description}">Chapter description</div>
+
+                <div class="lesson-list">
+                    <div th:if="${#lists.isEmpty(lessonMap[chapter.chapterId])}" class="empty">
+                        Chưa có lesson trong chapter này.
                     </div>
 
-                    <div>
-                        <div class="row-2">
+                    <div th:each="lesson : ${lessonMap[chapter.chapterId]}" class="lesson">
+                        <div class="lesson-main">
+                            <span class="lesson-icon"
+                                  th:classappend="${lesson.contentType == 'Video'} ? ' icon-video' : (${lesson.contentType == 'PDF'} ? ' icon-pdf' : ' icon-text')"
+                                  th:text="${lesson.contentType == 'Video'} ? '▶' : (${lesson.contentType == 'PDF'} ? 'P' : 'T')">▶</span>
                             <div>
-                                <label for="category">Category</label>
-                                <select id="category" th:field="*{category}">
-                                    <option value="Programming">Lập trình</option>
-                                    <option value="Business">Business</option>
-                                    <option value="Data Science">Data Science</option>
-                                </select>
-                            </div>
-
-                            <div>
-                                <label for="manager">Manager</label>
-                                <select id="manager" th:field="*{instructor}">
-                                    <option value="Administrator">Administrator</option>
-                                    <option value="Manager Name">Manager Name</option>
-                                </select>
-                            </div>
-
-                            <div>
-                                <label for="level">Level</label>
-                                <select id="level" th:field="*{level}">
-                                    <option value="Beginner">Beginner</option>
-                                    <option value="Intermediate">Intermediate</option>
-                                    <option value="Advanced">Advanced</option>
-                                </select>
-                            </div>
-
-                            <div>
-                                <label for="duration" class="required">Duration</label>
-                                <input type="text" id="duration" th:field="*{durationHours}" placeholder="Ví dụ: 8 giờ">
-                                <div class="error-text" th:if="${#fields.hasErrors('duration')}" th:errors="*{durationHours}"></div>
-                            </div>
-
-                            <div>
-                                <label for="listedPrice" class="required">Listed Price</label>
-                                <input type="number" id="listedPrice" th:field="*{price}" min="0" step="0.01">
-                                <div class="error-text" th:if="${#fields.hasErrors('listedPrice')}" th:errors="*{price}"></div>
-                            </div>
-
-                            <div>
-                                <label for="salePrice">Sale Price</label>
-                                <input type="number" id="salePrice" th:field="*{price}" min="0" step="0.01">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div>
-                        <div class="thumbnail-box">
-                            <label for="thumbnailFile">Thumbnail</label>
-
-                            <div class="thumb-large">
-                                <img th:if="${course.thumbnail != null and !#strings.isEmpty(course.thumbnail)}"
-                                     th:src="@{${course.thumbnail}}"
-                                     alt="Thumbnail">
-                                <div class="thumbnail-placeholder"
-                                     th:if="${course.thumbnail == null or #strings.isEmpty(course.thumbnail)}">
-                                    No image selected
+                                <div class="lesson-title"
+                                     th:text="|${lesson.orderIndex}. ${lesson.title}|">
+                                    1. Lesson title
+                                </div>
+                                <div class="lesson-meta"
+                                     th:text="|${#strings.toUpperCase(lesson.contentType)} • ${lesson.durationMinutes} min|">
+                                    VIDEO - 10 min
                                 </div>
                             </div>
-
-                            <input type="file" id="thumbnailFile" name="thumbnailFile" accept="image/*">
-                            <div class="hint">Chọn ảnh từ máy để tải lên. Không có preview phía client vì đã bỏ JavaScript.</div>
                         </div>
-                    </div>
-
-                    <div>
-                        <label style="display:block; margin-bottom:12px;">Status</label>
-                        <div class="checkbox-grid">
-                            <label class="checkbox-row">
-                                <input type="checkbox" th:field="*{status}">
-                                Published
-                            </label>
-                            <label class="checkbox-row">
-                                <input type="checkbox" >
-                                Featured Post
-                            </label>
+                        <div class="action-inline">
+                            <a class="play-link"
+                               th:if="${lesson.contentType == 'Video'}"
+                               href="javascript:void(0);"
+                               th:data-url="${lesson.contentUrl}"
+                               th:data-title="${lesson.title}"
+                               onclick="openLessonPlayer(this)">Play</a>
+                            <a th:href="@{/courses/lesson/edit/{id}(id=${lesson.lessonId})}">Edit</a>
+                            <a th:href="@{/courses/lesson/delete/{id}(id=${lesson.lessonId})}"
+                               onclick="return confirm('Delete this lesson?')">Delete</a>
                         </div>
-                    </div>
-
-                    <div class="full-width editor">
-                        <label for="description">Description</label>
-                        <div class="toolbar">
-                            <span class="tool-btn">B</span>
-                            <span class="tool-btn"><i>I</i></span>
-                            <span class="tool-btn"><u>U</u></span>
-                            <span class="tool-btn">S̶</span>
-                            <span class="tool-btn">▣</span>
-                            <span class="tool-btn">≣</span>
-                            <span class="tool-btn">≡</span>
-                            <span class="tool-btn">☰</span>
-                            <span class="tool-btn">▦</span>
-                            <span class="tool-btn">🔗</span>
-                            <span class="tool-btn">🖼</span>
-                            <span class="tool-btn">⤢</span>
-                            <span class="tool-btn">&lt;/&gt;</span>
-                            <span class="tool-btn">?</span>
-                        </div>
-                        <textarea id="description" th:field="*{description}"></textarea>
                     </div>
                 </div>
-
-                <div class="actions">
-                    <button type="submit"
-                            class="btn btn-light"
-                            th:text="${course.id == null} ? 'Submit' : 'Update Course'">
-                        Submit
-                    </button>
-                </div>
-            </form>
+            </div>
         </div>
     </div>
 </div>
+
+<div id="lessonPlayerModal" class="modal-backdrop">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span id="lessonPlayerTitle">Lesson</span>
+            <button type="button" class="modal-close" onclick="closeLessonPlayer()">×</button>
+        </div>
+        <div id="lessonPlayerBody" class="modal-body">
+            <!-- video iframe / tag sẽ được render bằng JS -->
+        </div>
+    </div>
+</div>
+
+<script>
+    function isYouTubeUrl(url) {
+        return /youtu\.be\/|youtube\.com\/watch\?v=/.test(url);
+    }
+
+    function getYouTubeEmbed(url) {
+        try {
+            if (url.includes('youtu.be/')) {
+                const id = url.split('youtu.be/')[1].split(/[?&#]/)[0];
+                return 'https://www.youtube.com/embed/' + id;
+            }
+            const urlObj = new URL(url);
+            const v = urlObj.searchParams.get('v');
+            if (v) {
+                return 'https://www.youtube.com/embed/' + v;
+            }
+        } catch (e) {
+            return null;
+        }
+        return null;
+    }
+
+    function openLessonPlayer(linkEl) {
+        const url = (linkEl.getAttribute('data-url') || '').trim();
+        const title = linkEl.getAttribute('data-title') || 'Lesson';
+        const modal = document.getElementById('lessonPlayerModal');
+        const body = document.getElementById('lessonPlayerBody');
+        const titleEl = document.getElementById('lessonPlayerTitle');
+
+        if (!url || !modal || !body || !titleEl) return;
+
+        titleEl.textContent = title;
+        body.innerHTML = '';
+
+        let html;
+        if (isYouTubeUrl(url)) {
+            const embed = getYouTubeEmbed(url);
+            if (embed) {
+                html = '<iframe src="' + embed + '" frameborder="0" allowfullscreen></iframe>';
+            }
+        } else {
+            html = '<video controls src="' + url + '"></video>';
+        }
+
+        if (!html) {
+            alert('Video URL không hợp lệ.');
+            return;
+        }
+
+        body.innerHTML = html;
+        modal.style.display = 'flex';
+    }
+
+    function closeLessonPlayer() {
+        const modal = document.getElementById('lessonPlayerModal');
+        const body = document.getElementById('lessonPlayerBody');
+        if (modal && body) {
+            modal.style.display = 'none';
+            body.innerHTML = '';
+        }
+    }
+
+    document.addEventListener('click', function (e) {
+        const modal = document.getElementById('lessonPlayerModal');
+        if (!modal) return;
+        if (e.target === modal) {
+            closeLessonPlayer();
+        }
+    });
+</script>
 </body>
 </html>

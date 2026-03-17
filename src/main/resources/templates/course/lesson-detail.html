@@ -1,13 +1,14 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lesson Detail</title>
+    <title th:text="${lessonDto.lessonId == null} ? 'Add Lesson' : 'Edit Lesson'">Lesson Detail</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #0d6efd;
-            --primary-dark: #0b5ed7;
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
             --secondary: #6c757d;
             --border: #dee2e6;
             --text: #212529;
@@ -15,21 +16,20 @@
             --shadow: 0 1px 2px rgba(0,0,0,0.08);
         }
 
-        * { box-sizing: border-box; }
+        * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
 
         body {
             margin: 0;
             padding: 10px;
-            font-family: Arial, Helvetica, sans-serif;
-            background: #fff;
+            background: #f0f2f5;
             color: var(--text);
         }
 
         .container {
-            border: 2px solid #2b6fe2;
+            border: 0;
             padding: 12px;
             min-height: calc(100vh - 20px);
-            background: #fff;
+            background: transparent;
         }
 
         .page-header {
@@ -59,7 +59,7 @@
             justify-content: center;
             text-decoration: none;
             border: 1px solid transparent;
-            border-radius: 4px;
+            border-radius: 999px;
             padding: 8px 14px;
             font-size: 14px;
             font-weight: 600;
@@ -81,10 +81,7 @@
             color: #fff;
         }
 
-        .card {
-            border: 1px solid var(--border);
-            background: #fff;
-        }
+        .card { border: none; background: #fff; border-radius: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); }
 
         .card-body {
             padding: 16px 22px 22px;
@@ -120,7 +117,7 @@
         select {
             width: 100%;
             border: 1px solid #b7b7b7;
-            border-radius: 3px;
+            border-radius: 12px;
             font-size: 15px;
             padding: 10px 12px;
             outline: none;
@@ -137,6 +134,32 @@
             color: var(--muted);
             font-size: 14px;
             margin-top: 6px;
+        }
+
+        .preview-box {
+            border: none;
+            border-radius: 16px;
+            padding: 10px;
+            background: #fff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+        }
+
+        .preview-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .video-frame {
+            width: 100%;
+            max-width: 480px;
+            aspect-ratio: 16 / 9;
+            background: #000;
+        }
+
+        .video-frame iframe,
+        .video-frame video {
+            width: 100%;
+            height: 100%;
         }
 
         .check-help {
@@ -163,24 +186,29 @@
 <body>
 <div class="container">
     <div class="page-header">
-        <h1 id="pageTitle">Lesson Detail</h1>
+        <h1 th:text="${lessonDto.lessonId == null} ? 'Add Lesson - ' + chapter.title : 'Edit Lesson - ' + chapter.title">
+            Lesson Detail
+        </h1>
         <div class="btn-group">
-            <a href="#" id="backLessonBtn" class="btn btn-secondary">← Back to Course</a>
+            <a th:href="@{/courses/content/{id}(id=${course.courseId})}" class="btn btn-secondary">← Back to Course</a>
         </div>
     </div>
 
     <div class="card">
-        <div class="card-body">
+        <form class="card-body" th:action="@{/courses/lesson/save}" th:object="${lessonDto}" method="post">
+            <input type="hidden" th:field="*{lessonId}">
+            <input type="hidden" th:field="*{chapterId}">
+            <input type="hidden" th:field="*{status}">
             <div class="lesson-grid">
                 <div class="stack-gap">
                     <div>
-                        <label for="lessonTitle" class="required">Lesson Title</label>
-                        <input type="text" id="lessonTitle">
+                        <label for="title" class="required">Lesson Title</label>
+                        <input type="text" id="title" th:field="*{title}">
                     </div>
 
                     <div>
                         <label for="contentType" class="required">Content Type</label>
-                        <select id="contentType">
+                        <select id="contentType" th:field="*{contentType}">
                             <option value="Video">Video</option>
                             <option value="PDF">PDF</option>
                             <option value="Text">Text</option>
@@ -188,229 +216,151 @@
                     </div>
 
                     <div>
-                        <label for="contentValue" id="contentValueLabel">Content Video</label>
-                        <textarea id="contentValue"></textarea>
-                        <div class="help-text" id="contentHint">YouTube URL or direct video file URL</div>
+                        <label for="contentUrl">Content URL / Value</label>
+                        <textarea id="contentUrl" th:field="*{contentUrl}"></textarea>
+                        <div class="help-text" id="contentHint">YouTube URL hoặc link file video trực tiếp. Nếu chọn PDF/Text thì dùng link file hoặc nội dung text.</div>
                     </div>
 
                     <div>
-                        <button type="button" id="saveLessonBtn" class="btn btn-primary">💾 Save Lesson</button>
+                        <button type="submit"
+                                class="btn btn-primary"
+                                th:text="${lessonDto.lessonId == null} ? '💾 Save Lesson' : '💾 Update Lesson'">💾 Save Lesson</button>
                     </div>
                 </div>
 
                 <div class="stack-gap">
                     <div>
-                        <label for="duration">Duration (Minutes)</label>
-                        <input type="number" id="duration" min="0" value="0">
+                        <label for="durationMinutes">Duration (Minutes)</label>
+                        <input type="number" id="durationMinutes" min="0" th:field="*{durationMinutes}">
                     </div>
 
                     <div>
-                        <label for="lessonOrder" class="required">Order</label>
-                        <input type="number" id="lessonOrder" min="1" value="1">
+                        <label for="orderIndex" class="required">Order</label>
+                        <input type="number" id="orderIndex" min="1" th:field="*{orderIndex}">
                         <div class="help-text">The order in which this lesson appears in the chapter</div>
                     </div>
 
                     <div class="check-help">
-                        <input type="checkbox" id="previewLesson">
+                        <input type="checkbox" id="isPreview" th:field="*{isPreview}">
                         <div>
-                            <label for="previewLesson" style="margin: 0;">Preview Lesson</label>
+                            <label for="isPreview" style="margin: 0;">Preview Lesson</label>
                             <div class="help-text" style="margin-top: 8px;">
                                 Preview lessons can be watched without enrollment
                             </div>
                         </div>
                     </div>
+
+                    <div class="preview-box">
+                        <div class="preview-title">Lesson Preview</div>
+                        <div id="videoPreview" class="video-frame" style="display: none;">
+                            <!-- nội dung video sẽ được render bằng JS -->
+                        </div>
+                        <div id="filePreview" style="display: none; font-size: 14px;">
+                            <a id="fileLink" href="#" target="_blank">Open content</a>
+                        </div>
+                        <div id="textPreview" style="display: none; font-size: 14px; white-space: pre-wrap;"></div>
+                    </div>
                 </div>
             </div>
-        </div>
+        </form>
     </div>
 </div>
-
 <script>
-    const STORAGE_KEY = "course_management_data";
+    (function () {
+        const typeSelect = document.getElementById('contentType');
+        const urlField = document.getElementById('contentUrl');
+        const hint = document.getElementById('contentHint');
 
-    function getDefaultData() {
-        return {
-            courses: [
-                {
-                    id: 1,
-                    title: "Tiêu đề course 1",
-                    manager: "Kien Nguyen8",
-                    category: "Business",
-                    level: "Beginner",
-                    duration: "6 giờ",
-                    listedPrice: 0,
-                    salePrice: 0,
-                    status: true,
-                    featured: false,
-                    description: "Mô tả khóa học số 1.",
-                    createdAt: "2025-08-07 08:42:55",
-                    chapters: []
-                },
-                {
-                    id: 2,
-                    title: "Course số 2",
-                    manager: "Kien Nguyen8",
-                    category: "Data Science",
-                    level: "Beginner",
-                    duration: "8 giờ",
-                    listedPrice: 15,
-                    salePrice: 12,
-                    status: true,
-                    featured: false,
-                    description: "Khóa học mẫu để quản lý chapter và lesson.",
-                    createdAt: "2025-08-07 10:07:30",
-                    chapters: [
-                        {
-                            id: 1,
-                            title: "Chương 2.1 - Tổng quan",
-                            description: "Mô tả tổng quan bài học",
-                            order: 1,
-                            lessons: [
-                                {
-                                    id: 1,
-                                    title: "Bài học tổng quan 2.1.1",
-                                    contentType: "Video",
-                                    contentValue: "https://www.youtube.com/watch?v=TzT5NI5V_lA",
-                                    duration: 0,
-                                    order: 1,
-                                    preview: false
-                                }
-                            ]
-                        }
-                    ]
-                }
-            ]
-        };
-    }
+        const videoPreview = document.getElementById('videoPreview');
+        const filePreview = document.getElementById('filePreview');
+        const textPreview = document.getElementById('textPreview');
+        const fileLink = document.getElementById('fileLink');
 
-    function loadData() {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) {
-            const seed = getDefaultData();
-            saveData(seed);
-            return seed;
-        }
-        return JSON.parse(raw);
-    }
-
-    function saveData(data) {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-    }
-
-    function generateId(items) {
-        if (!items || !items.length) return 1;
-        return Math.max(...items.map(item => item.id)) + 1;
-    }
-
-    function getQueryParam(name) {
-        const params = new URLSearchParams(window.location.search);
-        return params.get(name);
-    }
-
-    function updateContentTypeUI() {
-        const type = contentTypeInput.value;
-        const label = document.getElementById("contentValueLabel");
-        const hint = document.getElementById("contentHint");
-
-        if (type === "Video") {
-            label.textContent = "Content Video";
-            hint.textContent = "YouTube URL or direct video file URL";
-        } else if (type === "PDF") {
-            label.textContent = "Content PDF";
-            hint.textContent = "Nhập tên file PDF hoặc đường dẫn tài liệu";
-        } else {
-            label.textContent = "Content Text";
-            hint.textContent = "Nhập nội dung text hoặc mô tả lesson";
-        }
-    }
-
-    const data = loadData();
-    const mode = getQueryParam("mode") || "add";
-    const courseId = Number(getQueryParam("courseId"));
-    const chapterId = Number(getQueryParam("chapterId"));
-    const lessonId = Number(getQueryParam("lessonId"));
-
-    const course = data.courses.find(c => c.id === courseId);
-    if (!course) {
-        alert("Không tìm thấy khóa học.");
-        window.location.href = "course-list.html";
-    }
-
-    const chapter = course.chapters.find(ch => ch.id === chapterId);
-    if (!chapter) {
-        alert("Không tìm thấy chapter.");
-        window.location.href = "course-content.html?courseId=" + courseId;
-    }
-
-    const titleInput = document.getElementById("lessonTitle");
-    const contentTypeInput = document.getElementById("contentType");
-    const contentValueInput = document.getElementById("contentValue");
-    const durationInput = document.getElementById("duration");
-    const orderInput = document.getElementById("lessonOrder");
-    const previewInput = document.getElementById("previewLesson");
-    const saveBtn = document.getElementById("saveLessonBtn");
-    const pageTitle = document.getElementById("pageTitle");
-
-    document.getElementById("backLessonBtn").href = "course-content.html?courseId=" + courseId;
-
-    if (mode === "edit") {
-        pageTitle.textContent = "Edit Lesson - " + chapter.title;
-        saveBtn.textContent = "💾 Update Lesson";
-
-        const lesson = chapter.lessons.find(ls => ls.id === lessonId);
-        if (!lesson) {
-            alert("Không tìm thấy lesson.");
-            window.location.href = "course-content.html?courseId=" + courseId;
-        } else {
-            titleInput.value = lesson.title || "";
-            contentTypeInput.value = lesson.contentType || "Video";
-            contentValueInput.value = lesson.contentValue || "";
-            durationInput.value = lesson.duration || 0;
-            orderInput.value = lesson.order || 1;
-            previewInput.checked = !!lesson.preview;
-        }
-    } else {
-        pageTitle.textContent = "Add Lesson - " + chapter.title;
-        saveBtn.textContent = "💾 Save Lesson";
-    }
-
-    updateContentTypeUI();
-    contentTypeInput.addEventListener("change", updateContentTypeUI);
-
-    saveBtn.addEventListener("click", function () {
-        const payload = {
-            title: titleInput.value.trim(),
-            contentType: contentTypeInput.value,
-            contentValue: contentValueInput.value.trim(),
-            duration: Number(durationInput.value || 0),
-            order: Number(orderInput.value || 1),
-            preview: previewInput.checked
-        };
-
-        if (!payload.title) {
-            alert("Vui lòng nhập Lesson Title.");
-            titleInput.focus();
-            return;
-        }
-
-        if (mode === "add") {
-            chapter.lessons.push({
-                id: generateId(chapter.lessons || []),
-                ...payload
-            });
-        } else {
-            const index = chapter.lessons.findIndex(ls => ls.id === lessonId);
-            if (index !== -1) {
-                chapter.lessons[index] = {
-                    ...chapter.lessons[index],
-                    ...payload
-                };
+        function updateHint() {
+            if (!typeSelect || !hint) return;
+            const type = typeSelect.value;
+            if (type === 'Video') {
+                hint.textContent = 'YouTube URL hoặc link file video trực tiếp (mp4, webm, ...)';
+            } else if (type === 'PDF') {
+                hint.textContent = 'Link file PDF để người học có thể mở trong tab mới.';
+            } else {
+                hint.textContent = 'Nội dung text hoặc link tài liệu (nếu có).';
             }
         }
 
-        saveData(data);
-        window.location.href = "course-content.html?courseId=" + courseId;
-    });
+        function isYouTubeUrl(url) {
+            return /youtu\.be\/|youtube\.com\/watch\?v=/.test(url);
+        }
+
+        function getYouTubeEmbed(url) {
+            try {
+                if (url.includes('youtu.be/')) {
+                    const id = url.split('youtu.be/')[1].split(/[?&#]/)[0];
+                    return 'https://www.youtube.com/embed/' + id;
+                }
+                const urlObj = new URL(url);
+                const v = urlObj.searchParams.get('v');
+                if (v) {
+                    return 'https://www.youtube.com/embed/' + v;
+                }
+            } catch (e) {
+                return null;
+            }
+            return null;
+        }
+
+        function updatePreview() {
+            if (!typeSelect || !urlField) return;
+            const type = typeSelect.value;
+            const value = (urlField.value || '').trim();
+
+            videoPreview.style.display = 'none';
+            filePreview.style.display = 'none';
+            textPreview.style.display = 'none';
+            videoPreview.innerHTML = '';
+
+            if (!value) return;
+
+            if (type === 'Video') {
+                let content;
+                if (isYouTubeUrl(value)) {
+                    const embed = getYouTubeEmbed(value);
+                    if (embed) {
+                        content = '<iframe src="' + embed + '" frameborder="0" allowfullscreen></iframe>';
+                    }
+                } else {
+                    content = '<video controls src="' + value + '"></video>';
+                }
+                if (content) {
+                    videoPreview.innerHTML = content;
+                    videoPreview.style.display = 'block';
+                }
+            } else if (type === 'PDF') {
+                fileLink.href = value;
+                fileLink.textContent = 'Open PDF';
+                filePreview.style.display = 'block';
+            } else {
+                textPreview.textContent = value;
+                textPreview.style.display = 'block';
+            }
+        }
+
+        if (typeSelect) {
+            typeSelect.addEventListener('change', function () {
+                updateHint();
+                updatePreview();
+            });
+        }
+        if (urlField) {
+            urlField.addEventListener('input', updatePreview);
+            urlField.addEventListener('paste', function () {
+                setTimeout(updatePreview, 50);
+            });
+        }
+
+        updateHint();
+        updatePreview();
+    })();
 </script>
 </body>
 </html>
