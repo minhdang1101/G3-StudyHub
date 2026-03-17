@@ -1,100 +1,584 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Course Detail</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
-    <link th:href="@{/css/style.css}" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0d6efd;
+            --primary-dark: #0b5ed7;
+            --secondary: #6c757d;
+            --success: #198754;
+            --border: #dee2e6;
+            --text: #212529;
+            --muted: #6c757d;
+            --shadow: 0 1px 2px rgba(0,0,0,0.08);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            padding: 10px;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #fff;
+            color: var(--text);
+        }
+
+        .container {
+            border: 2px solid #2b6fe2;
+            padding: 12px;
+            min-height: calc(100vh - 20px);
+            background: #fff;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+
+        .page-header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            border: 1px solid transparent;
+            border-radius: 4px;
+            padding: 8px 14px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+            color: #fff;
+        }
+
+        .btn-light {
+            background: #f8f9fa;
+            border-color: var(--border);
+            color: #495057;
+        }
+
+        .card {
+            border: 1px solid var(--border);
+            background: #fff;
+        }
+
+        .card-body {
+            padding: 14px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 18px 34px;
+            align-items: start;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .row-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px 44px;
+        }
+
+        label {
+            display: inline-block;
+            margin-bottom: 6px;
+            font-size: 15px;
+            color: #444;
+        }
+
+        .required::after {
+            content: "*";
+            color: #444;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select,
+        textarea {
+            width: 100%;
+            border: 1px solid #b7b7b7;
+            border-radius: 3px;
+            font-size: 15px;
+            padding: 10px 12px;
+            outline: none;
+            background: #fff;
+            font-family: inherit;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 220px;
+        }
+
+        .thumbnail-box {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            align-items: flex-start;
+        }
+
+        .thumb-header {
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+
+        .change-link {
+            margin-left: auto;
+            color: #2a33ff;
+            text-decoration: underline;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .thumb-large {
+            width: 265px;
+            height: 160px;
+            border: 1px solid var(--border);
+            background: linear-gradient(135deg, #1d3557, #577aa7);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .thumb-large::before {
+            content: "CHANGE IMAGE\A ON HOVER\A IN SQUARESPACE";
+            white-space: pre;
+            position: absolute;
+            left: 18px;
+            top: 36px;
+            background: rgba(255,255,255,.84);
+            color: #406;
+            padding: 5px 8px;
+            line-height: 1.8;
+            font-size: 10px;
+            font-weight: 700;
+            transform: rotate(-6deg);
+        }
+
+        .thumb-large::after {
+            content: "";
+            position: absolute;
+            right: 26px;
+            top: 16px;
+            width: 68px;
+            height: 118px;
+            border-radius: 35px 35px 20px 20px;
+            background: linear-gradient(#e7d8c4, #c4a68d);
+            box-shadow: -16px 22px 0 -8px #fff;
+        }
+
+        .checkbox-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-top: 18px;
+            font-size: 15px;
+        }
+
+        .checkbox-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .checkbox-row input {
+            width: 16px;
+            height: 16px;
+        }
+
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2px;
+            padding: 8px;
+            border: 1px solid var(--border);
+            border-bottom: none;
+            background: #f8f9fa;
+            border-radius: 3px 3px 0 0;
+        }
+
+        .tool-btn {
+            min-width: 34px;
+            height: 30px;
+            border: 1px solid #cfcfcf;
+            background: #fff;
+            border-radius: 2px;
+            font-size: 16px;
+            font-weight: 700;
+            color: #333;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 8px;
+        }
+
+        .editor textarea {
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
+            background: #fcfcfc;
+        }
+
+        .actions {
+            margin-top: 18px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .hint {
+            color: var(--muted);
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        @media (max-width: 1100px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .row-2,
+            .checkbox-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .thumb-large {
+                width: 100%;
+                max-width: 320px;
+            }
+        }
+    </style>
 </head>
 <body>
-<div class="d-flex">
-    <div th:replace="~{common/sidebar :: sidebar(activePage='courses')}"></div>
+<div class="container">
+    <div class="page-header">
+        <h1 id="pageTitle">Course Details</h1>
+        <div class="btn-group">
+            <a href="course-list.html" class="btn btn-secondary">← Back to Courses</a>
+        </div>
+    </div>
 
-    <div class="container-fluid p-4">
-        <h2 class="mb-4" th:text="${courseDto.courseId != null ? 'Edit Course' : 'New Course'}"></h2>
+    <div class="card">
+        <div class="card-body">
+            <div class="form-grid">
+                <div class="full-width">
+                    <label for="title" class="required">Title</label>
+                    <input type="text" id="title">
+                </div>
 
-        <div th:if="${message}" class="alert" th:classappend="' alert-' + ${alertType}" th:text="${message}"></div>
-
-        <div class="card">
-            <div class="card-body">
-                <form th:action="@{/courses/save}" th:object="${courseDto}" method="post">
-                    <input type="hidden" th:field="*{courseId}">
-
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label">Title</label>
-                            <input type="text" th:field="*{title}" class="form-control">
-                            <div class="text-danger" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></div>
-                        </div>
-
-                        <div class="col-md-3">
-                            <label class="form-label">Category</label>
-                            <select th:field="*{categoryId}" class="form-select">
-                                <option value="">-- Select category --</option>
-                                <option th:each="c : ${categoryList}" th:value="${c.id}" th:text="${c.name}"></option>
+                <div>
+                    <div class="row-2">
+                        <div>
+                            <label for="category">Category</label>
+                            <select id="category">
+                                <option value="Programming">Lập trình</option>
+                                <option value="Business">Business</option>
+                                <option value="Data Science">Data Science</option>
                             </select>
-                            <div class="text-danger" th:if="${#fields.hasErrors('categoryId')}" th:errors="*{categoryId}"></div>
                         </div>
 
-                        <div class="col-md-3">
-                            <label class="form-label">Level</label>
-                            <select th:field="*{levelId}" class="form-select">
-                                <option value="">-- Select level --</option>
-                                <option th:each="l : ${levelList}" th:value="${l.id}" th:text="${l.name}"></option>
+                        <div>
+                            <label for="manager">Manager</label>
+                            <select id="manager">
+                                <option value="Kien Nguyen8">Kien Nguyen8</option>
+                                <option value="Administrator">Administrator</option>
+                                <option value="Manager Name">Manager Name</option>
                             </select>
-                            <div class="text-danger" th:if="${#fields.hasErrors('levelId')}" th:errors="*{levelId}"></div>
                         </div>
 
-                        <div class="col-md-4">
-                            <label class="form-label">Instructor</label>
-                            <select th:field="*{instructorId}" class="form-select">
-                                <option value="">-- Select instructor --</option>
-                                <option th:each="i : ${instructorList}" th:value="${i.id}" th:text="${i.fullName}"></option>
+                        <div>
+                            <label for="level">Level</label>
+                            <select id="level">
+                                <option value="Beginner">Beginner</option>
+                                <option value="Intermediate">Intermediate</option>
+                                <option value="Advanced">Advanced</option>
                             </select>
-                            <div class="text-danger" th:if="${#fields.hasErrors('instructorId')}" th:errors="*{instructorId}"></div>
                         </div>
 
-                        <div class="col-md-2">
-                            <label class="form-label">Duration (hours)</label>
-                            <input type="number" th:field="*{durationHours}" class="form-control">
-                            <div class="text-danger" th:if="${#fields.hasErrors('durationHours')}" th:errors="*{durationHours}"></div>
+                        <div>
+                            <label for="duration" class="required">Duration</label>
+                            <input type="text" id="duration" placeholder="Ví dụ: 8 giờ">
                         </div>
 
-                        <div class="col-md-3">
-                            <label class="form-label">Price</label>
-                            <input type="number" step="0.01" th:field="*{price}" class="form-control">
-                            <div class="text-danger" th:if="${#fields.hasErrors('price')}" th:errors="*{price}"></div>
+                        <div>
+                            <label for="listedPrice" class="required">Listed Price</label>
+                            <input type="number" id="listedPrice" min="0" step="0.01">
                         </div>
 
-                        <div class="col-md-3">
-                            <label class="form-label">Status</label>
-                            <select th:field="*{status}" class="form-select">
-                                <option value="1">Active</option>
-                                <option value="0">Inactive</option>
-                            </select>
-                            <div class="text-danger" th:if="${#fields.hasErrors('status')}" th:errors="*{status}"></div>
-                        </div>
-
-                        <div class="col-md-12">
-                            <label class="form-label">Thumbnail URL</label>
-                            <input type="text" th:field="*{thumbnailUrl}" class="form-control">
-                        </div>
-
-                        <div class="col-md-12">
-                            <label class="form-label">Description</label>
-                            <textarea th:field="*{description}" rows="5" class="form-control"></textarea>
+                        <div>
+                            <label for="salePrice">Sale Price</label>
+                            <input type="number" id="salePrice" min="0" step="0.01">
                         </div>
                     </div>
+                </div>
 
-                    <div class="mt-4 d-flex gap-2">
-                        <button type="submit" class="btn btn-primary">Save</button>
-                        <a th:href="@{/courses}" class="btn btn-secondary">Back</a>
+                <div>
+                    <div class="thumbnail-box">
+                        <div class="thumb-header">
+                            <label>Thumbnail</label>
+                            <span class="change-link">Change</span>
+                        </div>
+                        <div class="thumb-large"></div>
+                        <div class="hint">Mô phỏng giao diện ảnh đại diện.</div>
                     </div>
-                </form>
+                </div>
+
+                <div>
+                    <label style="display:block; margin-bottom:12px;">Status</label>
+                    <div class="checkbox-grid">
+                        <label class="checkbox-row">
+                            <input type="checkbox" id="status">
+                            Published
+                        </label>
+                        <label class="checkbox-row">
+                            <input type="checkbox" id="featured">
+                            Featured Post
+                        </label>
+                    </div>
+                </div>
+
+                <div class="full-width editor">
+                    <label for="description">Description</label>
+                    <div class="toolbar">
+                        <button type="button" class="tool-btn">B</button>
+                        <button type="button" class="tool-btn"><i>I</i></button>
+                        <button type="button" class="tool-btn"><u>U</u></button>
+                        <button type="button" class="tool-btn">S̶</button>
+                        <button type="button" class="tool-btn">▣</button>
+                        <button type="button" class="tool-btn">≣</button>
+                        <button type="button" class="tool-btn">≡</button>
+                        <button type="button" class="tool-btn">☰</button>
+                        <button type="button" class="tool-btn">▦</button>
+                        <button type="button" class="tool-btn">🔗</button>
+                        <button type="button" class="tool-btn">🖼</button>
+                        <button type="button" class="tool-btn">⤢</button>
+                        <button type="button" class="tool-btn">&lt;/&gt;</button>
+                        <button type="button" class="tool-btn">?</button>
+                    </div>
+                    <textarea id="description"></textarea>
+                </div>
+            </div>
+
+            <div class="actions">
+                <button type="button" id="submitCourseBtn" class="btn btn-light">Submit</button>
             </div>
         </div>
     </div>
 </div>
+
+<script>
+    const STORAGE_KEY = "course_management_data";
+
+    function getDefaultData() {
+        return {
+            courses: [
+                {
+                    id: 1,
+                    title: "Tiêu đề course 1",
+                    manager: "Kien Nguyen8",
+                    category: "Business",
+                    level: "Beginner",
+                    duration: "6 giờ",
+                    listedPrice: 0,
+                    salePrice: 0,
+                    status: true,
+                    featured: false,
+                    description: "Mô tả khóa học số 1.",
+                    createdAt: "2025-08-07 08:42:55",
+                    chapters: []
+                },
+                {
+                    id: 2,
+                    title: "Course số 2",
+                    manager: "Kien Nguyen8",
+                    category: "Data Science",
+                    level: "Beginner",
+                    duration: "8 giờ",
+                    listedPrice: 15,
+                    salePrice: 12,
+                    status: true,
+                    featured: false,
+                    description: "Khóa học mẫu để quản lý chapter và lesson.",
+                    createdAt: "2025-08-07 10:07:30",
+                    chapters: [
+                        {
+                            id: 1,
+                            title: "Chương 2.1 - Tổng quan",
+                            description: "Mô tả tổng quan bài học",
+                            order: 1,
+                            lessons: [
+                                {
+                                    id: 1,
+                                    title: "Bài học tổng quan 2.1.1",
+                                    contentType: "Video",
+                                    contentValue: "https://www.youtube.com/watch?v=TzT5NI5V_lA",
+                                    duration: 0,
+                                    order: 1,
+                                    preview: false
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        };
+    }
+
+    function loadData() {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) {
+            const seed = getDefaultData();
+            saveData(seed);
+            return seed;
+        }
+        return JSON.parse(raw);
+    }
+
+    function saveData(data) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }
+
+    function generateId(items) {
+        if (!items || !items.length) return 1;
+        return Math.max(...items.map(item => item.id)) + 1;
+    }
+
+    function getQueryParam(name) {
+        const params = new URLSearchParams(window.location.search);
+        return params.get(name);
+    }
+
+    function nowString() {
+        const d = new Date();
+        const p = n => String(n).padStart(2, "0");
+        return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
+    }
+
+    const mode = getQueryParam("mode") || "add";
+    const courseId = Number(getQueryParam("id"));
+    const data = loadData();
+
+    const titleInput = document.getElementById("title");
+    const categoryInput = document.getElementById("category");
+    const managerInput = document.getElementById("manager");
+    const levelInput = document.getElementById("level");
+    const durationInput = document.getElementById("duration");
+    const listedPriceInput = document.getElementById("listedPrice");
+    const salePriceInput = document.getElementById("salePrice");
+    const statusInput = document.getElementById("status");
+    const featuredInput = document.getElementById("featured");
+    const descriptionInput = document.getElementById("description");
+    const submitBtn = document.getElementById("submitCourseBtn");
+    const pageTitle = document.getElementById("pageTitle");
+
+    if (mode === "edit") {
+        pageTitle.textContent = "Edit Course";
+        submitBtn.textContent = "Update Course";
+    } else {
+        pageTitle.textContent = "Course Details";
+        submitBtn.textContent = "Submit";
+    }
+
+    if (mode === "edit" && courseId) {
+        const course = data.courses.find(c => c.id === courseId);
+        if (!course) {
+            alert("Không tìm thấy khóa học.");
+            window.location.href = "course-list.html";
+        } else {
+            titleInput.value = course.title || "";
+            categoryInput.value = course.category || "Programming";
+            managerInput.value = course.manager || "Kien Nguyen8";
+            levelInput.value = course.level || "Beginner";
+            durationInput.value = course.duration || "";
+            listedPriceInput.value = course.listedPrice || 0;
+            salePriceInput.value = course.salePrice || 0;
+            statusInput.checked = !!course.status;
+            featuredInput.checked = !!course.featured;
+            descriptionInput.value = course.description || "";
+        }
+    }
+
+    submitBtn.addEventListener("click", function () {
+        const payload = {
+            title: titleInput.value.trim(),
+            category: categoryInput.value,
+            manager: managerInput.value,
+            level: levelInput.value,
+            duration: durationInput.value.trim(),
+            listedPrice: Number(listedPriceInput.value || 0),
+            salePrice: Number(salePriceInput.value || 0),
+            status: statusInput.checked,
+            featured: featuredInput.checked,
+            description: descriptionInput.value.trim()
+        };
+
+        if (!payload.title) {
+            alert("Vui lòng nhập Title.");
+            titleInput.focus();
+            return;
+        }
+
+        if (!payload.duration) {
+            alert("Vui lòng nhập Duration.");
+            durationInput.focus();
+            return;
+        }
+
+        if (mode === "add") {
+            const newCourse = {
+                id: generateId(data.courses),
+                ...payload,
+                createdAt: nowString(),
+                chapters: []
+            };
+            data.courses.push(newCourse);
+        } else {
+            const index = data.courses.findIndex(c => c.id === courseId);
+            if (index !== -1) {
+                data.courses[index] = {
+                    ...data.courses[index],
+                    ...payload
+                };
+            }
+        }
+
+        saveData(data);
+        window.location.href = "course-list.html";
+    });
+</script>
 </body>
 </html>

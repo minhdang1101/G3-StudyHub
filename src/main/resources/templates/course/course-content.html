@@ -1,114 +1,547 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Course Content</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
-    <link th:href="@{/css/style.css}" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0d6efd;
+            --primary-dark: #0b5ed7;
+            --secondary: #6c757d;
+            --success: #198754;
+            --danger: #dc3545;
+            --info: #0dcaf0;
+            --border: #dee2e6;
+            --text: #212529;
+            --muted: #6c757d;
+            --shadow: 0 1px 2px rgba(0,0,0,0.08);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            padding: 10px;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #fff;
+            color: var(--text);
+        }
+
+        .container {
+            border: 2px solid #2b6fe2;
+            padding: 12px;
+            min-height: calc(100vh - 20px);
+            background: #fff;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+
+        .page-header h2 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            border: 1px solid transparent;
+            border-radius: 4px;
+            padding: 8px 14px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+        }
+
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+            color: #fff;
+        }
+
+        .btn-outline-primary {
+            background: #fff;
+            color: var(--primary);
+            border-color: #b6d4fe;
+        }
+
+        .card {
+            border: 1px solid var(--border);
+            background: #fff;
+            overflow: hidden;
+        }
+
+        .card-header {
+            background: #f8f9fa;
+            border-bottom: 1px solid var(--border);
+            padding: 10px 12px;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .card-body {
+            padding: 12px;
+        }
+
+        .content-layout {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 16px;
+            align-items: start;
+        }
+
+        .info-list {
+            display: grid;
+            gap: 12px;
+            font-size: 14px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            background: var(--success);
+            color: #fff;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 9px;
+            border-radius: 3px;
+        }
+
+        .status-draft {
+            background: var(--secondary);
+        }
+
+        .chapter-card {
+            border: 1px solid #e7e7e7;
+            border-radius: 4px;
+            margin-bottom: 14px;
+            overflow: hidden;
+            background: #fff;
+        }
+
+        .chapter-header {
+            background: #f8f9fa;
+            padding: 10px 12px;
+            border-bottom: 1px solid #ececec;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .chapter-title::before {
+            content: "📁 ";
+            font-size: 13px;
+        }
+
+        .chapter-desc {
+            padding: 12px 12px 4px;
+            color: #6b6b6b;
+            font-size: 14px;
+        }
+
+        .lesson-list {
+            padding: 0 12px 12px;
+            display: grid;
+            gap: 10px;
+        }
+
+        .lesson-item {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 10px;
+            border-top: 1px solid #f0f0f0;
+            padding-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .lesson-main {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+        }
+
+        .lesson-number {
+            width: 18px;
+            text-align: center;
+            font-size: 15px;
+            font-weight: 700;
+            color: #1f6feb;
+            flex-shrink: 0;
+        }
+
+        .lesson-number.pdf {
+            color: #dc3545;
+        }
+
+        .lesson-number.text {
+            color: #0dcaf0;
+        }
+
+        .lesson-text {
+            font-size: 14px;
+            line-height: 1.35;
+        }
+
+        .lesson-text .meta {
+            display: block;
+            font-size: 11px;
+            color: #8a8a8a;
+            text-transform: uppercase;
+            margin-top: 2px;
+        }
+
+        .lesson-text .duration {
+            font-size: 11px;
+            color: #8a8a8a;
+            margin-left: 4px;
+        }
+
+        .action-group {
+            display: inline-flex;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .icon-btn {
+            width: 30px;
+            height: 30px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #fff;
+            border: 1px solid;
+            text-decoration: none;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 0;
+        }
+
+        .icon-btn + .icon-btn {
+            border-left: none;
+        }
+
+        .icon-edit {
+            color: var(--primary);
+            border-color: #b6d4fe;
+        }
+
+        .icon-delete {
+            color: var(--danger);
+            border-color: #f1b8bf;
+        }
+
+        .empty {
+            color: var(--muted);
+            padding: 10px 0;
+        }
+
+        @media (max-width: 1000px) {
+            .content-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
-<div class="d-flex">
-    <div th:replace="~{common/sidebar :: sidebar(activePage='courses')}"></div>
-
-    <div class="container-fluid p-4">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2>Course Content</h2>
-            <div class="d-flex gap-2">
-                <a th:href="@{'/courses/edit/' + ${course.courseId}}" class="btn btn-warning">Edit Course</a>
-                <a th:href="@{/courses}" class="btn btn-secondary">Back</a>
-            </div>
+<div class="container">
+    <div class="page-header">
+        <h2 id="contentTitle">Course Content Management</h2>
+        <div class="btn-group">
+            <a id="addChapterBtn" href="#" class="btn btn-primary btn-sm">+ Add Chapter</a>
+            <a href="course-list.html" class="btn btn-secondary btn-sm">← Back to Courses</a>
         </div>
+    </div>
 
-        <div th:if="${message}" class="alert" th:classappend="' alert-' + ${alertType}" th:text="${message}"></div>
-
-        <div class="card mb-4">
+    <div class="content-layout">
+        <div class="card">
+            <div class="card-header">Course Information</div>
             <div class="card-body">
-                <div class="row g-3">
-                    <div class="col-md-8">
-                        <h4 th:text="${course.title}"></h4>
-                        <p class="mb-2" th:text="${course.description}"></p>
-                        <p class="mb-1"><strong>Category:</strong> <span th:text="${course.category != null ? course.category.name : ''}"></span></p>
-                        <p class="mb-1"><strong>Level:</strong> <span th:text="${course.level != null ? course.level.name : ''}"></span></p>
-                        <p class="mb-1"><strong>Instructor:</strong> <span th:text="${course.instructor != null ? course.instructor.fullName : ''}"></span></p>
-                        <p class="mb-1"><strong>Duration:</strong> <span th:text="${course.durationHours} + ' hours'"></span></p>
-                        <p class="mb-1"><strong>Price:</strong> <span th:text="${course.price}"></span></p>
-                    </div>
-                    <div class="col-md-4" th:if="${course.thumbnailUrl != null and !#strings.isEmpty(course.thumbnailUrl)}">
-                        <img th:src="${course.thumbnailUrl}" alt="thumbnail" class="img-fluid rounded border">
-                    </div>
+                <div class="info-list">
+                    <div><b>Title:</b> <span id="courseTitle"></span></div>
+                    <div><b>Category:</b> <span id="courseCategory"></span></div>
+                    <div><b>Instructor:</b> <span id="courseManager"></span></div>
+                    <div><b>Level:</b> <span id="courseLevel"></span></div>
+                    <div><b>Price:</b> <span id="coursePrice"></span></div>
+                    <div><b>Status:</b> <span id="courseStatus"></span></div>
                 </div>
             </div>
         </div>
 
-        <div class="mb-3">
-            <a th:href="@{/courses/chapter/new(courseId=${course.courseId})}" class="btn btn-success">Add Chapter</a>
-        </div>
-
-        <div th:if="${#lists.isEmpty(chapters)}" class="alert alert-info">
-            This course has no chapters yet.
-        </div>
-
-        <div th:each="chapter : ${chapters}" class="card mb-4">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <div>
-                    <strong th:text="${chapter.orderIndex} + '. ' + ${chapter.title}"></strong>
-                    <span class="badge bg-success ms-2" th:if="${chapter.status == 1}">Active</span>
-                    <span class="badge bg-secondary ms-2" th:if="${chapter.status != 1}">Inactive</span>
-                </div>
-                <div class="d-flex gap-2">
-                    <a th:href="@{/courses/lesson/new(chapterId=${chapter.chapterId})}" class="btn btn-sm btn-success">Add Lesson</a>
-                    <a th:href="@{'/courses/chapter/edit/' + ${chapter.chapterId}}" class="btn btn-sm btn-warning">Edit</a>
-                    <a th:href="@{'/courses/chapter/delete/' + ${chapter.chapterId}}"
-                       class="btn btn-sm btn-danger"
-                       onclick="return confirm('Delete this chapter?')">Delete</a>
-                </div>
-            </div>
-
-            <div class="card-body">
-                <p th:text="${chapter.description}"></p>
-
-                <div class="table-responsive">
-                    <table class="table table-bordered align-middle">
-                        <thead class="table-light">
-                        <tr>
-                            <th>Order</th>
-                            <th>Title</th>
-                            <th>Content Type</th>
-                            <th>Duration</th>
-                            <th>Preview</th>
-                            <th>Status</th>
-                            <th width="180">Actions</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr th:if="${#lists.isEmpty(lessonMap[chapter.chapterId])}">
-                            <td colspan="7" class="text-center text-muted">No lessons in this chapter</td>
-                        </tr>
-
-                        <tr th:each="lesson : ${lessonMap[chapter.chapterId]}">
-                            <td th:text="${lesson.orderIndex}"></td>
-                            <td th:text="${lesson.title}"></td>
-                            <td th:text="${lesson.contentType}"></td>
-                            <td th:text="${lesson.durationMinutes} + ' min'"></td>
-                            <td th:text="${lesson.isPreview ? 'Yes' : 'No'}"></td>
-                            <td>
-                                <span class="badge bg-success" th:if="${lesson.status == 1}">Active</span>
-                                <span class="badge bg-secondary" th:if="${lesson.status != 1}">Inactive</span>
-                            </td>
-                            <td class="d-flex gap-1">
-                                <a th:href="@{'/courses/lesson/edit/' + ${lesson.lessonId}}" class="btn btn-sm btn-warning">Edit</a>
-                                <a th:href="@{'/courses/lesson/delete/' + ${lesson.lessonId}}"
-                                   class="btn btn-sm btn-danger"
-                                   onclick="return confirm('Delete this lesson?')">Delete</a>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+        <div class="card">
+            <div class="card-header">Course Content</div>
+            <div class="card-body" id="chapterList"></div>
         </div>
     </div>
 </div>
+
+<script>
+    const STORAGE_KEY = "course_management_data";
+
+    function getDefaultData() {
+        return {
+            courses: [
+                {
+                    id: 1,
+                    title: "Tiêu đề course 1",
+                    manager: "Kien Nguyen8",
+                    category: "Business",
+                    level: "Beginner",
+                    duration: "6 giờ",
+                    listedPrice: 0,
+                    salePrice: 0,
+                    status: true,
+                    featured: false,
+                    description: "Mô tả khóa học số 1.",
+                    createdAt: "2025-08-07 08:42:55",
+                    chapters: []
+                },
+                {
+                    id: 2,
+                    title: "Course số 2",
+                    manager: "Kien Nguyen8",
+                    category: "Data Science",
+                    level: "Beginner",
+                    duration: "8 giờ",
+                    listedPrice: 15,
+                    salePrice: 12,
+                    status: true,
+                    featured: false,
+                    description: "Khóa học mẫu để quản lý chapter và lesson.",
+                    createdAt: "2025-08-07 10:07:30",
+                    chapters: [
+                        {
+                            id: 1,
+                            title: "Chương 2.1 - Tổng quan",
+                            description: "Mô tả tổng quan bài học",
+                            order: 1,
+                            lessons: [
+                                {
+                                    id: 1,
+                                    title: "Bài học tổng quan 2.1.1",
+                                    contentType: "Video",
+                                    contentValue: "https://www.youtube.com/watch?v=TzT5NI5V_lA",
+                                    duration: 0,
+                                    order: 1,
+                                    preview: false
+                                },
+                                {
+                                    id: 2,
+                                    title: "Bài học 2.1.2 updated6",
+                                    contentType: "PDF",
+                                    contentValue: "document.pdf",
+                                    duration: 0,
+                                    order: 2,
+                                    preview: false
+                                },
+                                {
+                                    id: 3,
+                                    title: "Bài học YouTube2",
+                                    contentType: "Video",
+                                    contentValue: "https://www.youtube.com/watch?v=TzT5NI5V_lA",
+                                    duration: 30,
+                                    order: 3,
+                                    preview: false
+                                }
+                            ]
+                        },
+                        {
+                            id: 2,
+                            title: "Chương 2.2. Nội dung chi tiết đầu",
+                            description: "Mô tả chương nội dung chi tiết đầu",
+                            order: 2,
+                            lessons: [
+                                {
+                                    id: 1,
+                                    title: "Bài 2.2.1 - Nội dung rich text",
+                                    contentType: "Text",
+                                    contentValue: "Nội dung lesson dạng text",
+                                    duration: 0,
+                                    order: 1,
+                                    preview: false
+                                },
+                                {
+                                    id: 2,
+                                    title: "Bài học PDF #2",
+                                    contentType: "PDF",
+                                    contentValue: "tailieu.pdf",
+                                    duration: 0,
+                                    order: 2,
+                                    preview: false
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        };
+    }
+
+    function loadData() {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) {
+            const seed = getDefaultData();
+            saveData(seed);
+            return seed;
+        }
+        return JSON.parse(raw);
+    }
+
+    function saveData(data) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }
+
+    function getQueryParam(name) {
+        const params = new URLSearchParams(window.location.search);
+        return params.get(name);
+    }
+
+    function formatStatus(value) {
+        return value ? "Published" : "Draft";
+    }
+
+    function statusClass(value) {
+        return value ? "status-badge" : "status-badge status-draft";
+    }
+
+    function getLessonClass(contentType) {
+        if (contentType === "PDF") return "lesson-number pdf";
+        if (contentType === "Text") return "lesson-number text";
+        return "lesson-number";
+    }
+
+    const data = loadData();
+    const courseId = Number(getQueryParam("courseId"));
+    const course = data.courses.find(c => c.id === courseId);
+
+    if (!course) {
+        alert("Không tìm thấy khóa học.");
+        window.location.href = "course-list.html";
+    }
+
+    document.getElementById("contentTitle").textContent = (course ? course.title : "") + " - Content Management";
+    document.getElementById("courseTitle").textContent = course.title;
+    document.getElementById("courseCategory").textContent = course.category;
+    document.getElementById("courseManager").textContent = course.manager;
+    document.getElementById("courseLevel").textContent = (course.level || "").toUpperCase();
+    document.getElementById("coursePrice").textContent = course.listedPrice;
+    document.getElementById("courseStatus").innerHTML = '<span class="' + statusClass(course.status) + '">' + formatStatus(course.status) + '</span>';
+    document.getElementById("addChapterBtn").href = "chapter-detail.html?mode=add&courseId=" + course.id;
+
+    function renderChapters() {
+        const container = document.getElementById("chapterList");
+        const chapters = [...(course.chapters || [])].sort((a, b) => a.order - b.order);
+
+        if (!chapters.length) {
+            container.innerHTML = '<div class="empty">Chưa có chapter nào. Nhấn "+ Add Chapter" để thêm mới.</div>';
+            return;
+        }
+
+        container.innerHTML = chapters.map(chapter => `
+      <div class="chapter-card">
+        <div class="chapter-header">
+          <div class="chapter-title">Chapter ${chapter.order}: ${chapter.title}</div>
+          <div class="btn-group">
+            <a href="lesson-detail.html?mode=add&courseId=${course.id}&chapterId=${chapter.id}" class="btn btn-outline-primary btn-sm">+ Add Lesson</a>
+            <div class="action-group">
+              <a href="chapter-detail.html?mode=edit&courseId=${course.id}&chapterId=${chapter.id}" class="icon-btn icon-edit" title="Edit Chapter">✎</a>
+              <button type="button" class="icon-btn icon-delete" title="Delete Chapter" onclick="deleteChapter(${chapter.id})">🗑</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="chapter-desc">${chapter.description || ""}</div>
+
+        <div class="lesson-list">
+          ${(chapter.lessons && chapter.lessons.length)
+            ? [...chapter.lessons].sort((a, b) => a.order - b.order).map(lesson => `
+              <div class="lesson-item">
+                <div class="lesson-main">
+                  <div class="${getLessonClass(lesson.contentType)}">${lesson.order}</div>
+                  <div class="lesson-text">
+                    ${lesson.title}
+                    <span class="meta">
+                      ${lesson.contentType}
+                      ${lesson.duration ? `<span class="duration">• ${lesson.duration} min</span>` : ""}
+                      ${lesson.preview ? `<span class="duration">• preview</span>` : ""}
+                    </span>
+                  </div>
+                </div>
+                <div class="action-group">
+                  <a href="lesson-detail.html?mode=edit&courseId=${course.id}&chapterId=${chapter.id}&lessonId=${lesson.id}" class="icon-btn icon-edit" title="Edit Lesson">✎</a>
+                  <button type="button" class="icon-btn icon-delete" title="Delete Lesson" onclick="deleteLesson(${chapter.id}, ${lesson.id})">🗑</button>
+                </div>
+              </div>
+            `).join("")
+            : `<div class="empty">Chưa có lesson nào trong chapter này.</div>`
+        }
+        </div>
+      </div>
+    `).join("");
+    }
+
+    function deleteChapter(chapterId) {
+        const chapter = course.chapters.find(ch => ch.id === chapterId);
+        if (!chapter) return;
+
+        const ok = confirm('Bạn có chắc muốn xoá chapter "' + chapter.title + '" không?');
+        if (!ok) return;
+
+        course.chapters = course.chapters.filter(ch => ch.id !== chapterId);
+        saveData(data);
+        renderChapters();
+    }
+
+    function deleteLesson(chapterId, lessonId) {
+        const chapter = course.chapters.find(ch => ch.id === chapterId);
+        if (!chapter) return;
+
+        const lesson = chapter.lessons.find(ls => ls.id === lessonId);
+        if (!lesson) return;
+
+        const ok = confirm('Bạn có chắc muốn xoá lesson "' + lesson.title + '" không?');
+        if (!ok) return;
+
+        chapter.lessons = chapter.lessons.filter(ls => ls.id !== lessonId);
+        saveData(data);
+        renderChapters();
+    }
+
+    renderChapters();
+</script>
 </body>
 </html>

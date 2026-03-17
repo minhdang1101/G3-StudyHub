@@ -1,6 +1,7 @@
 package org.example.assignment2.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.example.assignment2.dto.UserDTO;
 import org.example.assignment2.model.User;
@@ -183,5 +184,15 @@ public class UserController {
         model.addAttribute("comments", commentRepo.findByUserId(id));
 
         return "user/user-records";
+    }
+    @GetMapping("/logout")
+    public String logout(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+
+        if (session != null) {
+            session.invalidate();
+        }
+
+        return "redirect:/";
     }
 }

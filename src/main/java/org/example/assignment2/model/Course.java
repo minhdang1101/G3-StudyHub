@@ -32,18 +32,18 @@ public class Course {
     private BigDecimal price;
 
     @ManyToOne
-    @JoinColumn(name = "level", referencedColumnName = "setting_id")
+    @JoinColumn(name = "level", referencedColumnName = "id")
     private Setting level;
 
     @Column(name = "duration_hours")
     private Integer durationHours;
 
     @ManyToOne
-    @JoinColumn(name = "category_id", referencedColumnName = "setting_id")
+    @JoinColumn(name = "category_id", referencedColumnName = "id")
     private Setting category;
 
     @ManyToOne
-    @JoinColumn(name = "instructor_id", referencedColumnName = "user_id")
+    @JoinColumn(name = "instructor_id", referencedColumnName = "id")
     private User instructor;
 
     @Column(name = "status")

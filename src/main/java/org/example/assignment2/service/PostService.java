@@ -27,4 +27,5 @@ public class PostService {
     public void deletePost(Integer id) {
         postRepo.deleteById(id);
     }
+
 }
