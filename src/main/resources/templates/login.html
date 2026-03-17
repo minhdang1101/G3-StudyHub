@@ -1,56 +1,57 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <title>StudyHub Login</title>
 
     <style>
-        body{
+        body {
             font-family: Arial;
-            background: linear-gradient(135deg,#667eea,#764ba2);
-            height:100vh;
-            display:flex;
-            justify-content:center;
-            align-items:center;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
-        .login-box{
-            background:white;
-            padding:40px;
-            width:350px;
-            border-radius:10px;
-            box-shadow:0 10px 25px rgba(0,0,0,0.2);
+        .login-box {
+            background: white;
+            padding: 40px;
+            width: 350px;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
         }
 
-        h2{
-            text-align:center;
-            margin-bottom:25px;
+        h2 {
+            text-align: center;
+            margin-bottom: 25px;
         }
 
-        input{
-            width:100%;
-            padding:10px;
-            margin:10px 0;
-            border:1px solid #ddd;
-            border-radius:5px;
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
         }
 
-        button{
-            width:100%;
-            padding:10px;
-            background:#667eea;
-            color:white;
-            border:none;
-            border-radius:5px;
-            cursor:pointer;
+        button {
+            width: 100%;
+            padding: 10px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
         }
 
-        button:hover{
-            background:#5563d1;
+        button:hover {
+            background: #5563d1;
         }
 
-        .error{
-            color:red;
-            text-align:center;
+        .error {
+            color: red;
+            text-align: center;
         }
     </style>
 
@@ -58,29 +59,30 @@
 
 <body>
 
-<div class="login-box">
+    <div class="login-box">
 
-    <h2>StudyHub Login</h2>
+        <h2>StudyHub Login</h2>
 
-    <form th:action="@{/templates/login}" method="post">
+        <form th:action="@/login}" method="post">
 
-        <input type="email" name="email" placeholder="Email" required>
+            <input type="email" name="email" placeholder="Email" required>
 
-        <input type="password" name="password" placeholder="Password" required>
+            <input type="password" name="password" placeholder="Password" required>
 
-        <button type="submit">Login</button>
-        <div style="margin-top:10px;text-align:center">
+            <button type="submit">Login</button>
+            <div style="margin-top:10px;text-align:center">
 
-            <a href="/register">Register</a> |
-            <a href="/forgot-password">Forgot Password</a>
+                <a href="/register">Register</a> |
+                <a href="/forgot-password">Forgot Password</a>
 
-        </div>
+            </div>
 
-    </form>
+        </form>
 
-    <p class="error" th:text="${error}"></p>
+        <p class="error" th:text="${error}"></p>
 
-</div>
+    </div>
 
 </body>
+
 </html>
