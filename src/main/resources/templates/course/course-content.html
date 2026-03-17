@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Content</title>
+    <style>
+        :root {
+            --primary: #0d6efd;
+            --primary-dark: #0b5ed7;
+            --secondary: #6c757d;
+            --success: #198754;
+            --danger: #dc3545;
+            --info: #0dcaf0;
+            --border: #dee2e6;
+            --text: #212529;
+            --muted: #6c757d;
+            --shadow: 0 1px 2px rgba(0,0,0,0.08);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            padding: 10px;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #fff;
+            color: var(--text);
+        }
+
+        .container {
+            border: 2px solid #2b6fe2;
+            padding: 12px;
+            min-height: calc(100vh - 20px);
+            background: #fff;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+
+        .page-header h2 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            border: 1px solid transparent;
+            border-radius: 4px;
+            padding: 8px 14px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+        }
+
+        .btn-sm {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+            color: #fff;
+        }
+
+        .btn-outline-primary {
+            background: #fff;
+            color: var(--primary);
+            border-color: #b6d4fe;
+        }
+
+        .card {
+            border: 1px solid var(--border);
+            background: #fff;
+            overflow: hidden;
+        }
+
+        .card-header {
+            background: #f8f9fa;
+            border-bottom: 1px solid var(--border);
+            padding: 10px 12px;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .card-body {
+            padding: 12px;
+        }
+
+        .content-layout {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 16px;
+            align-items: start;
+        }
+
+        .info-list {
+            display: grid;
+            gap: 12px;
+            font-size: 14px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            background: var(--success);
+            color: #fff;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 9px;
+            border-radius: 3px;
+        }
+
+        .status-draft {
+            background: var(--secondary);
+        }
+
+        .chapter-card {
+            border: 1px solid #e7e7e7;
+            border-radius: 4px;
+            margin-bottom: 14px;
+            overflow: hidden;
+            background: #fff;
+        }
+
+        .chapter-header {
+            background: #f8f9fa;
+            padding: 10px 12px;
+            border-bottom: 1px solid #ececec;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .chapter-title::before {
+            content: "📁 ";
+            font-size: 13px;
+        }
+
+        .chapter-desc {
+            padding: 12px 12px 4px;
+            color: #6b6b6b;
+            font-size: 14px;
+        }
+
+        .lesson-list {
+            padding: 0 12px 12px;
+            display: grid;
+            gap: 10px;
+        }
+
+        .lesson-item {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 10px;
+            border-top: 1px solid #f0f0f0;
+            padding-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .lesson-main {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+        }
+
+        .lesson-number {
+            width: 18px;
+            text-align: center;
+            font-size: 15px;
+            font-weight: 700;
+            color: #1f6feb;
+            flex-shrink: 0;
+        }
+
+        .lesson-number.pdf {
+            color: #dc3545;
+        }
+
+        .lesson-number.text {
+            color: #0dcaf0;
+        }
+
+        .lesson-text {
+            font-size: 14px;
+            line-height: 1.35;
+        }
+
+        .lesson-text .meta {
+            display: block;
+            font-size: 11px;
+            color: #8a8a8a;
+            text-transform: uppercase;
+            margin-top: 2px;
+        }
+
+        .lesson-text .duration {
+            font-size: 11px;
+            color: #8a8a8a;
+            margin-left: 4px;
+        }
+
+        .action-group {
+            display: inline-flex;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .icon-btn {
+            width: 30px;
+            height: 30px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #fff;
+            border: 1px solid;
+            text-decoration: none;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 0;
+        }
+
+        .icon-btn + .icon-btn {
+            border-left: none;
+        }
+
+        .icon-edit {
+            color: var(--primary);
+            border-color: #b6d4fe;
+        }
+
+        .icon-delete {
+            color: var(--danger);
+            border-color: #f1b8bf;
+        }
+
+        .empty {
+            color: var(--muted);
+            padding: 10px 0;
+        }
+
+        @media (max-width: 1000px) {
+            .content-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="page-header">
+        <h2 id="contentTitle">Course Content Management</h2>
+        <div class="btn-group">
+            <a id="addChapterBtn" href="#" class="btn btn-primary btn-sm">+ Add Chapter</a>
+            <a href="course-list.html" class="btn btn-secondary btn-sm">← Back to Courses</a>
+        </div>
+    </div>
+
+    <div class="content-layout">
+        <div class="card">
+            <div class="card-header">Course Information</div>
+            <div class="card-body">
+                <div class="info-list">
+                    <div><b>Title:</b> <span id="courseTitle"></span></div>
+                    <div><b>Category:</b> <span id="courseCategory"></span></div>
+                    <div><b>Instructor:</b> <span id="courseManager"></span></div>
+                    <div><b>Level:</b> <span id="courseLevel"></span></div>
+                    <div><b>Price:</b> <span id="coursePrice"></span></div>
+                    <div><b>Status:</b> <span id="courseStatus"></span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">Course Content</div>
+            <div class="card-body" id="chapterList"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const STORAGE_KEY = "course_management_data";
+
+    function getDefaultData() {
+        return {
+            courses: [
+                {
+                    id: 1,
+                    title: "Tiêu đề course 1",
+                    manager: "Kien Nguyen8",
+                    category: "Business",
+                    level: "Beginner",
+                    duration: "6 giờ",
+                    listedPrice: 0,
+                    salePrice: 0,
+                    status: true,
+                    featured: false,
+                    description: "Mô tả khóa học số 1.",
+                    createdAt: "2025-08-07 08:42:55",
+                    chapters: []
+                },
+                {
+                    id: 2,
+                    title: "Course số 2",
+                    manager: "Kien Nguyen8",
+                    category: "Data Science",
+                    level: "Beginner",
+                    duration: "8 giờ",
+                    listedPrice: 15,
+                    salePrice: 12,
+                    status: true,
+                    featured: false,
+                    description: "Khóa học mẫu để quản lý chapter và lesson.",
+                    createdAt: "2025-08-07 10:07:30",
+                    chapters: [
+                        {
+                            id: 1,
+                            title: "Chương 2.1 - Tổng quan",
+                            description: "Mô tả tổng quan bài học",
+                            order: 1,
+                            lessons: [
+                                {
+                                    id: 1,
+                                    title: "Bài học tổng quan 2.1.1",
+                                    contentType: "Video",
+                                    contentValue: "https://www.youtube.com/watch?v=TzT5NI5V_lA",
+                                    duration: 0,
+                                    order: 1,
+                                    preview: false
+                                },
+                                {
+                                    id: 2,
+                                    title: "Bài học 2.1.2 updated6",
+                                    contentType: "PDF",
+                                    contentValue: "document.pdf",
+                                    duration: 0,
+                                    order: 2,
+                                    preview: false
+                                },
+                                {
+                                    id: 3,
+                                    title: "Bài học YouTube2",
+                                    contentType: "Video",
+                                    contentValue: "https://www.youtube.com/watch?v=TzT5NI5V_lA",
+                                    duration: 30,
+                                    order: 3,
+                                    preview: false
+                                }
+                            ]
+                        },
+                        {
+                            id: 2,
+                            title: "Chương 2.2. Nội dung chi tiết đầu",
+                            description: "Mô tả chương nội dung chi tiết đầu",
+                            order: 2,
+                            lessons: [
+                                {
+                                    id: 1,
+                                    title: "Bài 2.2.1 - Nội dung rich text",
+                                    contentType: "Text",
+                                    contentValue: "Nội dung lesson dạng text",
+                                    duration: 0,
+                                    order: 1,
+                                    preview: false
+                                },
+                                {
+                                    id: 2,
+                                    title: "Bài học PDF #2",
+                                    contentType: "PDF",
+                                    contentValue: "tailieu.pdf",
+                                    duration: 0,
+                                    order: 2,
+                                    preview: false
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        };
+    }
+
+    function loadData() {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) {
+            const seed = getDefaultData();
+            saveData(seed);
+            return seed;
+        }
+        return JSON.parse(raw);
+    }
+
+    function saveData(data) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }
+
+    function getQueryParam(name) {
+        const params = new URLSearchParams(window.location.search);
+        return params.get(name);
+    }
+
+    function formatStatus(value) {
+        return value ? "Published" : "Draft";
+    }
+
+    function statusClass(value) {
+        return value ? "status-badge" : "status-badge status-draft";
+    }
+
+    function getLessonClass(contentType) {
+        if (contentType === "PDF") return "lesson-number pdf";
+        if (contentType === "Text") return "lesson-number text";
+        return "lesson-number";
+    }
+
+    const data = loadData();
+    const courseId = Number(getQueryParam("courseId"));
+    const course = data.courses.find(c => c.id === courseId);
+
+    if (!course) {
+        alert("Không tìm thấy khóa học.");
+        window.location.href = "course-list.html";
+    }
+
+    document.getElementById("contentTitle").textContent = (course ? course.title : "") + " - Content Management";
+    document.getElementById("courseTitle").textContent = course.title;
+    document.getElementById("courseCategory").textContent = course.category;
+    document.getElementById("courseManager").textContent = course.manager;
+    document.getElementById("courseLevel").textContent = (course.level || "").toUpperCase();
+    document.getElementById("coursePrice").textContent = course.listedPrice;
+    document.getElementById("courseStatus").innerHTML = '<span class="' + statusClass(course.status) + '">' + formatStatus(course.status) + '</span>';
+    document.getElementById("addChapterBtn").href = "chapter-detail.html?mode=add&courseId=" + course.id;
+
+    function renderChapters() {
+        const container = document.getElementById("chapterList");
+        const chapters = [...(course.chapters || [])].sort((a, b) => a.order - b.order);
+
+        if (!chapters.length) {
+            container.innerHTML = '<div class="empty">Chưa có chapter nào. Nhấn "+ Add Chapter" để thêm mới.</div>';
+            return;
+        }
+
+        container.innerHTML = chapters.map(chapter => `
+      <div class="chapter-card">
+        <div class="chapter-header">
+          <div class="chapter-title">Chapter ${chapter.order}: ${chapter.title}</div>
+          <div class="btn-group">
+            <a href="lesson-detail.html?mode=add&courseId=${course.id}&chapterId=${chapter.id}" class="btn btn-outline-primary btn-sm">+ Add Lesson</a>
+            <div class="action-group">
+              <a href="chapter-detail.html?mode=edit&courseId=${course.id}&chapterId=${chapter.id}" class="icon-btn icon-edit" title="Edit Chapter">✎</a>
+              <button type="button" class="icon-btn icon-delete" title="Delete Chapter" onclick="deleteChapter(${chapter.id})">🗑</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="chapter-desc">${chapter.description || ""}</div>
+
+        <div class="lesson-list">
+          ${(chapter.lessons && chapter.lessons.length)
+            ? [...chapter.lessons].sort((a, b) => a.order - b.order).map(lesson => `
+              <div class="lesson-item">
+                <div class="lesson-main">
+                  <div class="${getLessonClass(lesson.contentType)}">${lesson.order}</div>
+                  <div class="lesson-text">
+                    ${lesson.title}
+                    <span class="meta">
+                      ${lesson.contentType}
+                      ${lesson.duration ? `<span class="duration">• ${lesson.duration} min</span>` : ""}
+                      ${lesson.preview ? `<span class="duration">• preview</span>` : ""}
+                    </span>
+                  </div>
+                </div>
+                <div class="action-group">
+                  <a href="lesson-detail.html?mode=edit&courseId=${course.id}&chapterId=${chapter.id}&lessonId=${lesson.id}" class="icon-btn icon-edit" title="Edit Lesson">✎</a>
+                  <button type="button" class="icon-btn icon-delete" title="Delete Lesson" onclick="deleteLesson(${chapter.id}, ${lesson.id})">🗑</button>
+                </div>
+              </div>
+            `).join("")
+            : `<div class="empty">Chưa có lesson nào trong chapter này.</div>`
+        }
+        </div>
+      </div>
+    `).join("");
+    }
+
+    function deleteChapter(chapterId) {
+        const chapter = course.chapters.find(ch => ch.id === chapterId);
+        if (!chapter) return;
+
+        const ok = confirm('Bạn có chắc muốn xoá chapter "' + chapter.title + '" không?');
+        if (!ok) return;
+
+        course.chapters = course.chapters.filter(ch => ch.id !== chapterId);
+        saveData(data);
+        renderChapters();
+    }
+
+    function deleteLesson(chapterId, lessonId) {
+        const chapter = course.chapters.find(ch => ch.id === chapterId);
+        if (!chapter) return;
+
+        const lesson = chapter.lessons.find(ls => ls.id === lessonId);
+        if (!lesson) return;
+
+        const ok = confirm('Bạn có chắc muốn xoá lesson "' + lesson.title + '" không?');
+        if (!ok) return;
+
+        chapter.lessons = chapter.lessons.filter(ls => ls.id !== lessonId);
+        saveData(data);
+        renderChapters();
+    }
+
+    renderChapters();
+</script>
+</body>
+</html>

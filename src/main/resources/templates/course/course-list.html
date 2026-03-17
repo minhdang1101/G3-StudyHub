@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Courses Management</title>
+    <style>
+        :root {
+            --primary: #0d6efd;
+            --primary-dark: #0b5ed7;
+            --secondary: #6c757d;
+            --success: #198754;
+            --danger: #dc3545;
+            --info: #0dcaf0;
+            --border: #dee2e6;
+            --text: #212529;
+            --muted: #6c757d;
+            --bg-row: #f3f3f3;
+            --shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            padding: 10px;
+            font-family: Arial, Helvetica, sans-serif;
+            color: var(--text);
+            background: #fff;
+        }
+
+        .container {
+            border: 2px solid #2b6fe2;
+            padding: 12px;
+            min-height: calc(100vh - 20px);
+            background: #fff;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .page-header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            border: 1px solid transparent;
+            border-radius: 4px;
+            padding: 8px 14px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .card {
+            border: 1px solid var(--border);
+            background: #fff;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1050px;
+        }
+
+        th, td {
+            padding: 12px 10px;
+            text-align: left;
+            font-size: 14px;
+            vertical-align: top;
+        }
+
+        thead th {
+            border-bottom: 2px solid #666;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        tbody tr:nth-child(odd) {
+            background: var(--bg-row);
+        }
+
+        tbody td {
+            border-top: 1px solid #efefef;
+        }
+
+        .course-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            line-height: 1.35;
+        }
+
+        .thumb {
+            width: 50px;
+            height: 28px;
+            display: block;
+            border: 1px solid #d9d9d9;
+            border-radius: 2px;
+            background: linear-gradient(135deg, #21409a, #41b6e6);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .thumb::after {
+            content: "IMG";
+            position: absolute;
+            right: 4px;
+            bottom: 2px;
+            font-size: 8px;
+            color: #fff;
+            font-weight: 700;
+        }
+
+        .status-badge {
+            display: inline-block;
+            background: var(--success);
+            color: #fff;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 9px;
+            border-radius: 3px;
+        }
+
+        .status-draft {
+            background: var(--secondary);
+        }
+
+        .action-group {
+            display: inline-flex;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .icon-btn {
+            width: 30px;
+            height: 30px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #fff;
+            border: 1px solid;
+            text-decoration: none;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 0;
+        }
+
+        .icon-btn + .icon-btn {
+            border-left: none;
+        }
+
+        .icon-edit {
+            color: var(--primary);
+            border-color: #b6d4fe;
+        }
+
+        .icon-list {
+            color: #0a8ba6;
+            border-color: #9eeaf9;
+        }
+
+        .icon-delete {
+            color: var(--danger);
+            border-color: #f1b8bf;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 30px 16px;
+            color: var(--muted);
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="page-header">
+        <h1>Courses Management</h1>
+        <a href="course-detail.html?mode=add" class="btn btn-primary">+ Add New Course</a>
+    </div>
+
+    <div class="card">
+        <table>
+            <thead>
+            <tr>
+                <th style="width: 60px;">ID</th>
+                <th>Title</th>
+                <th style="width: 160px;">Manager</th>
+                <th style="width: 150px;">Category</th>
+                <th style="width: 100px;">Price</th>
+                <th style="width: 110px;">Status</th>
+                <th style="width: 210px;">Created</th>
+                <th style="width: 140px;">Actions</th>
+            </tr>
+            </thead>
+            <tbody id="courseTableBody"></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    const STORAGE_KEY = "course_management_data";
+
+    function getDefaultData() {
+        return {
+            courses: [
+                {
+                    id: 1,
+                    title: "Tiêu đề course 1",
+                    manager: "Kien Nguyen8",
+                    category: "Business",
+                    level: "Beginner",
+                    duration: "6 giờ",
+                    listedPrice: 0,
+                    salePrice: 0,
+                    status: true,
+                    featured: false,
+                    description: "Mô tả khóa học số 1.",
+                    createdAt: "2025-08-07 08:42:55",
+                    chapters: []
+                },
+                {
+                    id: 2,
+                    title: "Course số 2",
+                    manager: "Kien Nguyen8",
+                    category: "Data Science",
+                    level: "Beginner",
+                    duration: "8 giờ",
+                    listedPrice: 15,
+                    salePrice: 12,
+                    status: true,
+                    featured: false,
+                    description: "Khóa học mẫu để quản lý chapter và lesson.",
+                    createdAt: "2025-08-07 10:07:30",
+                    chapters: [
+                        {
+                            id: 1,
+                            title: "Chương 2.1 - Tổng quan",
+                            description: "Mô tả tổng quan bài học",
+                            order: 1,
+                            lessons: [
+                                {
+                                    id: 1,
+                                    title: "Bài học tổng quan 2.1.1",
+                                    contentType: "Video",
+                                    contentValue: "https://www.youtube.com/watch?v=TzT5NI5V_lA",
+                                    duration: 0,
+                                    order: 1,
+                                    preview: false
+                                },
+                                {
+                                    id: 2,
+                                    title: "Bài học 2.1.2 updated6",
+                                    contentType: "PDF",
+                                    contentValue: "document.pdf",
+                                    duration: 0,
+                                    order: 2,
+                                    preview: false
+                                },
+                                {
+                                    id: 3,
+                                    title: "Bài học YouTube2",
+                                    contentType: "Video",
+                                    contentValue: "https://www.youtube.com/watch?v=TzT5NI5V_lA",
+                                    duration: 30,
+                                    order: 3,
+                                    preview: false
+                                }
+                            ]
+                        },
+                        {
+                            id: 2,
+                            title: "Chương 2.2. Nội dung chi tiết đầu",
+                            description: "Mô tả chương nội dung chi tiết đầu",
+                            order: 2,
+                            lessons: [
+                                {
+                                    id: 1,
+                                    title: "Bài 2.2.1 - Nội dung rich text",
+                                    contentType: "Text",
+                                    contentValue: "Nội dung lesson dạng text",
+                                    duration: 0,
+                                    order: 1,
+                                    preview: false
+                                },
+                                {
+                                    id: 2,
+                                    title: "Bài học PDF #2",
+                                    contentType: "PDF",
+                                    contentValue: "tailieu.pdf",
+                                    duration: 0,
+                                    order: 2,
+                                    preview: false
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        };
+    }
+
+    function loadData() {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) {
+            const seed = getDefaultData();
+            saveData(seed);
+            return seed;
+        }
+        return JSON.parse(raw);
+    }
+
+    function saveData(data) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }
+
+    function formatStatus(value) {
+        return value ? "Published" : "Draft";
+    }
+
+    function statusClass(value) {
+        return value ? "status-badge" : "status-badge status-draft";
+    }
+
+    function renderCourses() {
+        const data = loadData();
+        const tbody = document.getElementById("courseTableBody");
+        const courses = [...data.courses].sort((a, b) => b.id - a.id);
+
+        if (!courses.length) {
+            tbody.innerHTML = `
+        <tr>
+          <td colspan="8" class="empty-state">Chưa có khóa học nào.</td>
+        </tr>
+      `;
+            return;
+        }
+
+        tbody.innerHTML = courses.map(course => `
+      <tr>
+        <td>${course.id}</td>
+        <td>
+          <div class="course-title">${course.title}</div>
+          <span class="thumb"></span>
+        </td>
+        <td>${course.manager}</td>
+        <td>${course.category}</td>
+        <td>${Number(course.listedPrice || 0).toFixed(2)}</td>
+        <td><span class="${statusClass(course.status)}">${formatStatus(course.status)}</span></td>
+        <td>${course.createdAt || ""}</td>
+        <td>
+          <div class="action-group">
+            <a href="course-detail.html?mode=edit&id=${course.id}" class="icon-btn icon-edit" title="Edit">✎</a>
+            <a href="course-content.html?courseId=${course.id}" class="icon-btn icon-list" title="Content">☰</a>
+            <button type="button" class="icon-btn icon-delete" title="Delete" onclick="deleteCourse(${course.id})">🗑</button>
+          </div>
+        </td>
+      </tr>
+    `).join("");
+    }
+
+    function deleteCourse(id) {
+        const data = loadData();
+        const course = data.courses.find(c => c.id === id);
+        if (!course) return;
+
+        const ok = confirm('Bạn có chắc muốn xoá "' + course.title + '" không?');
+        if (!ok) return;
+
+        data.courses = data.courses.filter(c => c.id !== id);
+        saveData(data);
+        renderCourses();
+    }
+
+    renderCourses();
+</script>
+</body>
+</html>

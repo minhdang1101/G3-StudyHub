@@ -1,6 +1,7 @@
 package org.example.assignment2.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.example.assignment2.dto.UserDTO;
 import org.example.assignment2.model.User;
@@ -198,5 +199,15 @@ public class UserController {
     public String deleteUser(@PathVariable("id") Integer id) {
         userService.deleteUser(id);
         return "redirect:/users";
+    }
+    @GetMapping("/logout")
+    public String logout(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+
+        if (session != null) {
+            session.invalidate();
+        }
+
+        return "redirect:/";
     }
 }

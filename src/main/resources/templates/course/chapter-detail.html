@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter Detail</title>
+    <style>
+        :root {
+            --primary: #0d6efd;
+            --primary-dark: #0b5ed7;
+            --secondary: #6c757d;
+            --border: #dee2e6;
+            --text: #212529;
+            --muted: #6c757d;
+            --shadow: 0 1px 2px rgba(0,0,0,0.08);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            padding: 10px;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #fff;
+            color: var(--text);
+        }
+
+        .container {
+            border: 2px solid #2b6fe2;
+            padding: 12px;
+            min-height: calc(100vh - 20px);
+            background: #fff;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+
+        .page-header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            border: 1px solid transparent;
+            border-radius: 4px;
+            padding: 8px 14px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+            color: #fff;
+        }
+
+        .card {
+            border: 1px solid var(--border);
+            background: #fff;
+        }
+
+        .card-body {
+            padding: 16px 22px 22px;
+            display: grid;
+            gap: 12px;
+        }
+
+        label {
+            display: inline-block;
+            margin-bottom: 6px;
+            font-size: 15px;
+            color: #444;
+        }
+
+        .required::after {
+            content: "*";
+            color: #444;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        textarea {
+            width: 100%;
+            border: 1px solid #b7b7b7;
+            border-radius: 3px;
+            font-size: 15px;
+            padding: 10px 12px;
+            outline: none;
+            background: #fff;
+            font-family: inherit;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .help-text {
+            color: var(--muted);
+            font-size: 14px;
+            margin-top: 6px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="page-header">
+        <h1 id="pageTitle">Chapter Detail</h1>
+        <div class="btn-group">
+            <a href="#" id="backToCourseBtn" class="btn btn-secondary">← Back to Course</a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div>
+                <label for="chapterTitle" class="required">Chapter Title</label>
+                <input type="text" id="chapterTitle">
+            </div>
+
+            <div>
+                <label for="chapterDescription">Description</label>
+                <textarea id="chapterDescription"></textarea>
+            </div>
+
+            <div>
+                <label for="chapterOrder" class="required">Order</label>
+                <input type="number" id="chapterOrder" min="1" value="1">
+                <div class="help-text">The order in which this chapter appears in the course</div>
+            </div>
+
+            <div class="actions">
+                <button type="button" id="saveChapterBtn" class="btn btn-primary">💾 Save Chapter</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const STORAGE_KEY = "course_management_data";
+
+    function getDefaultData() {
+        return {
+            courses: [
+                {
+                    id: 1,
+                    title: "Tiêu đề course 1",
+                    manager: "Kien Nguyen8",
+                    category: "Business",
+                    level: "Beginner",
+                    duration: "6 giờ",
+                    listedPrice: 0,
+                    salePrice: 0,
+                    status: true,
+                    featured: false,
+                    description: "Mô tả khóa học số 1.",
+                    createdAt: "2025-08-07 08:42:55",
+                    chapters: []
+                },
+                {
+                    id: 2,
+                    title: "Course số 2",
+                    manager: "Kien Nguyen8",
+                    category: "Data Science",
+                    level: "Beginner",
+                    duration: "8 giờ",
+                    listedPrice: 15,
+                    salePrice: 12,
+                    status: true,
+                    featured: false,
+                    description: "Khóa học mẫu để quản lý chapter và lesson.",
+                    createdAt: "2025-08-07 10:07:30",
+                    chapters: [
+                        {
+                            id: 1,
+                            title: "Chương 2.1 - Tổng quan",
+                            description: "Mô tả tổng quan bài học",
+                            order: 1,
+                            lessons: [
+                                {
+                                    id: 1,
+                                    title: "Bài học tổng quan 2.1.1",
+                                    contentType: "Video",
+                                    contentValue: "https://www.youtube.com/watch?v=TzT5NI5V_lA",
+                                    duration: 0,
+                                    order: 1,
+                                    preview: false
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        };
+    }
+
+    function loadData() {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) {
+            const seed = getDefaultData();
+            saveData(seed);
+            return seed;
+        }
+        return JSON.parse(raw);
+    }
+
+    function saveData(data) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }
+
+    function generateId(items) {
+        if (!items || !items.length) return 1;
+        return Math.max(...items.map(item => item.id)) + 1;
+    }
+
+    function getQueryParam(name) {
+        const params = new URLSearchParams(window.location.search);
+        return params.get(name);
+    }
+
+    const data = loadData();
+    const mode = getQueryParam("mode") || "add";
+    const courseId = Number(getQueryParam("courseId"));
+    const chapterId = Number(getQueryParam("chapterId"));
+
+    const course = data.courses.find(c => c.id === courseId);
+    if (!course) {
+        alert("Không tìm thấy khóa học.");
+        window.location.href = "course-list.html";
+    }
+
+    document.getElementById("backToCourseBtn").href = "course-content.html?courseId=" + courseId;
+
+    const titleInput = document.getElementById("chapterTitle");
+    const descInput = document.getElementById("chapterDescription");
+    const orderInput = document.getElementById("chapterOrder");
+    const saveBtn = document.getElementById("saveChapterBtn");
+    const pageTitle = document.getElementById("pageTitle");
+
+    if (mode === "edit") {
+        pageTitle.textContent = "Edit Chapter - " + course.title;
+        saveBtn.textContent = "💾 Update Chapter";
+
+        const chapter = course.chapters.find(ch => ch.id === chapterId);
+        if (!chapter) {
+            alert("Không tìm thấy chapter.");
+            window.location.href = "course-content.html?courseId=" + courseId;
+        } else {
+            titleInput.value = chapter.title || "";
+            descInput.value = chapter.description || "";
+            orderInput.value = chapter.order || 1;
+        }
+    } else {
+        pageTitle.textContent = "Add Chapter - " + course.title;
+        saveBtn.textContent = "💾 Save Chapter";
+    }
+
+    saveBtn.addEventListener("click", function () {
+        const payload = {
+            title: titleInput.value.trim(),
+            description: descInput.value.trim(),
+            order: Number(orderInput.value || 1)
+        };
+
+        if (!payload.title) {
+            alert("Vui lòng nhập Chapter Title.");
+            titleInput.focus();
+            return;
+        }
+
+        if (mode === "add") {
+            course.chapters.push({
+                id: generateId(course.chapters),
+                ...payload,
+                lessons: []
+            });
+        } else {
+            const index = course.chapters.findIndex(ch => ch.id === chapterId);
+            if (index !== -1) {
+                course.chapters[index] = {
+                    ...course.chapters[index],
+                    ...payload
+                };
+            }
+        }
+
+        saveData(data);
+        window.location.href = "course-content.html?courseId=" + courseId;
+    });
+</script>
+</body>
+</html>

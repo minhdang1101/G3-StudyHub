@@ -22,4 +22,5 @@ public interface PostRepository extends JpaRepository<Post, Integer> {
     long countByAuthorId(Integer authorId);
 
     List<Post> findByAuthorId(Integer authorId);
+    List<Post> findTop4ByStatusOrderByCreatedAtDesc(String status);
 }
