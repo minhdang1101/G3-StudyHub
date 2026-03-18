@@ -65,16 +65,9 @@ public class UserEnrollmentController {
     public String submitEnrollment(@ModelAttribute Enrollment enrollment, @RequestParam("courseId") Long courseId, HttpSession session) {
         User currentUser = (User) session.getAttribute("user");
         
-        // Save initial enrollment details first
         enrollmentService.processEnrollmentSubmission(enrollment, courseId);
-        
-        // If guest, create account and send email
-        if (currentUser == null) {
-            processAutoRegistrationAndEmail(enrollment);
-        } else {
-            enrollment.setUser(currentUser);
-            enrollmentService.updateEnrollment(enrollment);
-        }
+        enrollment.setUser(currentUser);
+        enrollmentService.updateEnrollment(enrollment);
 
         if ("Internet Banking".equals(enrollment.getPaymentMethod()) || "VNPay".equals(enrollment.getPaymentMethod()) || "VNPAY".equals(enrollment.getPaymentMethod())) {
             return "redirect:/payment/vnpay/checkout?id=" + enrollment.getId();
@@ -150,27 +143,15 @@ public class UserEnrollmentController {
             return "redirect:/login";
         }
 
-        String roleValue = user.getRole() != null ? user.getRole().getValue() : "";
         Pageable pageable = PageRequest.of(page, PAGE_SIZE);
 
         Page<Enrollment> enrollmentPage;
-        if ("ROLE_ADMIN".equalsIgnoreCase(roleValue)) {
-            // Admin: all enrollments paged (reuse existing paginated admin query)
-            enrollmentPage = enrollmentService.searchEnrollmentsWithRole(
-                    null, null, null, null, user, pageable);
-        } else {
-            // Member: only their own enrollments, newest first
-            enrollmentPage = enrollmentService.getEnrollmentsByUserIdPaged(
+        enrollmentPage = enrollmentService.getEnrollmentsByUserIdPaged(
                     user.getId().longValue(), pageable);
-        }
+        
 
-        // Stats (computed from full list for the stats cards)
         List<Enrollment> allEnrollments;
-        if ("ROLE_ADMIN".equalsIgnoreCase(roleValue)) {
-            allEnrollments = enrollmentService.getAllEnrollments();
-        } else {
-            allEnrollments = enrollmentService.getEnrollmentsByUserId(user.getId().longValue());
-        }
+        allEnrollments = enrollmentService.getEnrollmentsByUserId(user.getId().longValue());
 
         model.addAttribute("enrollments", enrollmentPage.getContent());
         model.addAttribute("allEnrollments", allEnrollments);
@@ -180,54 +161,6 @@ public class UserEnrollmentController {
         model.addAttribute("currentUser", user);
 
         return "enrollment/my-enrollments";
-    }
-
-
-    public void markEnrollmentAsPaid(Long enrollmentId) {
-        Enrollment enrollment = enrollmentService.getEnrollmentById(enrollmentId);
-        
-        if (enrollment != null && "Pending".equalsIgnoreCase(enrollment.getStatus())) {
-            
-            enrollment.setStatus("Paid");
-            enrollment.setLastUpdated(LocalDateTime.now());
-            enrollmentService.updateEnrollment(enrollment);
-            processAutoRegistrationAndEmail(enrollment);
-        }
-    }
-
-    private void processAutoRegistrationAndEmail(Enrollment enrollment) {
-        String learnerEmail = enrollment.getEmail(); 
-        User existingLearner = userService.findByEmail(learnerEmail);
-        String generatedPassword = null;
-
-        if (existingLearner == null) {
-            User newLearner = new User();
-            newLearner.setEmail(learnerEmail);
-            newLearner.setFullName(enrollment.getFullName());
-            newLearner.setMobile(enrollment.getMobile());
-            newLearner.setStatus("Active");
-            generatedPassword = UUID.randomUUID().toString().substring(0, 8) + "@1A";
-            newLearner.setPassword(generatedPassword); 
-            
-            // Set default role (3 - Member/Learner)
-            org.example.assignment2.model.Setting role = new org.example.assignment2.model.Setting();
-            role.setId(3);
-            newLearner.setRole(role);
-
-            userService.saveUser(newLearner);
-            enrollment.setUser(newLearner);
-        } else {
-            enrollment.setUser(existingLearner);
-        }
-        
-        enrollmentService.updateEnrollment(enrollment);
-
-        emailService.sendAccessInfoToLearner(learnerEmail, enrollment, generatedPassword);
-
-        User buyer = enrollment.getUser(); // Usually the same as learner for guests
-        if (buyer != null && buyer.getEmail() != null && !buyer.getEmail().equalsIgnoreCase(learnerEmail)) {
-            emailService.sendReceiptToBuyer(buyer.getEmail(), enrollment);
-        }
     }
 
     @GetMapping("/enroll/edit/{id}")

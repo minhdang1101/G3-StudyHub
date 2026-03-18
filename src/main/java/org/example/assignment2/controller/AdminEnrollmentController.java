@@ -44,7 +44,6 @@ public class AdminEnrollmentController {
     @Autowired
     private ExcelService excelService;
 
-    // 1. DANH SÁCH CÓ PHÂN QUYỀN VÀ PHÂN TRANG
     @GetMapping
     public String showEnrollmentList(
             @RequestParam(required = false) Long courseId,
@@ -73,7 +72,6 @@ public class AdminEnrollmentController {
         Page<Enrollment> enrollmentPage = enrollmentService.searchEnrollmentsWithRole(
                 filterCourseId, filterUserId, filterStatus, filterSearch, currentUser, pageable);
         
-        // Scope course and user lists by role
         List<Course> courses = isManager
                 ? courseService.getCoursesByManagerId(currentUser.getId())
                 : courseService.getAllCourses();
@@ -85,8 +83,6 @@ public class AdminEnrollmentController {
         model.addAttribute("enrollments", enrollmentPage.getContent());
         model.addAttribute("courses", courses);
         model.addAttribute("users", users);
-        
-        // Metadata for pagination
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", enrollmentPage.getTotalPages());
         model.addAttribute("totalElements", enrollmentPage.getTotalElements());
@@ -116,7 +112,6 @@ public class AdminEnrollmentController {
         return "enrollment/enrollment-details";
     }
 
-    // REST: look up user by email for the Add Enrollment form
     @GetMapping("/lookup-user")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> lookupUserByEmail(
@@ -188,7 +183,6 @@ public class AdminEnrollmentController {
         }
     }
 
-    // EXPORT EXCEL (LẤY TẤT CẢ KHÔNG PHÂN TRANG)
     @GetMapping("/export")
     public void exportToExcel(
             @RequestParam(required = false) Long courseId,
@@ -216,13 +210,12 @@ public class AdminEnrollmentController {
         excelService.exportEnrollmentsToExcel(enrollments, response);
     }
 
-    // DOWNLOAD IMPORT TEMPLATE
+
     @GetMapping("/template")
     public void downloadImportTemplate(HttpServletResponse response) throws IOException {
         excelService.generateImportTemplate(response);
     }
 
-    // IMPORT EXCEL
     @PostMapping("/import")
     public String importFromExcel(
             @RequestParam("file") MultipartFile file,
@@ -245,7 +238,6 @@ public class AdminEnrollmentController {
             return "redirect:/admin/enrollments";
         }
 
-        // Manager can only import to their assigned courses
         if ("MANAGER".equalsIgnoreCase(currentUser.getRole().getValue())) {
             if (course.getManager() == null || !course.getManager().getId().equals(currentUser.getId())) {
                 redirectAttributes.addFlashAttribute("error", "You don't have permission to import for this course or the course has no assigned manager!");
@@ -271,7 +263,6 @@ public class AdminEnrollmentController {
         return "redirect:/admin/enrollments";
     }
 
-    // DELETE ENROLLMENT
     @PostMapping("/delete/{id}")
     public String deleteEnrollment(
             @PathVariable("id") Long id,
@@ -292,7 +283,6 @@ public class AdminEnrollmentController {
         return "redirect:/admin/enrollments";
     }
 
-    // CẬP NHẬT TRẠNG THÁI VÀ GHI CHÚ
     @PostMapping("/update")
     public String updateEnrollment(
             @RequestParam("enrollmentId") Long id,
