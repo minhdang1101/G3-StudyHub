@@ -36,6 +36,14 @@ public class EnrollmentService {
         return enrollmentRepository.findByUser_Id(userId);
     }
 
+    public boolean isAlreadyEnrolled(long userId, Long courseId) {
+        return enrollmentRepository.existsByUser_IdAndCourse_CourseId(userId, courseId);
+    }
+
+    public Page<Enrollment> getEnrollmentsByUserIdPaged(long userId, Pageable pageable) {
+        return enrollmentRepository.findByUser_Id(userId, pageable);
+    }
+
     public Enrollment getEnrollmentById(Long id) {
         return enrollmentRepository.findById(id).orElse(null);
     }

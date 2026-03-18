@@ -16,6 +16,10 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
 
     List<Enrollment> findByUser_Id(Long userId); 
 
+    boolean existsByUser_IdAndCourse_CourseId(Long userId, Long courseId);
+
+    Page<Enrollment> findByUser_Id(Long userId, Pageable pageable);
+
     @Query("SELECT e FROM Enrollment e WHERE " +
            "(:courseId IS NULL OR e.course.id = :courseId) AND " +
            "(:userId IS NULL OR e.user.id = :userId) AND " +

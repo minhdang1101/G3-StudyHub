@@ -27,4 +27,7 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     @Query("SELECT COUNT(u) FROM User u WHERE u.role.id = :roleId AND u.status = :status")
     long countByRoleIdAndStatus(@Param("roleId") Integer roleId, @Param("status") String status);
+
+    @Query("SELECT DISTINCT u FROM User u JOIN Enrollment e ON u.id = e.user.id WHERE e.course.manager.id = :managerId")
+    List<User> findUsersByManagerCourses(@Param("managerId") Integer managerId);
 }
