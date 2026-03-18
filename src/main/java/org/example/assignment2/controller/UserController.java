@@ -91,7 +91,7 @@ public class UserController {
             model.addAttribute("showModal", true);
             return "redirect:/users?showModal=true";
         }
-        userDto.setRoleId(3);
+        userDto.setRoleId(5);
 
         String randomPassword = UUID.randomUUID().toString().substring(0, 8);
 
