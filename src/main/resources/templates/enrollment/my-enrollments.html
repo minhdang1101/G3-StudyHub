@@ -390,7 +390,8 @@
                             <div class="stat-card d-flex align-items-center gap-3">
                                 <div class="stat-icon total"><i class="bi bi-layers"></i></div>
                                 <div>
-                                    <div class="stat-value" th:text="${allEnrollments != null ? allEnrollments.size() : 0}">0
+                                    <div class="stat-value"
+                                        th:text="${allEnrollments != null ? allEnrollments.size() : 0}">0
                                     </div>
                                     <div class="stat-label">Total Enrollments</div>
                                 </div>
@@ -474,20 +475,6 @@
                                                     title="View Notes & Update">
                                                     <i class="bi bi-pencil-square"></i> Details & Update
                                                 </a>
-                                                <th:block th:if="${en.status == 'Pending'}">
-                                                    <form th:action="@{/payment/payos/checkout}" method="post"
-                                                        class="m-0">
-                                                        <input type="hidden" name="id" th:value="${en.id}">
-                                                        <button type="submit" class="btn-pay btn-payos"><i
-                                                                class="bi bi-credit-card"></i> PayOS</button>
-                                                    </form>
-                                                    <form th:action="@{/payment/vnpay/checkout}" method="post"
-                                                        class="m-0">
-                                                        <input type="hidden" name="id" th:value="${en.id}">
-                                                        <button type="submit" class="btn-pay btn-vnpay"><i
-                                                                class="bi bi-wallet2"></i> VNPay</button>
-                                                    </form>
-                                                </th:block>
                                             </div>
 
                                             <a th:if="${en.status == 'Paid' or en.status == 'Approved'}"
@@ -531,8 +518,7 @@
                                 <!-- Prev -->
                                 <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
                                     <a class="page-link" style="border-radius: 8px;"
-                                        th:href="@{/my-enrollments(page=${currentPage - 1})}"
-                                        aria-label="Previous">
+                                        th:href="@{/my-enrollments(page=${currentPage - 1})}" aria-label="Previous">
                                         <i class="bi bi-chevron-left"></i>
                                     </a>
                                 </li>
@@ -541,16 +527,14 @@
                                 <th:block th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
                                     <li class="page-item" th:classappend="${i == currentPage} ? 'active'">
                                         <a class="page-link" style="border-radius: 8px;"
-                                            th:href="@{/my-enrollments(page=${i})}"
-                                            th:text="${i + 1}">1</a>
+                                            th:href="@{/my-enrollments(page=${i})}" th:text="${i + 1}">1</a>
                                     </li>
                                 </th:block>
 
                                 <!-- Next -->
                                 <li class="page-item" th:classappend="${currentPage + 1 >= totalPages} ? 'disabled'">
                                     <a class="page-link" style="border-radius: 8px;"
-                                        th:href="@{/my-enrollments(page=${currentPage + 1})}"
-                                        aria-label="Next">
+                                        th:href="@{/my-enrollments(page=${currentPage + 1})}" aria-label="Next">
                                         <i class="bi bi-chevron-right"></i>
                                     </a>
                                 </li>
