@@ -28,7 +28,7 @@
                     <hr class="mt-2 text-success" style="height: 3px; opacity: 1;">
                 </div>
                 <div class="card-body">
-                    <form th:action="@{/posts/save}" method="post" th:object="${postDto}">
+                    <form th:action="@{/admin/posts/save}" method="post" th:object="${postDto}">
                         <input type="hidden" th:field="*{id}" />
 
                         <div class="mb-3">
@@ -70,9 +70,14 @@
                             </div>
                         </div>
 
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Thumbnail URL:</label>
+                            <input type="text" class="form-control" th:field="*{thumbnailUrl}" placeholder="https://example.com/image.jpg">
+                        </div>
+
                         <div class="mt-4">
                             <button type="submit" class="btn btn-success px-4 me-2">Lưu</button>
-                            <a th:href="@{/posts}" class="btn btn-secondary px-4">Hủy</a>
+                            <a th:href="@{/admin/posts}" class="btn btn-secondary px-4">Hủy</a>
                         </div>
                     </form>
                 </div>

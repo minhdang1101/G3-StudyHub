@@ -1,20 +1,24 @@
 package org.example.assignment2.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.example.assignment2.dto.UserDTO;
 import org.example.assignment2.model.User;
 import org.example.assignment2.repository.CommentRepository;
 import org.example.assignment2.repository.PostRepository;
 import org.example.assignment2.repository.SettingRepository;
+import org.example.assignment2.service.EmailService;
 import org.example.assignment2.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.util.StringUtils;
+import org.example.assignment2.repository.UserRepository;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -35,6 +39,10 @@ public class UserController {
     private PostRepository postRepo;
     @Autowired
     private CommentRepository commentRepo;
+    @Autowired
+    private EmailService emailService;
+    @Autowired
+    private UserRepository userRepository;
 
     @GetMapping
     public String list(Model model,
@@ -68,26 +76,20 @@ public class UserController {
             model.addAttribute("showModal", true);
             return list(model, null, null, null);
         }
+        userDto.setRoleId(3);
 
+        String randomPassword = UUID.randomUUID().toString().substring(0, 8);
+
+        userDto.setPassword(randomPassword);
+
+        emailService.sendAccountEmail(userDto.getEmail(), randomPassword);
         userService.saveUser(userDto);
         return "redirect:/users";
     }
 
-    @GetMapping("/approve/{id}")
-    public String approveUser(@PathVariable("id") Integer id) {
-        userService.updateUserStatus(id, "Active");
-        return "redirect:/users";
-    }
-
-    @GetMapping("/block/{id}")
-    public String blockUser(@PathVariable("id") Integer id) {
-        userService.updateUserStatus(id, "Blocked");
-        return "redirect:/users";
-    }
-
-    @GetMapping("/unblock/{id}")
-    public String unblockUser(@PathVariable("id") Integer id) {
-        userService.updateUserStatus(id, "Active");
+    @GetMapping("/delete/{id}")
+    public String deleteUser(@PathVariable("id") Integer id) {
+        userService.deleteUser(id);
         return "redirect:/users";
     }
 
@@ -103,9 +105,11 @@ public class UserController {
         dto.setFullName(user.getFullName());
         dto.setEmail(user.getEmail());
         dto.setMobile(user.getMobile());
-        dto.setNote(user.getNote());
         dto.setStatus(user.getStatus());
-        dto.setAvatar(user.getAvatar());
+        dto.setAvatarUrl(user.getAvatarUrl());
+        dto.setCreatedAt(user.getCreatedAt());
+        dto.setLastLogin(user.getLastLogin());
+
 
         if (user.getRole() != null) {
             dto.setRoleId(user.getRole().getId());
@@ -135,12 +139,12 @@ public class UserController {
         if (!file.isEmpty()) {
             String avatarPath = saveFile(file, request);
             if (avatarPath != null) {
-                userDto.setAvatar(avatarPath);
+                userDto.setAvatarUrl(avatarPath);
             }
         } else {
             User oldUser = userService.getUserById(userDto.getId());
             if (oldUser != null) {
-                userDto.setAvatar(oldUser.getAvatar());
+                userDto.setAvatarUrl(oldUser.getAvatarUrl());
             }
         }
 
@@ -223,5 +227,106 @@ public class UserController {
         userRepository.save(user);
 
         return "redirect:/login";
+    }
+
+    // ========== USER PROFILE ==========
+    @GetMapping("/profile")
+    public String showUserProfile(HttpSession session, Model model) {
+        User currentUser = (User) session.getAttribute("user");
+        if (currentUser == null) {
+            return "redirect:/login";
+        }
+        
+        // Reload user from database to get latest data
+        User user = userService.getUserById(currentUser.getId());
+        model.addAttribute("user", user);
+        model.addAttribute("postCount", postRepo.countByAuthorId(user.getId()));
+        model.addAttribute("commentCount", commentRepo.countByUserId(user.getId()));
+        return "user/user-profile";
+    }
+
+    @PostMapping("/profile/update")
+    public String updateProfile(@RequestParam("fullName") String fullName,
+                                 @RequestParam("mobile") String mobile,
+                                 @RequestParam(value = "imageFile", required = false) MultipartFile file,
+                                 HttpSession session,
+                                 HttpServletRequest request,
+                                 RedirectAttributes redirectAttributes) {
+        User currentUser = (User) session.getAttribute("user");
+        if (currentUser == null) {
+            return "redirect:/login";
+        }
+
+        try {
+            User user = userService.getUserById(currentUser.getId());
+            user.setFullName(fullName);
+            user.setMobile(mobile);
+
+            if (file != null && !file.isEmpty()) {
+                String avatarPath = saveFile(file, request);
+                if (avatarPath != null) {
+                    user.setAvatarUrl(avatarPath);
+                }
+            }
+
+            userService.saveUser(user);
+            
+            // Update session
+            session.setAttribute("user", user);
+            
+            redirectAttributes.addFlashAttribute("message", "Profile updated successfully!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Error updating profile: " + e.getMessage());
+        }
+
+        return "redirect:/users/profile";
+    }
+
+    // ========== PASSWORD CHANGE ==========
+    @GetMapping("/change-password")
+    public String showChangePasswordForm(HttpSession session, Model model) {
+        User currentUser = (User) session.getAttribute("user");
+        if (currentUser == null) {
+            return "redirect:/login";
+        }
+        return "user/change-password";
+    }
+
+    @PostMapping("/change-password")
+    public String changePassword(@RequestParam("currentPassword") String currentPassword,
+                                  @RequestParam("newPassword") String newPassword,
+                                  @RequestParam("confirmPassword") String confirmPassword,
+                                  HttpSession session,
+                                  RedirectAttributes redirectAttributes) {
+        User currentUser = (User) session.getAttribute("user");
+        if (currentUser == null) {
+            return "redirect:/login";
+        }
+
+        // Validate current password
+        if (!currentUser.getPassword().equals(currentPassword)) {
+            redirectAttributes.addFlashAttribute("error", "Current password is incorrect!");
+            return "redirect:/users/change-password";
+        }
+
+        // Validate new password
+        if (newPassword.length() < 6) {
+            redirectAttributes.addFlashAttribute("error", "New password must be at least 6 characters!");
+            return "redirect:/users/change-password";
+        }
+
+        // Validate password match
+        if (!newPassword.equals(confirmPassword)) {
+            redirectAttributes.addFlashAttribute("error", "New password and confirm password do not match!");
+            return "redirect:/users/change-password";
+        }
+
+        // Update password
+        User user = userService.getUserById(currentUser.getId());
+        user.setPassword(newPassword);
+        userService.saveUser(user);
+
+        redirectAttributes.addFlashAttribute("message", "Password changed successfully!");
+        return "redirect:/users/profile";
     }
 }

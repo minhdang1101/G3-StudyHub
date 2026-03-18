@@ -23,6 +23,9 @@ public class Post {
 
     private String status; // PUBLISHED, DRAFT, ARCHIVED
 
+    @Column(name = "thumbnail_url")
+    private String thumbnailUrl;
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User author;

@@ -19,4 +19,6 @@ public class PostDTO {
 
     @NotNull(message = "Author is required")
     private Integer authorId;
+
+    private String thumbnailUrl;
 }

@@ -11,6 +11,8 @@ import java.util.List;
 @Repository
 public interface PostRepository extends JpaRepository<Post, Integer> {
 
+    boolean existsByTitle(String title);
+
     @Query("SELECT p FROM Post p WHERE " +
             "(:status IS NULL OR p.status = :status) AND " +
             "(:authorId IS NULL OR p.author.id = :authorId) AND " +

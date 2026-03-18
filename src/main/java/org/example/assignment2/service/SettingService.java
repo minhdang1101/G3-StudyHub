@@ -65,4 +65,12 @@ public class SettingService {
     public List<Setting> getAllTypes() {
         return settingRepo.findByParentIsNull();
     }
+
+    public List<Setting> getSettingsByTypeId(Integer typeId) {
+        return settingRepo.findByTypeId(typeId);
+    }
+
+    public Setting getSettingById(Integer id) {
+        return settingRepo.findById(id).orElse(null);
+    }
 }

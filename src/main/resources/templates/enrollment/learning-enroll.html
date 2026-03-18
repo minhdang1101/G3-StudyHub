@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Learning Enrollment</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-light">
+    <div th:replace="~{common/header :: header(activePage='enroll')}"></div>
+
+    <div class="container py-5">
+        <div class="card shadow border-0 mx-auto" style="max-width: 800px;">
+            <div class="card-header bg-white pb-0 border-0 mt-3">
+                <h3 class="fw-bold">Learning Enrollment</h3>
+            </div>
+            <div class="card-body p-4">
+                <form th:action="@{/enroll/submit}" method="post" th:object="${enrollment}">
+                    <input type="hidden" name="courseId" th:value="${course.courseId}">
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label text-muted">Course</label>
+                            <input type="text" class="form-control bg-light" th:value="${course.title}" readonly>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-muted">Total Fee (VND)</label>
+                            <input type="text" class="form-control bg-light" th:value="${course.price}" readonly>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label text-muted">Full Name *</label>
+                            <input type="text" class="form-control" th:field="*{fullName}" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-muted">Email *</label>
+                            <input type="email" class="form-control" th:field="*{email}" required>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3 align-items-center">
+                        <div class="col-md-6">
+                            <label class="form-label text-muted">Mobile *</label>
+                            <input type="text" class="form-control" th:field="*{mobile}" required>
+                        </div>
+                        <div class="col-md-6 mt-3 mt-md-0">
+                            <label class="form-label text-muted d-block">Payment Method</label>
+                            <div class="form-check form-check-inline mt-1">
+                                <input class="form-check-input" type="radio" th:field="*{paymentMethod}"
+                                    value="Bank Transfer" id="payBank" checked>
+                                <label class="form-check-label" for="payBank">Bank Transfer</label>
+                            </div>
+                            <div class="form-check form-check-inline mt-1">
+                                <input class="form-check-input" type="radio" th:field="*{paymentMethod}" value="VNPAY"
+                                    id="payInternet">
+                                <label class="form-check-label" for="payInternet">VNPAY</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label text-muted">Enroll Note</label>
+                        <textarea class="form-control" th:field="*{enrollReason}" rows="3"></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-outline-secondary px-4">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="~{common/footer :: footer}"></div>
+</body>
+
+</html>

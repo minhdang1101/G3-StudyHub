@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
+
 @Controller
 public class CourseController {
 
@@ -19,6 +20,15 @@ public class CourseController {
 
     @Autowired
     private CategoryRepository categoryRepository;
+
+    @GetMapping("/admin/courses")
+    public String adminCourses(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) Integer categoryId,
+            Model model
+    ) {
+        return publicCourses(keyword, categoryId, model); // Reuse public courses for now
+    }
 
     @GetMapping("/courses")
     public String publicCourses(
