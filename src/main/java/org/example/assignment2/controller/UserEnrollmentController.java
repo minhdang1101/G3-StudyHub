@@ -176,6 +176,7 @@ public class UserEnrollmentController {
             return "redirect:/my-enrollments?error=access_denied";
         }
         model.addAttribute("enrollment", enrollment);
+        model.addAttribute("user", currentUser);
         model.addAttribute("course", enrollment.getCourse());
         
         return "enrollment/learning-enroll";
