@@ -37,6 +37,10 @@ public class CourseService {
     @Autowired
     private UserRepository userRepo;
 
+    public List<Course> findAll() {
+        return courseRepo.findAll();
+    }
+
     public List<Course> getFeaturedCourses() {
         return courseRepo.findTop6ByStatusOrderByCreatedAtDesc("Published");
     }

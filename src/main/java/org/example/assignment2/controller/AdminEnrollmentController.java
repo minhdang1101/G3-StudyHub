@@ -71,7 +71,7 @@ public class AdminEnrollmentController {
         Page<Enrollment> enrollmentPage = enrollmentService.searchEnrollmentsWithRole(
                 filterCourseId, filterUserId, filterStatus, filterSearch, currentUser, pageable);
         
-        List<Course> courses = courseService.getAllCourses();
+        List<Course> courses = courseService.findAll();
         List<User> users = userService.getAllUsers(); 
 
         model.addAttribute("enrollmentPage", enrollmentPage);
@@ -99,7 +99,7 @@ public class AdminEnrollmentController {
         if (currentUser == null) return "redirect:/login";
 
         model.addAttribute("enrollment", new Enrollment()); 
-        model.addAttribute("courses", courseService.getAllCourses());
+        model.addAttribute("courses", courseService.findAll());
         model.addAttribute("users", userService.getAllUsers());
         model.addAttribute("isNew", true); 
 
@@ -121,7 +121,7 @@ public class AdminEnrollmentController {
         }
         
         model.addAttribute("enrollment", enrollment);
-        model.addAttribute("courses", courseService.getAllCourses());
+        model.addAttribute("courses", courseService.findAll());
         model.addAttribute("users", userService.getAllUsers());
         model.addAttribute("isNew", false); 
 
