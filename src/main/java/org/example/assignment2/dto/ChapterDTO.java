@@ -11,7 +11,7 @@ public class ChapterDTO {
     private Integer chapterId;
 
     @NotNull(message = "Course is required")
-    private Integer courseId;
+    private Long courseId;
 
     @NotEmpty(message = "Title is required")
     private String title;

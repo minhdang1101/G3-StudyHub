@@ -108,7 +108,7 @@
             <div class="meta-item"><strong>Instructor:</strong> <span th:text="${course.instructor != null ? course.instructor.fullName : 'Administrator'}">Administrator</span></div>
             <div class="meta-item"><strong>Level:</strong> <span th:text="${course.level != null ? course.level.name : ''}"></span></div>
             <div class="meta-item"><strong>Price:</strong> <span th:text="${course.price}">0</span></div>
-            <div class="meta-item"><strong>Status:</strong> <span th:text="${course.status == 1 ? 'Published' : 'Draft'}">Published</span></div>
+            <div class="meta-item"><strong>Status:</strong> <span th:text="${course.status}">Published</span></div>
         </div>
 
         <div class="card">

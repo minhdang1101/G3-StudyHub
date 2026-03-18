@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 @Data
 public class CourseDTO {
 
-    private Integer courseId;
+    private Long courseId;
 
     @NotEmpty(message = "Title is required")
     private String title;
@@ -38,5 +38,5 @@ public class CourseDTO {
     private Integer durationHours;
 
     @NotNull(message = "Status is required")
-    private Integer status;
+    private String status;
 }

@@ -637,8 +637,8 @@
 
                     <td>
         <span class="status-badge"
-              th:classappend="${course.status == 1} ? ' status-published' : ' status-draft'"
-              th:text="${course.status == 1} ? 'Published' : 'Draft'">
+              th:classappend="${course.status != null and course.status.equalsIgnoreCase('Published')} ? ' status-published' : ' status-draft'"
+              th:text="${course.status != null ? course.status : 'Draft'}">
             Published
         </span>
                     </td>
