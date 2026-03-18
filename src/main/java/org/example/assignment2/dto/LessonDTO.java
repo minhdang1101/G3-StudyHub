@@ -16,12 +16,11 @@ public class LessonDTO {
     @NotEmpty(message = "Title is required")
     private String title;
 
-    @NotEmpty(message = "Content type is required")
+    @NotNull(message = "Content type is required")
     private String contentType;
 
     private String contentUrl;
 
-    @NotNull(message = "Duration is required")
     @Min(value = 0, message = "Duration must be greater than or equal to 0")
     private Integer durationMinutes;
 
@@ -29,7 +28,6 @@ public class LessonDTO {
     @Min(value = 1, message = "Order index must be at least 1")
     private Integer orderIndex;
 
-    @NotNull(message = "Preview flag is required")
     private Boolean isPreview;
 
     @NotNull(message = "Status is required")
