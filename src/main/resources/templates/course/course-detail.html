@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${courseDto == null or courseDto.courseId == null} ? 'Course Detail' : 'Edit Course'">Course Detail</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #6c757d;
+            --border: #dee2e6;
+            --text: #212529;
+            --muted: #6c757d;
+            --shadow: 0 1px 2px rgba(0,0,0,0.08);
+        }
+
+        * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+
+        body {
+            margin: 0;
+            padding: 10px;
+            background: #f0f2f5;
+            color: var(--text);
+        }
+
+        .container {
+            border: 0;
+            padding: 12px;
+            min-height: calc(100vh - 20px);
+            background: transparent;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+
+        .page-header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            border: 1px solid transparent;
+            border-radius: 999px;
+            padding: 8px 14px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+            color: #fff;
+        }
+
+        .btn-light {
+            background: #f8f9fa;
+            border-color: var(--border);
+            color: #495057;
+        }
+
+        .card { border: none; background: #fff; border-radius: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); }
+
+        .card-body {
+            padding: 14px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 18px 34px;
+            align-items: start;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .row-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px 44px;
+        }
+
+        label {
+            display: inline-block;
+            margin-bottom: 6px;
+            font-size: 15px;
+            color: #444;
+        }
+
+        .required::after {
+            content: "*";
+            color: #444;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="file"],
+        select,
+        textarea {
+            width: 100%;
+            border: 1px solid #b7b7b7;
+            border-radius: 12px;
+            font-size: 15px;
+            padding: 10px 12px;
+            outline: none;
+            background: #fff;
+            font-family: inherit;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 220px;
+        }
+
+        .thumbnail-box {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: flex-start;
+        }
+
+        .thumb-large {
+            width: 265px;
+            height: 160px;
+            border: none;
+            background: #f8f9fa;
+            overflow: hidden;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+        }
+
+        .thumb-large img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .thumbnail-placeholder {
+            color: var(--muted);
+            font-size: 14px;
+            text-align: center;
+            padding: 10px;
+        }
+
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2px;
+            padding: 8px;
+            border: 1px solid var(--border);
+            border-bottom: none;
+            background: #f8f9fa;
+            border-radius: 3px 3px 0 0;
+        }
+
+        .tool-btn {
+            min-width: 34px;
+            height: 30px;
+            border: 1px solid #cfcfcf;
+            background: #fff;
+            border-radius: 2px;
+            font-size: 16px;
+            font-weight: 700;
+            color: #333;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 8px;
+        }
+
+        .editor textarea {
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
+            background: #fcfcfc;
+        }
+
+        .actions {
+            margin-top: 18px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .hint {
+            color: var(--muted);
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        .error-text {
+            color: red;
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        @media (max-width: 1100px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .row-2 {
+                grid-template-columns: 1fr;
+            }
+
+            .thumb-large {
+                width: 100%;
+                max-width: 320px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="page-header">
+        <h1 th:text="${courseDto == null or courseDto.courseId == null} ? 'Course Details' : 'Edit Course'">Course Details</h1>
+        <div class="btn-group">
+            <a th:href="@{/courses}" class="btn btn-secondary">← Back to Courses</a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <form th:action="@{/courses/save}"
+                  th:object="${courseDto}"
+                  method="post"
+                  enctype="multipart/form-data">
+
+                <input type="hidden" th:field="*{courseId}"/>
+
+                <div class="form-grid">
+                    <div class="full-width">
+                        <label for="title" class="required">Title</label>
+                        <input type="text" id="title" th:field="*{title}">
+                        <div class="error-text"
+                             th:if="${#fields.hasErrors('title')}"
+                             th:errors="*{title}"></div>
+                    </div>
+
+                    <div>
+                        <div class="row-2">
+                            <div>
+                                <label for="categoryId" class="required">Category</label>
+                                <select id="categoryId" th:field="*{categoryId}">
+                                    <option value="">-- Select Category --</option>
+                                    <option value="1">Business</option>
+                                    <option value="2">Data Science</option>
+                                    <option value="3">Programming</option>
+                                    <option value="4">Design</option>
+                                    <option value="5">Marketing</option>
+                                </select>
+                                <div class="error-text"
+                                     th:if="${#fields.hasErrors('categoryId')}"
+                                     th:errors="*{categoryId}"></div>
+                            </div>
+
+                            <div>
+                                <label for="instructorId" class="required">Manager</label>
+                                <select id="instructorId" th:field="*{instructorId}">
+                                    <option value="">-- Select Manager --</option>
+                                    <option value="1">Administrator</option>
+                                    <option value="8">Kien Nguyen8</option>
+                                </select>
+                                <div class="error-text"
+                                     th:if="${#fields.hasErrors('instructorId')}"
+                                     th:errors="*{instructorId}"></div>
+                            </div>
+
+                            <div>
+                                <label for="levelId" class="required">Level</label>
+                                <select id="levelId" th:field="*{levelId}">
+                                    <option value="">-- Select Level --</option>
+                                    <option value="1">Beginner</option>
+                                    <option value="2">Intermediate</option>
+                                    <option value="3">Advanced</option>
+                                    <option value="4">Expert</option>
+                                    <option value="5">All Levels</option>
+                                </select>
+                                <div class="error-text"
+                                     th:if="${#fields.hasErrors('levelId')}"
+                                     th:errors="*{levelId}"></div>
+                            </div>
+
+                            <div>
+                                <label for="durationHours" class="required">Duration</label>
+                                <input type="number" id="durationHours" th:field="*{durationHours}" min="0" placeholder="Ví dụ: 8">
+                                <div class="error-text"
+                                     th:if="${#fields.hasErrors('durationHours')}"
+                                     th:errors="*{durationHours}"></div>
+                            </div>
+
+                            <div>
+                                <label for="price" class="required">Price</label>
+                                <input type="number" id="price" th:field="*{price}" min="0" step="0.01">
+                                <div class="error-text"
+                                     th:if="${#fields.hasErrors('price')}"
+                                     th:errors="*{price}"></div>
+                            </div>
+
+                            <div>
+                                <label for="status" class="required">Status</label>
+                                <select id="status" th:field="*{status}">
+                                    <option value="">-- Select Status --</option>
+                                    <option value="1">Published</option>
+                                    <option value="0">Unpublished</option>
+                                </select>
+                                <div class="error-text"
+                                     th:if="${#fields.hasErrors('status')}"
+                                     th:errors="*{status}"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="thumbnail-box">
+                            <label for="thumbnailUrl">Thumbnail URL</label>
+
+                            <div class="thumb-large">
+                                <img th:if="${courseDto.thumbnailUrl != null and !#strings.isEmpty(courseDto.thumbnailUrl)}"
+                                     th:src="${courseDto.thumbnailUrl}"
+                                     alt="Thumbnail">
+
+                                <div class="thumbnail-placeholder"
+                                     th:if="${courseDto.thumbnailUrl == null or #strings.isEmpty(courseDto.thumbnailUrl)}">
+                                    No image selected
+                                </div>
+                            </div>
+
+                            <input type="text" id="thumbnailUrl" th:field="*{thumbnailUrl}" placeholder="Nhập hoặc dán URL ảnh thumbnail">
+                            <div class="hint">Bạn có thể dán URL ảnh (hoặc data URL) và ảnh sẽ hiển thị ngay ở khung trên.</div>
+                        </div>
+                    </div>
+
+                    <div class="full-width editor">
+                        <label for="description">Description</label>
+                        <div class="toolbar">
+                            <span class="tool-btn">B</span>
+                            <span class="tool-btn"><i>I</i></span>
+                            <span class="tool-btn"><u>U</u></span>
+                            <span class="tool-btn">S̶</span>
+                            <span class="tool-btn">▣</span>
+                            <span class="tool-btn">≣</span>
+                            <span class="tool-btn">≡</span>
+                            <span class="tool-btn">☰</span>
+                            <span class="tool-btn">▦</span>
+                            <span class="tool-btn">🔗</span>
+                            <span class="tool-btn">🖼</span>
+                            <span class="tool-btn">⤢</span>
+                            <span class="tool-btn">&lt;/&gt;</span>
+                            <span class="tool-btn">?</span>
+                        </div>
+                        <textarea id="description" th:field="*{description}"></textarea>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <button type="submit"
+                            class="btn btn-light"
+                            th:text="${courseDto == null or courseDto.courseId == null} ? 'Submit' : 'Update Course'">
+                        Submit
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function () {
+        const thumbInput = document.getElementById('thumbnailUrl');
+        const thumbImg = document.querySelector('.thumb-large img');
+        const thumbPlaceholder = document.querySelector('.thumbnail-placeholder');
+
+        if (thumbInput) {
+            const updatePreview = () => {
+                const value = thumbInput.value && thumbInput.value.trim();
+                if (!thumbImg || !thumbPlaceholder) return;
+
+                if (value) {
+                    thumbImg.src = value;
+                    thumbImg.style.display = 'block';
+                    thumbPlaceholder.style.display = 'none';
+                } else {
+                    thumbImg.removeAttribute('src');
+                    thumbImg.style.display = 'none';
+                    thumbPlaceholder.style.display = 'block';
+                }
+            };
+
+            thumbInput.addEventListener('input', updatePreview);
+            thumbInput.addEventListener('paste', function () {
+                setTimeout(updatePreview, 50);
+            });
+        }
+    })();
+</script>
+</body>
+</html>

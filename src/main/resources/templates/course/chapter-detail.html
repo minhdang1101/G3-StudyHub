@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${chapterDto.chapterId == null} ? 'Add Chapter' : 'Edit Chapter'">Chapter Detail</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #6c757d;
+            --border: #dee2e6;
+            --text: #212529;
+            --muted: #6c757d;
+            --shadow: 0 1px 2px rgba(0,0,0,0.08);
+        }
+
+        * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+
+        body {
+            margin: 0;
+            padding: 10px;
+            background: #f0f2f5;
+            color: var(--text);
+        }
+
+        .container {
+            border: 0;
+            padding: 12px;
+            background: transparent;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+
+        .page-header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            border: 1px solid transparent;
+            border-radius: 999px;
+            padding: 8px 14px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+            color: #fff;
+        }
+
+        .card { border: none; background: #fff; border-radius: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); }
+
+        .card-body {
+            padding: 16px 22px 22px;
+            display: grid;
+            gap: 12px;
+        }
+
+        label {
+            display: inline-block;
+            margin-bottom: 6px;
+            font-size: 15px;
+            color: #444;
+        }
+
+        .required::after {
+            content: "*";
+            color: #444;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        textarea {
+            width: 100%;
+            border: 1px solid #b7b7b7;
+            border-radius: 12px;
+            font-size: 15px;
+            padding: 10px 12px;
+            outline: none;
+            background: #fff;
+            font-family: inherit;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .help-text {
+            color: var(--muted);
+            font-size: 14px;
+            margin-top: 6px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="page-header">
+        <h1 th:text="${chapterDto.chapterId == null} ? 'Add Chapter - ' + course.title : 'Edit Chapter - ' + course.title">
+            Chapter Detail
+        </h1>
+        <div class="btn-group">
+            <a th:href="@{/courses/content/{id}(id=${course.courseId})}" class="btn btn-secondary">← Back to Course</a>
+        </div>
+    </div>
+
+    <div class="card">
+        <form class="card-body" th:action="@{/courses/chapter/save}" th:object="${chapterDto}" method="post">
+            <input type="hidden" th:field="*{chapterId}">
+            <input type="hidden" th:field="*{courseId}">
+            <input type="hidden" th:field="*{status}">
+
+            <div>
+                <label for="title" class="required">Chapter Title</label>
+                <input type="text" id="title" th:field="*{title}">
+                <div class="help-text" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></div>
+            </div>
+
+            <div>
+                <label for="description">Description</label>
+                <textarea id="description" th:field="*{description}"></textarea>
+            </div>
+
+            <div>
+                <label for="orderIndex" class="required">Order</label>
+                <input type="number" id="orderIndex" min="1" th:field="*{orderIndex}">
+                <div class="help-text">The order in which this chapter appears in the course</div>
+                <div class="help-text" th:if="${#fields.hasErrors('orderIndex')}" th:errors="*{orderIndex}"></div>
+            </div>
+
+            <div class="actions">
+                <button type="submit"
+                        class="btn btn-primary"
+                        th:text="${chapterDto.chapterId == null} ? '💾 Save Chapter' : '💾 Update Chapter'">💾 Save Chapter</button>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>

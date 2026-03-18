@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${lessonDto.lessonId == null} ? 'Add Lesson' : 'Edit Lesson'">Lesson Detail</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #6c757d;
+            --border: #dee2e6;
+            --text: #212529;
+            --muted: #6c757d;
+            --shadow: 0 1px 2px rgba(0,0,0,0.08);
+        }
+
+        * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+
+        body {
+            margin: 0;
+            padding: 10px;
+            background: #f0f2f5;
+            color: var(--text);
+        }
+
+        .container {
+            border: 0;
+            padding: 12px;
+            min-height: calc(100vh - 20px);
+            background: transparent;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+
+        .page-header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            border: 1px solid transparent;
+            border-radius: 999px;
+            padding: 8px 14px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+            color: #fff;
+        }
+
+        .card { border: none; background: #fff; border-radius: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); }
+
+        .card-body {
+            padding: 16px 22px 22px;
+        }
+
+        .lesson-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 18px 20px;
+            align-items: start;
+        }
+
+        .stack-gap {
+            display: grid;
+            gap: 12px;
+        }
+
+        label {
+            display: inline-block;
+            margin-bottom: 6px;
+            font-size: 15px;
+            color: #444;
+        }
+
+        .required::after {
+            content: "*";
+            color: #444;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        textarea,
+        select {
+            width: 100%;
+            border: 1px solid #b7b7b7;
+            border-radius: 12px;
+            font-size: 15px;
+            padding: 10px 12px;
+            outline: none;
+            background: #fff;
+            font-family: inherit;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 84px;
+        }
+
+        .help-text {
+            color: var(--muted);
+            font-size: 14px;
+            margin-top: 6px;
+        }
+
+        .preview-box {
+            border: none;
+            border-radius: 16px;
+            padding: 10px;
+            background: #fff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+        }
+
+        .preview-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .video-frame {
+            width: 100%;
+            max-width: 480px;
+            aspect-ratio: 16 / 9;
+            background: #000;
+        }
+
+        .video-frame iframe,
+        .video-frame video {
+            width: 100%;
+            height: 100%;
+        }
+
+        .check-help {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 10px 8px;
+            align-items: start;
+            margin-top: 20px;
+        }
+
+        .check-help input {
+            width: 18px;
+            height: 18px;
+            margin-top: 2px;
+        }
+
+        @media (max-width: 900px) {
+            .lesson-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="page-header">
+        <h1 th:text="${lessonDto.lessonId == null} ? 'Add Lesson - ' + chapter.title : 'Edit Lesson - ' + chapter.title">
+            Lesson Detail
+        </h1>
+        <div class="btn-group">
+            <a th:href="@{/courses/content/{id}(id=${course.courseId})}" class="btn btn-secondary">← Back to Course</a>
+        </div>
+    </div>
+
+    <div class="card">
+        <form class="card-body" th:action="@{/courses/lesson/save}" th:object="${lessonDto}" method="post">
+            <input type="hidden" th:field="*{lessonId}">
+            <input type="hidden" th:field="*{chapterId}">
+            <input type="hidden" th:field="*{status}">
+            <div class="lesson-grid">
+                <div class="stack-gap">
+                    <div>
+                        <label for="title" class="required">Lesson Title</label>
+                        <input type="text" id="title" th:field="*{title}">
+                    </div>
+
+                    <div>
+                        <label for="contentType" class="required">Content Type</label>
+                        <select id="contentType" th:field="*{contentType}">
+                            <option value="Video">Video</option>
+                            <option value="PDF">PDF</option>
+                            <option value="Text">Text</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="contentUrl">Content URL / Value</label>
+                        <textarea id="contentUrl" th:field="*{contentUrl}"></textarea>
+                        <div class="help-text" id="contentHint">YouTube URL hoặc link file video trực tiếp. Nếu chọn PDF/Text thì dùng link file hoặc nội dung text.</div>
+                    </div>
+
+                    <div>
+                        <button type="submit"
+                                class="btn btn-primary"
+                                th:text="${lessonDto.lessonId == null} ? '💾 Save Lesson' : '💾 Update Lesson'">💾 Save Lesson</button>
+                    </div>
+                </div>
+
+                <div class="stack-gap">
+                    <div>
+                        <label for="durationMinutes">Duration (Minutes)</label>
+                        <input type="number" id="durationMinutes" min="0" th:field="*{durationMinutes}">
+                    </div>
+
+                    <div>
+                        <label for="orderIndex" class="required">Order</label>
+                        <input type="number" id="orderIndex" min="1" th:field="*{orderIndex}">
+                        <div class="help-text">The order in which this lesson appears in the chapter</div>
+                    </div>
+
+                    <div class="check-help">
+                        <input type="checkbox" id="isPreview" th:field="*{isPreview}">
+                        <div>
+                            <label for="isPreview" style="margin: 0;">Preview Lesson</label>
+                            <div class="help-text" style="margin-top: 8px;">
+                                Preview lessons can be watched without enrollment
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="preview-box">
+                        <div class="preview-title">Lesson Preview</div>
+                        <div id="videoPreview" class="video-frame" style="display: none;">
+                            <!-- nội dung video sẽ được render bằng JS -->
+                        </div>
+                        <div id="filePreview" style="display: none; font-size: 14px;">
+                            <a id="fileLink" href="#" target="_blank">Open content</a>
+                        </div>
+                        <div id="textPreview" style="display: none; font-size: 14px; white-space: pre-wrap;"></div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+    (function () {
+        const typeSelect = document.getElementById('contentType');
+        const urlField = document.getElementById('contentUrl');
+        const hint = document.getElementById('contentHint');
+
+        const videoPreview = document.getElementById('videoPreview');
+        const filePreview = document.getElementById('filePreview');
+        const textPreview = document.getElementById('textPreview');
+        const fileLink = document.getElementById('fileLink');
+
+        function updateHint() {
+            if (!typeSelect || !hint) return;
+            const type = typeSelect.value;
+            if (type === 'Video') {
+                hint.textContent = 'YouTube URL hoặc link file video trực tiếp (mp4, webm, ...)';
+            } else if (type === 'PDF') {
+                hint.textContent = 'Link file PDF để người học có thể mở trong tab mới.';
+            } else {
+                hint.textContent = 'Nội dung text hoặc link tài liệu (nếu có).';
+            }
+        }
+
+        function isYouTubeUrl(url) {
+            return /youtu\.be\/|youtube\.com\/watch\?v=/.test(url);
+        }
+
+        function getYouTubeEmbed(url) {
+            try {
+                if (url.includes('youtu.be/')) {
+                    const id = url.split('youtu.be/')[1].split(/[?&#]/)[0];
+                    return 'https://www.youtube.com/embed/' + id;
+                }
+                const urlObj = new URL(url);
+                const v = urlObj.searchParams.get('v');
+                if (v) {
+                    return 'https://www.youtube.com/embed/' + v;
+                }
+            } catch (e) {
+                return null;
+            }
+            return null;
+        }
+
+        function updatePreview() {
+            if (!typeSelect || !urlField) return;
+            const type = typeSelect.value;
+            const value = (urlField.value || '').trim();
+
+            videoPreview.style.display = 'none';
+            filePreview.style.display = 'none';
+            textPreview.style.display = 'none';
+            videoPreview.innerHTML = '';
+
+            if (!value) return;
+
+            if (type === 'Video') {
+                let content;
+                if (isYouTubeUrl(value)) {
+                    const embed = getYouTubeEmbed(value);
+                    if (embed) {
+                        content = '<iframe src="' + embed + '" frameborder="0" allowfullscreen></iframe>';
+                    }
+                } else {
+                    content = '<video controls src="' + value + '"></video>';
+                }
+                if (content) {
+                    videoPreview.innerHTML = content;
+                    videoPreview.style.display = 'block';
+                }
+            } else if (type === 'PDF') {
+                fileLink.href = value;
+                fileLink.textContent = 'Open PDF';
+                filePreview.style.display = 'block';
+            } else {
+                textPreview.textContent = value;
+                textPreview.style.display = 'block';
+            }
+        }
+
+        if (typeSelect) {
+            typeSelect.addEventListener('change', function () {
+                updateHint();
+                updatePreview();
+            });
+        }
+        if (urlField) {
+            urlField.addEventListener('input', updatePreview);
+            urlField.addEventListener('paste', function () {
+                setTimeout(updatePreview, 50);
+            });
+        }
+
+        updateHint();
+        updatePreview();
+    })();
+</script>
+</body>
+</html>

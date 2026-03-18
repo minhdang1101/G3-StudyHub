@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Courses Management</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --primary-soft: #eef2ff;
+            --success: #16a34a;
+            --success-soft: #dcfce7;
+            --warning: #f59e0b;
+            --warning-soft: #fef3c7;
+            --danger: #ef4444;
+            --danger-soft: #fee2e2;
+            --info: #06b6d4;
+            --info-soft: #cffafe;
+
+            --text: #0f172a;
+            --muted: #64748b;
+            --border: #e2e8f0;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --row-hover: #f8faff;
+
+            --shadow-sm: 0 4px 10px rgba(15, 23, 42, 0.06);
+            --shadow-md: 0 12px 30px rgba(15, 23, 42, 0.08);
+            --radius-xl: 24px;
+            --radius-lg: 18px;
+            --radius-md: 14px;
+            --radius-sm: 10px;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            margin: 0;
+            color: var(--text);
+            background: #f0f2f5;
+        }
+
+        .page {
+            max-width: 1360px;
+            margin: 0 auto;
+            padding: 28px 20px 40px;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #4338ca, #2563eb 55%, #06b6d4);
+            color: #fff;
+            border-radius: 28px;
+            padding: 28px;
+            box-shadow: var(--shadow-md);
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 22px;
+        }
+
+        .hero::before,
+        .hero::after {
+            content: "";
+            position: absolute;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.10);
+        }
+
+        .hero::before {
+            width: 260px;
+            height: 260px;
+            right: -70px;
+            top: -80px;
+        }
+
+        .hero::after {
+            width: 150px;
+            height: 150px;
+            bottom: -55px;
+            left: 42%;
+        }
+
+        .hero-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 18px;
+            position: relative;
+            z-index: 1;
+            flex-wrap: wrap;
+        }
+
+        .hero-title-wrap h1 {
+            margin: 0;
+            font-size: 34px;
+            font-weight: 800;
+            letter-spacing: -0.4px;
+        }
+
+        .hero-title-wrap p {
+            margin: 10px 0 0;
+            color: rgba(255,255,255,0.92);
+            font-size: 15px;
+            max-width: 680px;
+            line-height: 1.6;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            border: none;
+            text-decoration: none;
+            border-radius: 14px;
+            padding: 12px 18px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.22s ease;
+        }
+
+        .btn-primary {
+            background: #fff;
+            color: var(--primary);
+            box-shadow: 0 10px 18px rgba(255,255,255,0.18);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            background: #f8faff;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(140px, 1fr));
+            gap: 14px;
+            margin-top: 22px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .stat-card {
+            background: rgba(255,255,255,0.16);
+            border: 1px solid rgba(255,255,255,0.18);
+            border-radius: 18px;
+            padding: 16px 18px;
+            backdrop-filter: blur(8px);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: rgba(255,255,255,0.85);
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 800;
+            color: #fff;
+        }
+
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+
+        .toolbar-left {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .search-box,
+        .filter-box {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .search-box {
+            min-width: 300px;
+            display: flex;
+            align-items: center;
+            padding: 0 14px;
+        }
+
+        .search-box span {
+            color: var(--muted);
+            margin-right: 8px;
+            font-size: 15px;
+        }
+
+        .search-box input {
+            width: 100%;
+            border: none;
+            outline: none;
+            background: transparent;
+            padding: 13px 0;
+            font-size: 14px;
+            color: var(--text);
+        }
+
+        .filter-box select {
+            border: none;
+            outline: none;
+            background: transparent;
+            padding: 13px 14px;
+            min-width: 160px;
+            font-size: 14px;
+            color: var(--text);
+            cursor: pointer;
+        }
+
+        .btn-add {
+            background: linear-gradient(135deg, var(--primary), #2563eb);
+            color: #fff;
+            box-shadow: 0 10px 20px rgba(79, 70, 229, 0.22);
+        }
+
+        .btn-add:hover {
+            transform: translateY(-1px);
+            background: linear-gradient(135deg, var(--primary-dark), #1d4ed8);
+        }
+
+        .table-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            min-width: 1120px;
+        }
+
+        thead th {
+            background: #f8fafc;
+            color: #334155;
+            text-align: left;
+            font-size: 13px;
+            font-weight: 800;
+            letter-spacing: 0.2px;
+            padding: 18px 16px;
+            border-bottom: 1px solid var(--border);
+            white-space: nowrap;
+        }
+
+        tbody td {
+            padding: 18px 16px;
+            border-bottom: 1px solid #eef2f7;
+            vertical-align: top;
+            font-size: 14px;
+        }
+
+        tbody tr:hover {
+            background: var(--row-hover);
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .id-pill {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 38px;
+            height: 30px;
+            padding: 0 10px;
+            background: var(--primary-soft);
+            color: var(--primary);
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .course-info {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            min-width: 280px;
+        }
+
+        .thumb {
+            width: 84px;
+            height: 52px;
+            flex-shrink: 0;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #4338ca, #2563eb 55%, #06b6d4);
+            box-shadow: inset 0 0 0 1px rgba(255,255,255,0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .thumb::before {
+            content: "";
+            position: absolute;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.18);
+            right: -8px;
+            top: -10px;
+        }
+
+        .thumb::after {
+            content: "COURSE";
+            position: absolute;
+            left: 10px;
+            bottom: 8px;
+            font-size: 10px;
+            letter-spacing: 0.8px;
+            color: rgba(255,255,255,0.92);
+            font-weight: 800;
+        }
+
+        .course-title {
+            font-size: 16px;
+            font-weight: 800;
+            line-height: 1.45;
+            margin: 0 0 6px;
+            color: var(--text);
+        }
+
+        .course-meta {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .meta-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #f8fafc;
+            border: 1px solid #e8edf5;
+            border-radius: 999px;
+            padding: 6px 10px;
+        }
+
+        .manager-cell,
+        .category-cell,
+        .created-cell {
+            color: #334155;
+            font-weight: 600;
+        }
+
+        .price-box {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .price-main {
+            font-weight: 800;
+            color: var(--text);
+            font-size: 15px;
+        }
+
+        .price-sale {
+            font-size: 12px;
+            color: var(--success);
+            font-weight: 700;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .status-badge::before {
+            content: "";
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        .status-published {
+            background: var(--success-soft);
+            color: var(--success);
+        }
+
+        .status-draft {
+            background: var(--warning-soft);
+            color: var(--warning);
+        }
+
+        .action-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: nowrap;
+        }
+
+        .icon-btn {
+            width: 38px;
+            height: 38px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: #fff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .icon-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .icon-edit {
+            color: var(--primary);
+            background: var(--primary-soft);
+            border-color: #dbe3ff;
+        }
+
+        .icon-list {
+            color: var(--info);
+            background: var(--info-soft);
+            border-color: #b8edf7;
+        }
+
+        .icon-delete {
+            color: var(--danger);
+            background: var(--danger-soft);
+            border-color: #fecdd3;
+        }
+
+        .empty-state {
+            padding: 42px 18px;
+            text-align: center;
+            color: var(--muted);
+        }
+
+        .empty-state .emoji {
+            font-size: 42px;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .empty-state strong {
+            display: block;
+            color: var(--text);
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        .table-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            padding: 16px 20px;
+            border-top: 1px solid var(--border);
+            background: #fcfdff;
+        }
+
+        .footer-note {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        @media (max-width: 900px) {
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .search-box {
+                min-width: 100%;
+            }
+
+            .toolbar {
+                align-items: stretch;
+            }
+
+            .toolbar-left {
+                width: 100%;
+            }
+
+            .filter-box,
+            .filter-box select {
+                width: 100%;
+            }
+
+            .btn-add {
+                width: 100%;
+            }
+
+            .hero-title-wrap h1 {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="page">
+    <section class="hero">
+        <div class="hero-top">
+            <div class="hero-title-wrap">
+                <h1>Courses Management</h1>
+                <p>Quản lý danh sách khóa học, chỉnh sửa nội dung, theo dõi trạng thái xuất bản và giữ mọi thứ gọn gàng thay vì để nó trông như biên bản họp tổ dân phố.</p>
+            </div>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-label">Tổng số khóa học</div>
+                <div class="stat-value" id="statTotal" th:text="${#lists.size(courses)}">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Đã xuất bản</div>
+                <div class="stat-value" id="statPublished" th:text="${#lists.size(courses.?[status == 1])}">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Bản nháp</div>
+                <div class="stat-value" id="statDraft" th:text="${#lists.size(courses.?[status != 1])}">0</div>
+            </div>
+        </div>
+    </section>
+
+    <form class="toolbar" th:action="@{/courses}" method="get">
+        <div class="toolbar-left">
+            <div class="search-box">
+                <span>🔎</span>
+                <input type="text"
+                       name="keyword"
+                       th:value="${keyword}"
+                       placeholder="Tìm theo tiêu đề khóa học...">
+            </div>
+
+            <div class="filter-box">
+                <select name="status">
+                    <option th:value="${null}" th:selected="${currentStatus == null}">Tất cả trạng thái</option>
+                    <option value="1" th:selected="${currentStatus == 1}">Published</option>
+                    <option value="0" th:selected="${currentStatus == 0}">Draft</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="toolbar-left">
+            <button type="submit" class="btn btn-add">Apply Filter</button>
+            <a th:href="@{/courses/new}" class="btn btn-add">＋ Add New Course</a>
+        </div>
+    </form>
+
+    <div class="table-card">
+        <div class="table-wrap">
+            <table>
+                <thead>
+                <tr>
+                    <th style="width: 80px;">ID</th>
+                    <th>Course</th>
+                    <th style="width: 180px;">Manager</th>
+                    <th style="width: 160px;">Category</th>
+                    <th style="width: 130px;">Price</th>
+                    <th style="width: 140px;">Status</th>
+                    <th style="width: 180px;">Created</th>
+                    <th style="width: 150px;">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if="${#lists.isEmpty(courses)}">
+                    <td colspan="8">
+                        <div class="empty-state">
+                            <span class="emoji">📚</span>
+                            <strong>Không tìm thấy khóa học phù hợp</strong>
+                            <div>Thử đổi từ khóa tìm kiếm hoặc bộ lọc trạng thái.</div>
+                        </div>
+                    </td>
+                </tr>
+
+                <tr th:each="course : ${courses}">
+                    <td>
+                        <span class="id-pill" th:text="|#${course.courseId}|">#1</span>
+                    </td>
+
+                    <td>
+                        <div class="course-info">
+                            <div class="thumb"></div>
+                            <div>
+                                <div class="course-title" th:text="${course.title}">Course Title</div>
+                                <div class="course-meta">
+                                    <span class="meta-badge">🧩 0 chapters</span>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+
+                    <td class="manager-cell"
+                        th:text="${course.instructor != null ? course.instructor.fullName : 'Administrator'}">
+                        Administrator
+                    </td>
+
+                    <td class="category-cell"
+                        th:text="${course.category != null ? course.category.name : ''}">
+                        Category
+                    </td>
+
+                    <td>
+                        <div class="price-box">
+                            <div class="price-main" th:text="${course.price}">0.00</div>
+                        </div>
+                    </td>
+
+                    <td>
+        <span class="status-badge"
+              th:classappend="${course.status != null and course.status.equalsIgnoreCase('Published')} ? ' status-published' : ' status-draft'"
+              th:text="${course.status != null ? course.status : 'Draft'}">
+            Published
+        </span>
+                    </td>
+
+                    <td class="created-cell" th:text="${course.createdAt}">2025-01-01</td>
+
+                    <td>
+                        <div class="action-group">
+                            <a th:href="@{/courses/edit/{id}(id=${course.courseId})}"
+                               class="icon-btn icon-edit"
+                               title="Edit">✎</a>
+
+                            <a th:href="@{/courses/content/{id}(id=${course.courseId})}"
+                               class="icon-btn icon-list"
+                               title="Content">☰</a>
+
+                            <a th:href="@{/courses/delete/{id}(id=${course.courseId})}"
+                               class="icon-btn icon-delete"
+                               title="Delete"
+                               onclick="return confirm('Delete this course?')">
+                                🗑
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="table-footer">
+            <div class="footer-note" id="resultCount" th:text="|Hiển thị ${#lists.size(courses)} khóa học|">Hiển thị 0 khóa học</div>
+            <div class="footer-note">StudyHub • Courses dashboard</div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

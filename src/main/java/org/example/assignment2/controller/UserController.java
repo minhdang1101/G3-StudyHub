@@ -189,24 +189,25 @@ public class UserController {
         return "user/user-records";
     }
 
-    //
+    @GetMapping("/logout")
+    public String logout(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+
+        if (session != null) {
+            session.invalidate();
+        }
+
+        return "redirect:/home";
+    }
     @GetMapping("/register")
     public String showRegister(Model model) {
-
         model.addAttribute("userDto", new UserDTO());
-
         return "user/register";
     }
 
-    //
     @PostMapping("/register")
-    public String registerUser(
-            @ModelAttribute("userDto") UserDTO userDto,
-            Model model
-    ) {
-
-        // check password confirm
-        if (!userDto.getPassword().equals(userDto.getConfirmPassword())) {
+    public String registerUser(@ModelAttribute("userDto") UserDTO userDto, Model model) {
+        if (userDto.getPassword() == null || !userDto.getPassword().equals(userDto.getConfirmPassword())) {
             model.addAttribute("error", "Password confirm does not match");
             return "user/register";
         }
@@ -218,12 +219,10 @@ public class UserController {
         }
 
         User user = new User();
-
         user.setFullName(userDto.getFullName());
         user.setEmail(userDto.getEmail());
         user.setPassword(userDto.getPassword());
         user.setStatus("ACTIVE");
-
         userRepository.save(user);
 
         return "redirect:/login";
