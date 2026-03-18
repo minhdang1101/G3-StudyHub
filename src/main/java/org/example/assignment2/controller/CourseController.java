@@ -31,7 +31,7 @@ public class CourseController {
                               @RequestParam(name = "keyword", required = false) String keyword,
                               @RequestParam(name = "categoryId", required = false) Integer categoryId,
                               @RequestParam(name = "instructorId", required = false) Integer instructorId,
-                              @RequestParam(name = "status", required = false) Integer status) {
+                              @RequestParam(name = "status", required = false) String status) {
 
         model.addAttribute("courses", courseService.getCourses(keyword, categoryId, instructorId, status));
         model.addAttribute("categoryList", courseService.getAllCategories());
@@ -48,7 +48,7 @@ public class CourseController {
     @GetMapping("/new")
     public String showAddCourseForm(Model model) {
         CourseDTO courseDto = new CourseDTO();
-        courseDto.setStatus(1);
+        courseDto.setStatus("Published");
 
         model.addAttribute("courseDto", courseDto);
         loadCourseFormData(model);
@@ -57,7 +57,7 @@ public class CourseController {
     }
 
     @GetMapping("/edit/{id}")
-    public String showEditCourseForm(@PathVariable("id") Integer id, Model model) {
+    public String showEditCourseForm(@PathVariable("id") Long id, Model model) {
         CourseDTO courseDto = courseService.getCourseDtoById(id);
         if (courseDto == null) {
             return "redirect:/courses";
@@ -94,8 +94,8 @@ public class CourseController {
     }
 
     @GetMapping("/status/{id}")
-    public String changeStatus(@PathVariable("id") Integer id,
-                               @RequestParam("status") Integer status,
+    public String changeStatus(@PathVariable("id") Long id,
+                               @RequestParam("status") String status,
                                RedirectAttributes redirectAttributes) {
 
         try {
@@ -111,7 +111,7 @@ public class CourseController {
     }
 
     @GetMapping("/delete/{id}")
-    public String deleteCourse(@PathVariable("id") Integer id,
+    public String deleteCourse(@PathVariable("id") Long id,
                                RedirectAttributes redirectAttributes) {
 
         try {
@@ -127,7 +127,7 @@ public class CourseController {
     }
 
     @GetMapping("/content/{id}")
-    public String viewCourseContent(@PathVariable("id") Integer id, Model model) {
+    public String viewCourseContent(@PathVariable("id") Long id, Model model) {
         Course course = courseService.getCourseById(id);
         if (course == null) {
             return "redirect:/courses";
@@ -149,7 +149,7 @@ public class CourseController {
     }
 
     @GetMapping("/chapter/new")
-    public String showAddChapterForm(@RequestParam("courseId") Integer courseId, Model model) {
+    public String showAddChapterForm(@RequestParam("courseId") Long courseId, Model model) {
         Course course = courseService.getCourseById(courseId);
         if (course == null) {
             return "redirect:/courses";
@@ -218,7 +218,7 @@ public class CourseController {
             return "redirect:/courses";
         }
 
-        Integer courseId = chapter.getCourse().getCourseId();
+        Long courseId = chapter.getCourse().getCourseId();
 
         try {
             courseService.deleteChapter(id);
@@ -315,7 +315,7 @@ public class CourseController {
             return "redirect:/courses";
         }
 
-        Integer courseId = chapter.getCourse().getCourseId();
+        Long courseId = chapter.getCourse().getCourseId();
 
         try {
             courseService.deleteLesson(id);

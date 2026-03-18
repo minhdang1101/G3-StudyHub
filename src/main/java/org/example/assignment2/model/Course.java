@@ -3,11 +3,12 @@ package org.example.assignment2.model;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.List;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "course")
@@ -17,7 +18,7 @@ public class Course {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "course_id")
-    private Integer courseId;
+    private Long courseId;
 
     @Column(name = "title", nullable = false)
     private String title;
@@ -38,26 +39,28 @@ public class Course {
     @Column(name = "duration_hours")
     private Integer durationHours;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", referencedColumnName = "id")
     private Setting category;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "instructor_id", referencedColumnName = "id")
+    @NotFound(action = NotFoundAction.IGNORE)
     private User instructor;
 
-    @Column(name = "status")
-    private Integer status;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "manager_id", referencedColumnName = "id")
+    @NotFound(action = NotFoundAction.IGNORE)
+    private User manager;
 
-    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
-    @OrderBy("orderIndex ASC")
-    private List<Chapter> chapters;
+    @Column(name = "status")
+    private String status; // Published / Draft / ...
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
-    private Date createdAt;
+    private LocalDateTime createdAt;
 
     @UpdateTimestamp
     @Column(name = "updated_at")
-    private Date updatedAt;
+    private LocalDateTime updatedAt;
 }

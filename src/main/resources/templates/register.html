@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+
+    <title>StudyHub Register</title>
+
+    <style>
+
+        body{
+            font-family: Arial;
+            background: linear-gradient(135deg,#6a82fb,#8f5db7);
+            height:100vh;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+        }
+
+        .box{
+            width:350px;
+            background:white;
+            padding:40px;
+            border-radius:10px;
+            box-shadow:0 5px 20px rgba(0,0,0,0.2);
+        }
+
+        input{
+            width:100%;
+            padding:10px;
+            margin:10px 0;
+        }
+
+        button{
+            width:100%;
+            padding:10px;
+            background:#6a82fb;
+            border:none;
+            color:white;
+            border-radius:5px;
+        }
+
+        .error{
+            color:red;
+        }
+
+        .link{
+            margin-top:10px;
+            text-align:center;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="box">
+
+    <h2>Register</h2>
+
+    <p class="error" th:text="${error}"></p>
+
+    <form th:action="@{/register}" th:object="${registerDTO}" method="post">
+
+        <input type="text" th:field="*{fullName}" placeholder="Full Name">
+
+        <input type="email" th:field="*{email}" placeholder="Email">
+
+        <input type="password" th:field="*{password}" placeholder="Password">
+
+        <input type="password" th:field="*{confirmPassword}" placeholder="Confirm Password">
+
+        <button type="submit">Register</button>
+
+    </form>
+
+    <div class="link">
+
+        <a href="/login">Back to Login</a>
+
+    </div>
+
+</div>
+
+</body>
+</html>

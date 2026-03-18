@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<body>
+    <div th:fragment="header(activePage)">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+            <div class="container-fluid">
+                <a class="navbar-brand fw-bold" th:href="@{/}">📚 StudyHub</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarText">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarText">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item" th:if="${session.user != null}">
+                            <a class="nav-link" th:classappend="${activePage == 'my-enrollments'} ? 'active' : ''"
+                                th:href="@{/my-enrollments}">My Enrollments</a>
+                        </li>
+                        <li class="nav-item"
+                            th:if="${session.user != null and session.user.role != null and session.user.role.name == 'Admin'}">
+                            <a class="nav-link" th:classappend="${activePage == 'admin-enrollments'} ? 'active' : ''"
+                                th:href="@{/admin/enrollments}">Admin Enrollments</a>
+                        </li>
+                    </ul>
+                    <span class="navbar-text text-white d-flex align-items-center gap-2"
+                        th:if="${session.user != null}">
+                        <i class="bi bi-person-circle fs-5"></i>
+                        <span th:text="${'Welcome, ' + session.user.fullName}">Welcome, User</span>
+                        <a th:href="@{/logout}" class="btn btn-sm btn-outline-light ms-3">Logout</a>
+                    </span>
+                    <span class="navbar-text text-white d-flex align-items-center gap-2"
+                        th:if="${session.user == null}">
+                        <a th:href="@{/login}" class="btn btn-sm btn-outline-light">Login</a>
+                    </span>
+                </div>
+            </div>
+        </nav>
+    </div>
+</body>
+
+</html>

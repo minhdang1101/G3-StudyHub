@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${isNew ? 'Add New Enrollment' : 'Enrollment Details'}">Enrollment Details</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-light">
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-2 p-0 bg-dark min-vh-100">
+                <div th:replace="~{common/sidebar :: sidebar(activePage='enrollments')}"></div>
+            </div>
+
+            <div class="col-md-10 p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 th:text="${isNew ? 'Add New Enrollment' : 'Enrollment Details'}">Enrollment Details</h2>
+                    <a th:href="@{/admin/enrollments}" class="btn btn-secondary">← Back to List</a>
+                </div>
+
+                <div class="card shadow-sm border-0">
+                    <div class="card-body p-4">
+                        <form th:action="@{/admin/enrollments/save}" method="post">
+                            <input type="hidden" name="enrollmentId" th:value="${enrollment.id}">
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Course *</label>
+
+                                    <select th:if="${isNew}" name="courseId" id="courseSelect" class="form-select"
+                                        required>
+                                        <option value="">-- Select Course --</option>
+                                        <option th:each="c : ${courses}" th:value="${c.courseId}" th:text="${c.title}"
+                                            th:attr="data-price=${c.price}">
+                                        </option>
+                                    </select>
+
+                                    <input th:unless="${isNew}" type="text" class="form-control bg-light"
+                                        th:value="${enrollment.course?.title}" readonly>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Fee (VND)</label>
+                                    <input type="text" id="feeDisplay" class="form-control bg-light"
+                                        th:value="${enrollment.fee != null ? enrollment.fee : ''}"
+                                        placeholder="Select a course to see price" readonly>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Email người dùng *</label>
+
+                                    <!-- ADD NEW: email input with AJAX lookup -->
+                                    <div th:if="${isNew}">
+                                        <input type="hidden" id="userId" name="userId">
+                                        <div class="input-group">
+                                            <input type="email" id="userEmailInput" class="form-control"
+                                                placeholder="Nhập email..." required>
+                                            <button type="button" class="btn btn-outline-secondary" id="lookupBtn">
+                                                <i class="bi bi-search"></i>
+                                            </button>
+                                        </div>
+                                        <div id="emailError" class="text-danger small mt-1" style="display:none;"></div>
+                                        <div id="emailOk" class="text-success small mt-1" style="display:none;"></div>
+                                    </div>
+
+                                    <!-- EDIT: show email readonly -->
+                                    <input th:unless="${isNew}" type="text" class="form-control bg-light"
+                                        th:value="${enrollment.user?.email}" readonly>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Full Name</label>
+                                    <input type="text" id="fullNameDisplay" class="form-control bg-light"
+                                        th:value="${enrollment.fullName != null ? enrollment.fullName : (enrollment.user?.fullName != null ? enrollment.user?.fullName : '')}"
+                                        placeholder="Tự động điền sau khi nhập email" readonly>
+                                </div>
+                            </div>
+
+                            <div class="mb-3" th:unless="${isNew}">
+                                <label class="form-label fw-bold">Enroll Reason</label>
+                                <textarea class="form-control bg-light" rows="2" readonly
+                                    th:text="${enrollment.enrollReason}"></textarea>
+                            </div>
+
+                            <hr class="my-4">
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold d-block">Status</label>
+                                    <div class="form-check form-check-inline mt-2">
+                                        <input class="form-check-input" type="radio" name="status" id="statusPending"
+                                            value="Pending" th:checked="${enrollment.status == 'Pending' or isNew}">
+                                        <label class="form-check-label" for="statusPending">Pending</label>
+                                    </div>
+                                    <div class="form-check form-check-inline mt-2">
+                                        <input class="form-check-input" type="radio" name="status" id="statusApproved"
+                                            value="Paid" th:checked="${enrollment.status == 'Paid'}">
+                                        <label class="form-check-label" for="statusApproved">Paid</label>
+                                    </div>
+                                    <div class="form-check form-check-inline mt-2">
+                                        <input class="form-check-input" type="radio" name="status" id="statusRejected"
+                                            value="Cancelled" th:checked="${enrollment.status == 'Cancelled'}">
+                                        <label class="form-check-label" for="statusRejected">Cancelled</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6" th:unless="${isNew}">
+                                    <label class="form-label fw-bold">Last Updated</label>
+                                    <input type="text" class="form-control bg-light"
+                                        th:value="${enrollment.lastUpdated != null ? #temporals.format(enrollment.lastUpdated, 'dd/MM/yyyy HH:mm:ss') : ''}"
+                                        readonly>
+                                </div>
+                            </div>
+
+                            <div class="mb-3" id="rejectNotesGroup">
+                                <label class="form-label fw-bold">Rejected Notes</label>
+                                <textarea class="form-control" name="rejectNotes" rows="2"
+                                    placeholder="Provide reason if rejecting..."
+                                    th:text="${enrollment.rejectNotes}"></textarea>
+                            </div>
+
+                            <div class="row mb-4" th:unless="${isNew}">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Progress (%)</label>
+                                    <input type="text" class="form-control bg-light" th:value="${enrollment.progress}"
+                                        readonly>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Completed At</label>
+                                    <input type="text" class="form-control bg-light"
+                                        th:value="${enrollment.completedAt != null ? #temporals.format(enrollment.completedAt, 'dd/MM/yyyy HH:mm') : ''}"
+                                        readonly>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary px-4 py-2"
+                                th:text="${isNew ? 'Create Enrollment' : 'Submit Update'}">Submit</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const radioButtons = document.querySelectorAll('input[name="status"]');
+            const rejectGroup = document.getElementById('rejectNotesGroup');
+
+            function toggleRejectNotes() {
+                const rejectedRadio = document.getElementById('statusRejected');
+                if (rejectedRadio) {
+                    const isRejected = rejectedRadio.checked;
+                    rejectGroup.style.display = isRejected ? 'block' : 'none';
+                }
+            }
+
+            radioButtons.forEach(radio => radio.addEventListener('change', toggleRejectNotes));
+            toggleRejectNotes();
+
+            // Auto-fill fee when selecting a course
+            const courseSelect = document.getElementById('courseSelect');
+            const feeDisplay = document.getElementById('feeDisplay');
+            if (courseSelect && feeDisplay) {
+                courseSelect.addEventListener('change', function () {
+                    const selectedOption = this.options[this.selectedIndex];
+                    const price = selectedOption.getAttribute('data-price');
+                    if (price) {
+                        feeDisplay.value = Number(price).toLocaleString('vi-VN') + ' VND';
+                    } else {
+                        feeDisplay.value = '';
+                    }
+                });
+            }
+
+            // ── Email lookup ──────────────────────────────────────────────
+            const emailInput = document.getElementById('userEmailInput');
+            const userIdHidden = document.getElementById('userId');
+            const fullNameField = document.getElementById('fullNameDisplay');
+            const emailError = document.getElementById('emailError');
+            const emailOk = document.getElementById('emailOk');
+            const lookupBtn = document.getElementById('lookupBtn');
+
+            function lookupUser() {
+                const email = emailInput ? emailInput.value.trim() : '';
+                if (!email) return;
+
+                fetch('/admin/enrollments/lookup-user?email=' + encodeURIComponent(email))
+                    .then(async res => {
+                        const data = await res.json();
+                        if (data.found) {
+                            userIdHidden.value = data.userId;
+                            fullNameField.value = data.fullName || '';
+                            emailInput.classList.remove('is-invalid');
+                            emailInput.classList.add('is-valid');
+                            emailError.style.display = 'none';
+                            emailOk.textContent = '\u2714 ' + data.fullName;
+                            emailOk.style.display = 'block';
+                        } else {
+                            userIdHidden.value = '';
+                            fullNameField.value = '';
+                            emailInput.classList.add('is-invalid');
+                            emailInput.classList.remove('is-valid');
+                            emailError.textContent = data.message || 'Kh\u00f4ng t\u00ecm th\u1ea5y ng\u01b0\u1eddi d\u00f9ng.';
+                            emailError.style.display = 'block';
+                            emailOk.style.display = 'none';
+                        }
+                    })
+                    .catch(() => {
+                        emailError.textContent = 'L\u1ed7i k\u1ebft n\u1ed1i, vui l\u00f2ng th\u1eed l\u1ea1i.';
+                        emailError.style.display = 'block';
+                        emailOk.style.display = 'none';
+                    });
+            }
+
+            if (emailInput) {
+                emailInput.addEventListener('blur', lookupUser);
+            }
+            if (lookupBtn) {
+                lookupBtn.addEventListener('click', lookupUser);
+            }
+
+            // Block submit if userId not resolved
+            const form = document.querySelector('form');
+            if (form && userIdHidden) {
+                form.addEventListener('submit', function (e) {
+                    // Only validate on add-new (userId hidden field present and empty)
+                    if (userIdHidden && userIdHidden.value === '') {
+                        e.preventDefault();
+                        emailError.textContent = 'Vui l\u00f2ng nh\u1eadp v\u00e0 ki\u1ec3m tra email ng\u01b0\u1eddi d\u00f9ng.';
+                        emailError.style.display = 'block';
+                        emailInput.focus();
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>

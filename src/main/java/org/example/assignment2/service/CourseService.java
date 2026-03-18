@@ -38,18 +38,18 @@ public class CourseService {
     private UserRepository userRepo;
 
     public List<Course> getFeaturedCourses() {
-        return courseRepo.findTop6ByStatusOrderByCreatedAtDesc(1);
+        return courseRepo.findTop6ByStatusOrderByCreatedAtDesc("Published");
     }
 
     public List<Course> getPublicCourses() {
-        return courseRepo.findByStatusOrderByCreatedAtDesc(1);
+        return courseRepo.findByStatusOrderByCreatedAtDesc("Published");
     }
 
 
     // =========================================================
     // GROUP 1: LIST / FORM DATA
     // =========================================================
-    public List<Course> getCourses(String keyword, Integer categoryId, Integer instructorId, Integer status) {
+    public List<Course> getCourses(String keyword, Integer categoryId, Integer instructorId, String status) {
         String key = (keyword != null && !keyword.trim().isEmpty()) ? keyword.trim() : null;
         return courseRepo.searchCourses(key, categoryId, instructorId, status);
     }
@@ -73,11 +73,11 @@ public class CourseService {
     // =========================================================
     // GROUP 2: COURSE CRUD
     // =========================================================
-    public Course getCourseById(Integer id) {
+    public Course getCourseById(Long id) {
         return courseRepo.findById(id).orElse(null);
     }
 
-    public CourseDTO getCourseDtoById(Integer id) {
+    public CourseDTO getCourseDtoById(Long id) {
         Course course = courseRepo.findById(id).orElse(null);
         if (course == null) {
             return null;
@@ -149,7 +149,7 @@ public class CourseService {
     }
 
     @Transactional
-    public void updateCourseStatus(Integer id, Integer status) {
+    public void updateCourseStatus(Long id, String status) {
         Course course = courseRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Course not found"));
         course.setStatus(status);
@@ -157,14 +157,14 @@ public class CourseService {
     }
 
     @Transactional
-    public void deleteCourse(Integer id) {
+    public void deleteCourse(Long id) {
         courseRepo.deleteById(id);
     }
 
     // =========================================================
     // GROUP 3: CHAPTER / LESSON
     // =========================================================
-    public List<Chapter> getChaptersByCourseId(Integer courseId) {
+    public List<Chapter> getChaptersByCourseId(Long courseId) {
         return chapterRepo.findByCourseCourseIdOrderByOrderIndexAsc(courseId);
     }
 
@@ -273,7 +273,7 @@ public class CourseService {
     // =========================================================
     // GROUP 4: AUTHORIZATION HOOKS
     // =========================================================
-    public boolean isAssignedCourse(Integer currentUserId, Integer courseId) {
+    public boolean isAssignedCourse(Integer currentUserId, Long courseId) {
         if (currentUserId == null || courseId == null) {
             return false;
         }
@@ -286,7 +286,7 @@ public class CourseService {
         return currentUserId.equals(course.getInstructor().getId());
     }
 
-    public boolean canViewCourse(Integer currentUserId, String currentRole, Integer courseId) {
+    public boolean canViewCourse(Integer currentUserId, String currentRole, Long courseId) {
         if (currentRole == null || currentRole.isBlank()) {
             return true; // TODO: teammate auth có thể siết lại sau
         }
@@ -302,7 +302,7 @@ public class CourseService {
         return false;
     }
 
-    public boolean canEditCourse(Integer currentUserId, String currentRole, Integer courseId) {
+    public boolean canEditCourse(Integer currentUserId, String currentRole, Long courseId) {
         if (currentRole == null || currentRole.isBlank()) {
             return true; // TODO: teammate auth có thể siết lại sau
         }

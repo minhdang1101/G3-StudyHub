@@ -17,6 +17,9 @@ public class User {
     @Column(name = "full_name")
     private String fullName;
 
+    @Column(name = "username")
+    private String username;
+
     @Column(name = "email")
     private String email;
 
@@ -36,11 +39,9 @@ public class User {
     @JoinColumn(name = "role_id")
     private Setting role;
 
-    @Column(name = "avatar")
-    private String avatar;
+    @Column(name = "avatar_url")
+    private String avatarUrl;
 
-    @Column(name = "note")
-    private String note;
     @Column(name = "created_at", updatable = false)
     @CreationTimestamp
     private Date createdAt;

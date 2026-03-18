@@ -8,6 +8,7 @@ import org.example.assignment2.model.User;
 import org.example.assignment2.repository.CommentRepository;
 import org.example.assignment2.repository.PostRepository;
 import org.example.assignment2.repository.SettingRepository;
+import org.example.assignment2.service.EmailService;
 import org.example.assignment2.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -16,12 +17,14 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.util.StringUtils;
+import org.example.assignment2.repository.UserRepository;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
 import java.util.UUID;
 
 @Controller
@@ -36,14 +39,33 @@ public class UserController {
     private PostRepository postRepo;
     @Autowired
     private CommentRepository commentRepo;
+    @Autowired
+    private EmailService emailService;
+    @Autowired
+    private UserRepository userRepository;
 
     @GetMapping
     public String list(Model model,
                        @RequestParam(name = "roleId", required = false) Integer roleId,
                        @RequestParam(name = "status", required = false) String status,
-                       @RequestParam(name = "keyword", required = false) String keyword) {
+                       @RequestParam(name = "keyword", required = false) String keyword,
+                       HttpSession session) {
 
-        model.addAttribute("users", userService.getUsers(roleId, status, keyword));
+        User currentUser = (User) session.getAttribute("user");
+        List<org.example.assignment2.model.User> users;
+
+        if (currentUser != null && currentUser.getRole() != null) {
+            String roleValue = currentUser.getRole().getValue();
+            if ("MANAGER".equalsIgnoreCase(roleValue) || "ROLE_MANAGER".equalsIgnoreCase(roleValue)) {
+                users = userService.getUsersByManagerCourses(currentUser.getId());
+            } else {
+                users = userService.getUsers(roleId, status, keyword);
+            }
+        } else {
+            users = userService.getUsers(roleId, status, keyword);
+        }
+
+        model.addAttribute("users", users);
         model.addAttribute("roleList", settingRepo.findActiveRoles());
         model.addAttribute("currentRoleId", roleId);
         model.addAttribute("currentStatus", status);
@@ -67,28 +89,22 @@ public class UserController {
 
         if (result.hasErrors()) {
             model.addAttribute("showModal", true);
-            return list(model, null, null, null);
+            return "redirect:/users?showModal=true";
         }
+        userDto.setRoleId(3);
 
+        String randomPassword = UUID.randomUUID().toString().substring(0, 8);
+
+        userDto.setPassword(randomPassword);
+
+        emailService.sendAccountEmail(userDto.getEmail(), randomPassword);
         userService.saveUser(userDto);
         return "redirect:/users";
     }
 
-    @GetMapping("/approve/{id}")
-    public String approveUser(@PathVariable("id") Integer id) {
-        userService.updateUserStatus(id, "Active");
-        return "redirect:/users";
-    }
-
-    @GetMapping("/block/{id}")
-    public String blockUser(@PathVariable("id") Integer id) {
-        userService.updateUserStatus(id, "Blocked");
-        return "redirect:/users";
-    }
-
-    @GetMapping("/unblock/{id}")
-    public String unblockUser(@PathVariable("id") Integer id) {
-        userService.updateUserStatus(id, "Active");
+    @GetMapping("/delete/{id}")
+    public String deleteUser(@PathVariable("id") Integer id) {
+        userService.deleteUser(id);
         return "redirect:/users";
     }
 
@@ -104,9 +120,11 @@ public class UserController {
         dto.setFullName(user.getFullName());
         dto.setEmail(user.getEmail());
         dto.setMobile(user.getMobile());
-        dto.setNote(user.getNote());
         dto.setStatus(user.getStatus());
-        dto.setAvatar(user.getAvatar());
+        dto.setAvatarUrl(user.getAvatarUrl());
+        dto.setCreatedAt(user.getCreatedAt());
+        dto.setLastLogin(user.getLastLogin());
+
 
         if (user.getRole() != null) {
             dto.setRoleId(user.getRole().getId());
@@ -136,12 +154,12 @@ public class UserController {
         if (!file.isEmpty()) {
             String avatarPath = saveFile(file, request);
             if (avatarPath != null) {
-                userDto.setAvatar(avatarPath);
+                userDto.setAvatarUrl(avatarPath);
             }
         } else {
             User oldUser = userService.getUserById(userDto.getId());
             if (oldUser != null) {
-                userDto.setAvatar(oldUser.getAvatar());
+                userDto.setAvatarUrl(oldUser.getAvatarUrl());
             }
         }
 
@@ -175,16 +193,15 @@ public class UserController {
 
         model.addAttribute("user", user);
 
-        // Thống kê số liệu [cite: 196, 197]
         model.addAttribute("postCount", postRepo.countByAuthorId(id));
         model.addAttribute("commentCount", commentRepo.countByUserId(id));
 
-        // Danh sách bài viết và comment [cite: 198, 202]
         model.addAttribute("posts", postRepo.findByAuthorId(id));
         model.addAttribute("comments", commentRepo.findByUserId(id));
 
         return "user/user-records";
     }
+
     @GetMapping("/logout")
     public String logout(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
@@ -194,5 +211,33 @@ public class UserController {
         }
 
         return "redirect:/home";
+    }
+
+    @GetMapping("/register")
+    public String showRegister(Model model) {
+        model.addAttribute("userDto", new UserDTO());
+        return "user/register";
+    }
+
+    @PostMapping("/register")
+    public String registerUser(@ModelAttribute("userDto") UserDTO userDto, Model model) {
+        if (userDto.getPassword() == null || !userDto.getPassword().equals(userDto.getConfirmPassword())) {
+            model.addAttribute("error", "Password confirm does not match");
+            return "user/register";
+        }
+
+        if (userRepository.existsByEmail(userDto.getEmail())) {
+            model.addAttribute("error", "Email already exists");
+            return "user/register";
+        }
+
+        User user = new User();
+        user.setFullName(userDto.getFullName());
+        user.setEmail(userDto.getEmail());
+        user.setPassword(userDto.getPassword());
+        user.setStatus("ACTIVE");
+        userRepository.save(user);
+
+        return "redirect:/login";
     }
 }
