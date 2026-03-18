@@ -1,7 +1,17 @@
 package org.example.assignment2.config;
 
-import org.example.assignment2.model.*;
-import org.example.assignment2.repository.*;
+import org.example.assignment2.model.Comment;
+import org.example.assignment2.model.Course;
+import org.example.assignment2.model.Enrollment;
+import org.example.assignment2.model.Post;
+import org.example.assignment2.model.Setting;
+import org.example.assignment2.model.User;
+import org.example.assignment2.repository.CommentRepository;
+import org.example.assignment2.repository.CourseRepository;
+import org.example.assignment2.repository.EnrollmentRepository;
+import org.example.assignment2.repository.PostRepository;
+import org.example.assignment2.repository.SettingRepository;
+import org.example.assignment2.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -33,39 +43,79 @@ public class DataSeeder implements CommandLineRunner {
     public void run(String... args) throws Exception {
         System.out.println("Starting data seeding...");
 
-        // 1. Seed Settings (Parent Types)
+        // 1. Seed Setting Types
         Setting userRoleType = getOrCreateSettingType("User Role", "System settings for user roles");
         Setting courseCategoryType = getOrCreateSettingType("Course Category", "System settings for course categories");
-        getOrCreateSettingType("Post Status", "System settings for post statuses");
+        Setting postStatusType = getOrCreateSettingType("Post Status", "System settings for post statuses");
+        Setting courseLevelType = getOrCreateSettingType("Course Level", "System settings for course levels");
 
-        // 2. Seed Child Settings (Roles)
+        // 2. Seed User Roles
         Setting roleAdmin = getOrCreateChildSetting("ROLE_ADMIN", "ADMIN", userRoleType, 1);
         Setting roleManager = getOrCreateChildSetting("ROLE_MANAGER", "MANAGER", userRoleType, 2);
         Setting roleTeacher = getOrCreateChildSetting("ROLE_TEACHER", "TEACHER", userRoleType, 3);
         Setting roleStudent = getOrCreateChildSetting("ROLE_STUDENT", "STUDENT", userRoleType, 4);
 
-        // 3. Seed Categories
+        // 3. Seed Course Categories
         Setting catIT = getOrCreateChildSetting("Information Technology", "IT", courseCategoryType, 1);
         Setting catBusiness = getOrCreateChildSetting("Business & Finance", "BUSINESS", courseCategoryType, 2);
-        getOrCreateChildSetting("Graphics Design", "DESIGN", courseCategoryType, 3);
+        Setting catDesign = getOrCreateChildSetting("Graphics Design", "DESIGN", courseCategoryType, 3);
 
-        // 4. Seed Users
+        // 4. Seed Course Levels
+        Setting levelBeginner = getOrCreateChildSetting("Beginner", "BEGINNER", courseLevelType, 1);
+        Setting levelIntermediate = getOrCreateChildSetting("Intermediate", "INTERMEDIATE", courseLevelType, 2);
+        Setting levelAdvanced = getOrCreateChildSetting("Advanced", "ADVANCED", courseLevelType, 3);
+
+        // 5. Seed Post Status
+        getOrCreateChildSetting("Published", "PUBLISHED", postStatusType, 1);
+        getOrCreateChildSetting("Draft", "DRAFT", postStatusType, 2);
+
+        // 6. Seed Users
         User admin = getOrCreateUser("Admin User", "admin", "admin@gmail.com", "1", roleAdmin);
         User manager = getOrCreateUser("Course Manager", "manager", "manager@gmail.com", "1", roleManager);
         User teacher = getOrCreateUser("John Doe", "teacher1", "teacher1@gmail.com", "1", roleTeacher);
         User student = getOrCreateUser("Jane Smith", "student1", "student1@gmail.com", "1", roleStudent);
 
-        // 5. Seed Courses
-        Course c1 = getOrCreateCourse("Java Backend Development", "Full stack Java development with Spring Boot", 
-                "https://images.unsplash.com/photo-1517694712202-14dd9538aa97", new BigDecimal("1500000"), catIT, teacher, manager);
-        getOrCreateCourse("Business Management 101", "Essentials of business management", 
-                "https://images.unsplash.com/photo-1454165833767-027ffea70215", new BigDecimal("1200000"), catBusiness, teacher, manager);
+        // 7. Seed Courses
+        Course c1 = getOrCreateCourse(
+                "Java Backend Development",
+                "Full stack Java development with Spring Boot",
+                "https://images.unsplash.com/photo-1517694712202-14dd9538aa97",
+                new BigDecimal("1500000"),
+                catIT,
+                levelBeginner,
+                teacher,
+                manager
+        );
 
-        // 6. Seed Posts
-        Post p1 = getOrCreatePost("Getting Started with Spring Boot", "This is a comprehensive guide to Spring Boot...", admin, "PUBLISHED", "https://images.unsplash.com/photo-1517694712202-14dd9538aa97");
-        getOrCreatePost("Top 10 Design Trends in 2026", "Exploring the future of web design...", admin, "PUBLISHED", "https://images.unsplash.com/photo-1509395062183-67c5ad6faff9");
+        getOrCreateCourse(
+                "Business Management 101",
+                "Essentials of business management",
+                "https://images.unsplash.com/photo-1454165833767-027ffea70215",
+                new BigDecimal("1200000"),
+                catBusiness,
+                levelIntermediate,
+                teacher,
+                manager
+        );
 
-        // 7. Seed Comments
+        // 8. Seed Posts
+        Post p1 = getOrCreatePost(
+                "Getting Started with Spring Boot",
+                "This is a comprehensive guide to Spring Boot...",
+                admin,
+                "PUBLISHED",
+                "https://images.unsplash.com/photo-1517694712202-14dd9538aa97"
+        );
+
+        getOrCreatePost(
+                "Top 10 Design Trends in 2026",
+                "Exploring the future of web design...",
+                admin,
+                "PUBLISHED",
+                "https://images.unsplash.com/photo-1509395062183-67c5ad6faff9"
+        );
+
+        // 9. Seed Comments
         if (commentRepo.count() <= 1) {
             for (int i = 1; i <= 12; i++) {
                 Comment c = new Comment();
@@ -76,7 +126,7 @@ public class DataSeeder implements CommandLineRunner {
             }
         }
 
-        // 8. Seed Enrollments
+        // 10. Seed Enrollments
         if (enrollmentRepo.count() == 0) {
             Enrollment e1 = new Enrollment();
             e1.setCourse(c1);
@@ -95,8 +145,9 @@ public class DataSeeder implements CommandLineRunner {
     }
 
     private Setting getOrCreateSettingType(String name, String desc) {
-        return settingRepo.findByParentIsNull().stream()
-                .filter(s -> s.getName().equals(name))
+        return settingRepo.findByParentIsNull()
+                .stream()
+                .filter(s -> s.getName().equalsIgnoreCase(name))
                 .findFirst()
                 .orElseGet(() -> {
                     Setting s = new Setting();
@@ -108,8 +159,9 @@ public class DataSeeder implements CommandLineRunner {
     }
 
     private Setting getOrCreateChildSetting(String name, String value, Setting parent, int order) {
-        return settingRepo.findByTypeId(parent.getId()).stream()
-                .filter(s -> s.getName().equals(name))
+        return settingRepo.findByTypeId(parent.getId())
+                .stream()
+                .filter(s -> s.getName().equalsIgnoreCase(name))
                 .findFirst()
                 .orElseGet(() -> {
                     Setting s = new Setting();
@@ -129,7 +181,7 @@ public class DataSeeder implements CommandLineRunner {
             u.setFullName(fullName);
             u.setUsername(username);
             u.setEmail(email);
-            u.setPassword(password); // In real app, encode this
+            u.setPassword(password);
             u.setRole(role);
             u.setStatus("Active");
             u.setMobile("0987654321");
@@ -137,21 +189,32 @@ public class DataSeeder implements CommandLineRunner {
         });
     }
 
-    private Course getOrCreateCourse(String title, String desc, String thumb, BigDecimal price, Setting cat, User instructor, User manager) {
+    private Course getOrCreateCourse(
+            String title,
+            String desc,
+            String thumb,
+            BigDecimal price,
+            Setting cat,
+            Setting level,
+            User instructor,
+            User manager
+    ) {
         if (courseRepo.existsByTitle(title)) {
             return courseRepo.findByTitleContainingIgnoreCase(title).get(0);
         }
+
         Course c = new Course();
         c.setTitle(title);
         c.setDescription(desc);
         c.setThumbnailUrl(thumb);
         c.setPrice(price);
         c.setCategory(cat);
+        c.setLevel(level);
         c.setInstructor(instructor);
         c.setManager(manager);
         c.setStatus("Published");
-        c.setLevel("All Levels");
         c.setDurationHours(40);
+
         return courseRepo.save(c);
     }
 
@@ -159,12 +222,14 @@ public class DataSeeder implements CommandLineRunner {
         if (postRepo.existsByTitle(title)) {
             return postRepo.searchPosts(null, null, title).get(0);
         }
+
         Post p = new Post();
         p.setTitle(title);
         p.setContent(content);
         p.setAuthor(author);
         p.setStatus(status);
         p.setThumbnailUrl(thumb);
+
         return postRepo.save(p);
     }
 }
