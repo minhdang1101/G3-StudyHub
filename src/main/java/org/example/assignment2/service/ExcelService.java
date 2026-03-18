@@ -138,12 +138,6 @@ public class ExcelService {
                     status = "Pending";
                 }
 
-                // Check trùng enrollment
-                if (enrollmentRepository.existsActiveEnrollment(Long.valueOf(user.getId()), course.getCourseId())) {
-                    errors.add("Row " + (rowIdx + 1) + ": Người dùng '" + email + "' đã đăng ký khóa học này rồi, bỏ qua.");
-                    continue;
-                }
-
                 Enrollment enrollment = new Enrollment();
                 enrollment.setCourse(course);
                 enrollment.setUser(user);

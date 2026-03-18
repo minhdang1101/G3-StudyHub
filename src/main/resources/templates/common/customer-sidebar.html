@@ -54,7 +54,7 @@
                 <li class="nav-section">Account</li>
 
                 <li class="nav-item">
-                    <a th:href="@{/profile}" class="nav-link"
+                    <a th:href="@{/users/profile}" class="nav-link"
                         th:classappend="${activePage == 'profile'} ? 'active' : ''">
                         <i class="bi bi-person-circle"></i>
                         <span>My Profile</span>
@@ -62,7 +62,7 @@
                 </li>
 
                 <li class="nav-item">
-                    <a th:href="@{/change-password}" class="nav-link"
+                    <a th:href="@{/users/change-password}" class="nav-link"
                         th:classappend="${activePage == 'change-password'} ? 'active' : ''">
                         <i class="bi bi-shield-lock"></i>
                         <span>Change Password</span>
@@ -85,7 +85,7 @@
                     </div>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownCustomer">
-                    <li><a class="dropdown-item" th:href="@{/profile}"><i class="bi bi-person me-2"></i>Profile</a></li>
+                    <li><a class="dropdown-item" th:href="@{/users/profile}"><i class="bi bi-person me-2"></i>Profile</a></li>
                     <li>
                         <hr class="dropdown-divider">
                     </li>

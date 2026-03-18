@@ -15,6 +15,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.util.StringUtils;
 import org.example.assignment2.repository.UserRepository;
@@ -24,7 +25,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.List;
 import java.util.UUID;
 
 @Controller
@@ -48,24 +48,9 @@ public class UserController {
     public String list(Model model,
                        @RequestParam(name = "roleId", required = false) Integer roleId,
                        @RequestParam(name = "status", required = false) String status,
-                       @RequestParam(name = "keyword", required = false) String keyword,
-                       HttpSession session) {
+                       @RequestParam(name = "keyword", required = false) String keyword) {
 
-        User currentUser = (User) session.getAttribute("user");
-        List<org.example.assignment2.model.User> users;
-
-        if (currentUser != null && currentUser.getRole() != null) {
-            String roleValue = currentUser.getRole().getValue();
-            if ("MANAGER".equalsIgnoreCase(roleValue) || "ROLE_MANAGER".equalsIgnoreCase(roleValue)) {
-                users = userService.getUsersByManagerCourses(currentUser.getId());
-            } else {
-                users = userService.getUsers(roleId, status, keyword);
-            }
-        } else {
-            users = userService.getUsers(roleId, status, keyword);
-        }
-
-        model.addAttribute("users", users);
+        model.addAttribute("users", userService.getUsers(roleId, status, keyword));
         model.addAttribute("roleList", settingRepo.findActiveRoles());
         model.addAttribute("currentRoleId", roleId);
         model.addAttribute("currentStatus", status);
@@ -89,7 +74,7 @@ public class UserController {
 
         if (result.hasErrors()) {
             model.addAttribute("showModal", true);
-            return "redirect:/users?showModal=true";
+            return list(model, null, null, null);
         }
         userDto.setRoleId(3);
 
@@ -193,15 +178,18 @@ public class UserController {
 
         model.addAttribute("user", user);
 
+        // Thống kê số liệu [cite: 196, 197]
         model.addAttribute("postCount", postRepo.countByAuthorId(id));
         model.addAttribute("commentCount", commentRepo.countByUserId(id));
 
+        // Danh sách bài viết và comment [cite: 198, 202]
         model.addAttribute("posts", postRepo.findByAuthorId(id));
         model.addAttribute("comments", commentRepo.findByUserId(id));
 
         return "user/user-records";
     }
 
+    //
     @GetMapping("/register")
     public String showRegister(Model model) {
 
@@ -210,18 +198,20 @@ public class UserController {
         return "user/register";
     }
 
-    
+    //
     @PostMapping("/register")
     public String registerUser(
             @ModelAttribute("userDto") UserDTO userDto,
             Model model
     ) {
 
+        // check password confirm
         if (!userDto.getPassword().equals(userDto.getConfirmPassword())) {
             model.addAttribute("error", "Password confirm does not match");
             return "user/register";
         }
 
+        // check email existed
         if (userRepository.existsByEmail(userDto.getEmail())) {
             model.addAttribute("error", "Email already exists");
             return "user/register";
@@ -237,5 +227,106 @@ public class UserController {
         userRepository.save(user);
 
         return "redirect:/login";
+    }
+
+    // ========== USER PROFILE ==========
+    @GetMapping("/profile")
+    public String showUserProfile(HttpSession session, Model model) {
+        User currentUser = (User) session.getAttribute("user");
+        if (currentUser == null) {
+            return "redirect:/login";
+        }
+        
+        // Reload user from database to get latest data
+        User user = userService.getUserById(currentUser.getId());
+        model.addAttribute("user", user);
+        model.addAttribute("postCount", postRepo.countByAuthorId(user.getId()));
+        model.addAttribute("commentCount", commentRepo.countByUserId(user.getId()));
+        return "user/user-profile";
+    }
+
+    @PostMapping("/profile/update")
+    public String updateProfile(@RequestParam("fullName") String fullName,
+                                 @RequestParam("mobile") String mobile,
+                                 @RequestParam(value = "imageFile", required = false) MultipartFile file,
+                                 HttpSession session,
+                                 HttpServletRequest request,
+                                 RedirectAttributes redirectAttributes) {
+        User currentUser = (User) session.getAttribute("user");
+        if (currentUser == null) {
+            return "redirect:/login";
+        }
+
+        try {
+            User user = userService.getUserById(currentUser.getId());
+            user.setFullName(fullName);
+            user.setMobile(mobile);
+
+            if (file != null && !file.isEmpty()) {
+                String avatarPath = saveFile(file, request);
+                if (avatarPath != null) {
+                    user.setAvatarUrl(avatarPath);
+                }
+            }
+
+            userService.saveUser(user);
+            
+            // Update session
+            session.setAttribute("user", user);
+            
+            redirectAttributes.addFlashAttribute("message", "Profile updated successfully!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("error", "Error updating profile: " + e.getMessage());
+        }
+
+        return "redirect:/users/profile";
+    }
+
+    // ========== PASSWORD CHANGE ==========
+    @GetMapping("/change-password")
+    public String showChangePasswordForm(HttpSession session, Model model) {
+        User currentUser = (User) session.getAttribute("user");
+        if (currentUser == null) {
+            return "redirect:/login";
+        }
+        return "user/change-password";
+    }
+
+    @PostMapping("/change-password")
+    public String changePassword(@RequestParam("currentPassword") String currentPassword,
+                                  @RequestParam("newPassword") String newPassword,
+                                  @RequestParam("confirmPassword") String confirmPassword,
+                                  HttpSession session,
+                                  RedirectAttributes redirectAttributes) {
+        User currentUser = (User) session.getAttribute("user");
+        if (currentUser == null) {
+            return "redirect:/login";
+        }
+
+        // Validate current password
+        if (!currentUser.getPassword().equals(currentPassword)) {
+            redirectAttributes.addFlashAttribute("error", "Current password is incorrect!");
+            return "redirect:/users/change-password";
+        }
+
+        // Validate new password
+        if (newPassword.length() < 6) {
+            redirectAttributes.addFlashAttribute("error", "New password must be at least 6 characters!");
+            return "redirect:/users/change-password";
+        }
+
+        // Validate password match
+        if (!newPassword.equals(confirmPassword)) {
+            redirectAttributes.addFlashAttribute("error", "New password and confirm password do not match!");
+            return "redirect:/users/change-password";
+        }
+
+        // Update password
+        User user = userService.getUserById(currentUser.getId());
+        user.setPassword(newPassword);
+        userService.saveUser(user);
+
+        redirectAttributes.addFlashAttribute("message", "Password changed successfully!");
+        return "redirect:/users/profile";
     }
 }

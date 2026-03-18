@@ -15,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.example.assignment2.model.Setting;
 import org.example.assignment2.service.ExcelService;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,11 +23,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
-import java.util.HashMap;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
-
-import org.springframework.http.ResponseEntity;
 
 @Controller
 @RequestMapping("/admin/enrollments")
@@ -62,8 +62,6 @@ public class AdminEnrollmentController {
             return "redirect:/login"; 
         }
 
-        boolean isManager = isManager(currentUser);
-
         Long filterCourseId = (courseId != null && courseId > 0) ? courseId : null;
         Long filterUserId = (userId != null && userId > 0) ? userId : null;
         String filterStatus = (status != null && !status.trim().isEmpty() && !"All".equalsIgnoreCase(status)) ? status.trim() : null;
@@ -73,13 +71,8 @@ public class AdminEnrollmentController {
         Page<Enrollment> enrollmentPage = enrollmentService.searchEnrollmentsWithRole(
                 filterCourseId, filterUserId, filterStatus, filterSearch, currentUser, pageable);
         
-        // Scope course and user lists by role
-        List<Course> courses = isManager
-                ? courseService.getCoursesByManagerId(currentUser.getId())
-                : courseService.getAllCourses();
-        List<User> users = isManager
-                ? userService.getUsersByManagerCourses(currentUser.getId())
-                : userService.getAllUsers();
+        List<Course> courses = courseService.getAllCourses();
+        List<User> users = userService.getAllUsers(); 
 
         model.addAttribute("enrollmentPage", enrollmentPage);
         model.addAttribute("enrollments", enrollmentPage.getContent());
@@ -105,33 +98,12 @@ public class AdminEnrollmentController {
         User currentUser = getCurrentUser(request, session);
         if (currentUser == null) return "redirect:/login";
 
-        boolean isManager = isManager(currentUser);
-
         model.addAttribute("enrollment", new Enrollment()); 
-        model.addAttribute("courses", isManager
-                ? courseService.getCoursesByManagerId(currentUser.getId())
-                : courseService.getAllCourses());
+        model.addAttribute("courses", courseService.getAllCourses());
+        model.addAttribute("users", userService.getAllUsers());
         model.addAttribute("isNew", true); 
 
         return "enrollment/enrollment-details";
-    }
-
-    // REST: look up user by email for the Add Enrollment form
-    @GetMapping("/lookup-user")
-    @ResponseBody
-    public ResponseEntity<Map<String, Object>> lookupUserByEmail(
-            @RequestParam String email) {
-        User user = userService.findByEmail(email.trim());
-        Map<String, Object> resp = new HashMap<>();
-        if (user == null) {
-            resp.put("found", false);
-            resp.put("message", "Không tìm thấy người dùng với email: " + email);
-            return ResponseEntity.status(404).body(resp);
-        }
-        resp.put("found", true);
-        resp.put("userId", user.getId());
-        resp.put("fullName", user.getFullName());
-        return ResponseEntity.ok(resp);
     }
 
     @GetMapping("/{id}") 
@@ -149,12 +121,8 @@ public class AdminEnrollmentController {
         }
         
         model.addAttribute("enrollment", enrollment);
-        model.addAttribute("courses", isManager(currentUser)
-                ? courseService.getCoursesByManagerId(currentUser.getId())
-                : courseService.getAllCourses());
-        model.addAttribute("users", isManager(currentUser)
-                ? userService.getUsersByManagerCourses(currentUser.getId())
-                : userService.getAllUsers());
+        model.addAttribute("courses", courseService.getAllCourses());
+        model.addAttribute("users", userService.getAllUsers());
         model.addAttribute("isNew", false); 
 
         return "enrollment/enrollment-details";
@@ -168,8 +136,7 @@ public class AdminEnrollmentController {
             @RequestParam("status") String status,
             @RequestParam(value = "rejectNotes", required = false) String rejectNotes,
             HttpServletRequest request,
-            HttpSession session,
-            RedirectAttributes redirectAttributes) {
+            HttpSession session) {
         
         User currentUser = getCurrentUser(request, session);
         if (currentUser == null) return "redirect:/login";
@@ -180,11 +147,10 @@ public class AdminEnrollmentController {
             } else {
                 enrollmentService.updateEnrollmentStatusAndNotes(id, status, rejectNotes, currentUser);
             }
-            redirectAttributes.addFlashAttribute("success", "Lưu thông tin đăng ký thành công!");
-            return "redirect:/admin/enrollments";
+            return "redirect:/admin/enrollments?success=saved";
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
-            return "redirect:/admin/enrollments";
+            String encodedMessage = URLEncoder.encode(e.getMessage(), StandardCharsets.UTF_8);
+            return "redirect:/admin/enrollments?error=" + encodedMessage;
         }
     }
 
@@ -299,30 +265,32 @@ public class AdminEnrollmentController {
             @RequestParam("status") String status,
             @RequestParam(value = "rejectNotes", required = false) String rejectNotes,
             HttpServletRequest request,
-            HttpSession session,
-            RedirectAttributes redirectAttributes) {
+            HttpSession session) {
         
         User currentUser = getCurrentUser(request, session);
         if (currentUser == null) return "redirect:/login";
 
         try {
             enrollmentService.updateEnrollmentStatusAndNotes(id, status, rejectNotes, currentUser);
-            redirectAttributes.addFlashAttribute("success", "Cập nhật trạng thái thành công!");
-            return "redirect:/admin/enrollments";
+            return "redirect:/admin/enrollments?success=updated";
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
-            return "redirect:/admin/enrollments";
+            String encodedMessage = URLEncoder.encode(e.getMessage(), StandardCharsets.UTF_8);
+            return "redirect:/admin/enrollments?error=" + encodedMessage;
         }
     }
 
-    private boolean isManager(User user) {
-        if (user == null || user.getRole() == null) return false;
-        String v = user.getRole().getValue();
-        return "MANAGER".equalsIgnoreCase(v) || "ROLE_MANAGER".equalsIgnoreCase(v);
-    }
-
     private User getCurrentUser(HttpServletRequest request, HttpSession session) {
-        return (User) session.getAttribute("user");
+        User mockManager = new User();
+        mockManager.setId(2); 
+        mockManager.setFullName("Test Manager");
+    
+        Setting role = new Setting();
+        role.setId(2);
+        role.setValue("MANAGER"); 
+        role.setName("MANAGER");
+        mockManager.setRole(role);
+                                                                                                            
+        return mockManager;
     }
 
 }

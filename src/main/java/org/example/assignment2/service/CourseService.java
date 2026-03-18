@@ -18,11 +18,6 @@ public class CourseService {
         return courseRepository.findAll();
     }
 
-    // 5. Lấy courses do manager quản lý
-    public List<Course> getCoursesByManagerId(Integer managerId) {
-        return courseRepository.findByManager_Id(managerId);
-    }
-
     // 2. Tìm khóa học theo ID
     public Course getCourseById(Long id) {
         return courseRepository.findById(id).orElse(null);

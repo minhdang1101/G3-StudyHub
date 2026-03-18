@@ -38,9 +38,9 @@
 
                     <div class="collapse navbar-collapse">
                         <ul class="navbar-nav me-auto mb-2 mb-lg-0 fw-bold">
-                            <li class="nav-item"><a class="nav-link active" th:href="@{/static}">Home</a></li>
-                            <li class="nav-item"><a class="nav-link" href="#">Products</a></li>
-                            <li class="nav-item"><a class="nav-link" href="#">Blogs</a></li>
+                            <li class="nav-item"><a class="nav-link active" th:href="@{/dashboard}">Home</a></li>
+                            <li class="nav-item"><a class="nav-link" th:href="@{/admin/courses}">Courses</a></li>
+                            <li class="nav-item"><a class="nav-link" th:href="@{/blog}">Blogs</a></li>
                         </ul>
                     </div>
 
@@ -66,8 +66,7 @@
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div>
-                                        <h6 class="text-uppercase mb-1"
-                                            th:text="${currentUser != null and (currentUser.role.value == 'ROLE_MANAGER' or currentUser.role.value == 'MANAGER')} ? 'Enrolled Users' : 'Total Users'">Total Users</h6>
+                                        <h6 class="text-uppercase mb-1">Total Users</h6>
                                         <h2 class="display-6 fw-bold" th:text="${totalUsers}">5</h2>
                                     </div>
                                     <i class="bi bi-people-fill fs-1 opacity-50"></i>
@@ -86,14 +85,13 @@
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div>
-                                        <h6 class="text-uppercase mb-1"
-                                            th:text="${currentUser != null and (currentUser.role.value == 'ROLE_MANAGER' or currentUser.role.value == 'MANAGER')} ? 'My Courses' : 'Total Courses'">Total Courses</h6>
+                                        <h6 class="text-uppercase mb-1">Total Courses</h6>
                                         <h2 class="display-6 fw-bold" th:text="${totalCourses}">7</h2>
                                     </div>
                                     <i class="bi bi-book-fill fs-1 opacity-50"></i>
                                 </div>
                                 <hr class="border-white opacity-25">
-                                <a th:href="@{/courses}" class="text-white text-decoration-none small">
+                                <a th:href="@{/admin/courses}" class="text-white text-decoration-none small">
                                     Browse <i class="bi bi-arrow-right ms-1"></i>
                                 </a>
                             </div>
@@ -106,8 +104,7 @@
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div>
-                                        <h6 class="text-uppercase mb-1"
-                                            th:text="${currentUser != null and (currentUser.role.value == 'ROLE_MANAGER' or currentUser.role.value == 'MANAGER')} ? 'Active Learners' : 'Active Members'">Active Members</h6>
+                                        <h6 class="text-uppercase mb-1">Active Members</h6>
                                         <h2 class="display-6 fw-bold" th:text="${activeMembers}">3</h2>
                                     </div>
                                     <i class="bi bi-mortarboard-fill fs-1 opacity-50"></i>
@@ -127,14 +124,13 @@
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div>
-                                        <h6 class="text-uppercase mb-1"
-                                            th:text="${currentUser != null and (currentUser.role.value == 'ROLE_MANAGER' or currentUser.role.value == 'MANAGER')} ? 'My Published' : 'Published Courses'">Published Courses</h6>
+                                        <h6 class="text-uppercase mb-1">Published Courses</h6>
                                         <h2 class="display-6 fw-bold" th:text="${publishedCourses}">7</h2>
                                     </div>
                                     <i class="bi bi-check-circle-fill fs-1 opacity-50"></i>
                                 </div>
                                 <hr class="border-dark opacity-25">
-                                <a th:href="@{/courses(status='Published')}"
+                                <a th:href="@{/admin/courses(status='Published')}"
                                     class="text-dark text-decoration-none small">
                                     View Published <i class="bi bi-arrow-right ms-1"></i>
                                 </a>
@@ -176,16 +172,16 @@
                                                 <span class="badge bg-secondary" th:if="${course.status != 'Published'}"
                                                     th:text="${course.status}">Draft</span>
                                             </td>
-                                            <td th:text="${#temporals.format(course.createdAt, 'yyyy-MM-dd HH:mm')}">
+                                            <td th:text="${course.createdAt != null ? #temporals.format(course.createdAt, 'yyyy-MM-dd HH:mm') : 'N/A'}">
                                                 Date</td>
                                             <td class="text-center">
                                                 <th:block
                                                     th:if="${currentUser != null and (currentUser.role.value != 'MANAGER' or (course.manager != null and course.manager.id == currentUser.id))}">
-                                                    <a th:href="@{/courses/edit/{id}(id=${course.courseId})}"
+                                                    <a th:href="@{/admin/courses/edit/{id}(id=${course.courseId})}"
                                                         class="btn btn-sm btn-outline-primary">
                                                         <i class="bi bi-pencil-square"></i>
                                                     </a>
-                                                    <a th:href="@{/courses/view/{id}(id=${course.courseId})}"
+                                                    <a th:href="@{/admin/courses/view/{id}(id=${course.courseId})}"
                                                         class="btn btn-sm btn-outline-info">
                                                         <i class="bi bi-list-ul"></i>
                                                     </a>

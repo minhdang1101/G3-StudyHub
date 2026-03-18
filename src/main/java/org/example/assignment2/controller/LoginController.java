@@ -52,10 +52,6 @@ public class LoginController {
         session.setAttribute("user",user);
         session.setAttribute("permissions",permissions);
 
-        String roleValue = user.getRole() != null ? user.getRole().getValue() : "";
-        if ("ROLE_MEMBER".equalsIgnoreCase(roleValue)) {
-            return "redirect:/courses";
-        }
         return "redirect:/dashboard";
     }
     @GetMapping("/forgot-password")
@@ -117,6 +113,6 @@ public class LoginController {
     @GetMapping("/logout")
     public String logout(HttpSession session) {
         session.invalidate();
-        return "redirect:/login";
+        return "redirect:/login?logout=success";
     }
 }

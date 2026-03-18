@@ -43,7 +43,7 @@
             </li>
 
             <li>
-                <a th:href="@{/posts}" class="nav-link text-white"
+                <a th:href="@{/admin/posts}" class="nav-link text-white"
                     th:classappend="${activePage == 'posts'} ? 'active bg-primary' : ''">
                     <i class="bi bi-journal-text me-2"></i> Post Management
                 </a>
@@ -79,7 +79,7 @@
                 <strong th:text="${session.user != null ? session.user.fullName : 'Admin User'}">User</strong>
             </a>
             <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
-                <li><a class="dropdown-item" href="#">Profile</a></li>
+                <li><a class="dropdown-item" th:href="@{/users/profile}">Profile</a></li>
                 <li>
                     <hr class="dropdown-divider">
                 </li>

@@ -127,12 +127,12 @@
                                     </td>
                                     <td th:text="${#temporals.format(e.enrolledAt, 'dd/MM/yyyy HH:mm')}">Date</td>
                                     <td>
-                                        <span th:if="${e.status == 'Paid'}"
-                                            class="badge bg-success status-badge">Paid</span>
+                                        <span th:if="${e.status == 'Approved'}"
+                                            class="badge bg-success status-badge">Approved</span>
                                         <span th:if="${e.status == 'Pending'}"
                                             class="badge bg-warning text-dark status-badge">Pending</span>
-                                        <span th:if="${e.status == 'Cancelled'}"
-                                            class="badge bg-danger status-badge">Cancelled</span>
+                                        <span th:if="${e.status == 'Rejected'}"
+                                            class="badge bg-danger status-badge">Rejected</span>
                                     </td>
                                     <td th:text="${e.progress + '%'}">0%</td>
                                     <td>

@@ -42,7 +42,7 @@
             <div class="card p-3 mb-3 border-secondary">
                 <h4 class="mb-3">Post List</h4>
 
-                <form th:action="@{/posts}" method="get" class="row g-2 align-items-center">
+                <form th:action="@{/admin/posts}" method="get" class="row g-2 align-items-center">
 
                     <div class="col-auto">
                         <select name="authorId" class="form-select">
@@ -71,7 +71,10 @@
                     </div>
 
                     <div class="col text-end">
-                        <a th:href="@{/posts/new}" class="btn btn-light border">New Post</a>
+                        <a th:href="@{/blog}" class="btn btn-outline-primary border me-2" target="_blank">
+                            <i class="bi bi-eye me-1"></i> View Blog
+                        </a>
+                        <a th:href="@{/admin/posts/new}" class="btn btn-light border">New Post</a>
                     </div>
                 </form>
 
@@ -79,6 +82,7 @@
                     <thead class="table-header">
                         <tr>
                             <th>ID</th>
+                            <th>Thumbnail</th>
                             <th>Tiêu đề</th>
                             <th>Tác giả</th>
                             <th>Trạng thái</th>
@@ -89,10 +93,18 @@
                     </thead>
                     <tbody>
                         <tr th:if="${#lists.isEmpty(posts)}">
-                            <td colspan="7" class="text-center text-muted">No posts found</td>
+                            <td colspan="8" class="text-center text-muted">No posts found</td>
                         </tr>
                         <tr th:each="p : ${posts}">
                             <td th:text="${p.id}">1</td>
+                            <td>
+                                <img th:if="${p.thumbnailUrl}" th:src="${p.thumbnailUrl}" 
+                                     style="width: 50px; height: 50px; object-fit: cover;" class="rounded border shadow-sm">
+                                <div th:unless="${p.thumbnailUrl}" 
+                                     style="width: 50px; height: 50px; background-color: #f8f9fa;" class="rounded border d-flex align-items-center justify-content-center text-muted small">
+                                    N/A
+                                </div>
+                            </td>
                             <td class="fw-bold" th:text="${p.title}">Title</td>
                             <td th:text="${p.author != null ? p.author.fullName : 'Unknown'}">John Doe</td>
                             <td>
@@ -104,11 +116,11 @@
                             <td th:text="${p.createdAt != null ? #dates.format(p.createdAt, 'dd/MM/yyyy') : 'N/A'}">
                                 01/01/2024</td>
                             <td>
-                                <a th:href="@{/posts/view/{id}(id=${p.id})}"
+                                <a th:href="@{/admin/posts/view/{id}(id=${p.id})}"
                                     class="text-primary text-decoration-none">Xem</a> |
-                                <a th:href="@{/posts/edit/{id}(id=${p.id})}"
+                                <a th:href="@{/admin/posts/edit/{id}(id=${p.id})}"
                                     class="text-primary text-decoration-none">Sửa</a> |
-                                <a th:href="@{/posts/delete/{id}(id=${p.id})}" class="text-primary text-decoration-none"
+                                <a th:href="@{/admin/posts/delete/{id}(id=${p.id})}" class="text-primary text-decoration-none"
                                     onclick="return confirm('Confirm delete?')">Xóa</a>
                             </td>
                         </tr>

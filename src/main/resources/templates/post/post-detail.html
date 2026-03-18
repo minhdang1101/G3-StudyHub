@@ -75,31 +75,52 @@
                         th:text="${post.updatedAt != null ? #dates.format(post.updatedAt, 'dd/MM/yyyy HH:mm:ss') : 'N/A'}"></span>
                 </div>
 
+                <div th:if="${post.thumbnailUrl}" class="my-4">
+                    <img th:src="${post.thumbnailUrl}" alt="Post Thumbnail" class="img-fluid rounded shadow-sm" style="max-height: 400px; width: 100%; object-fit: cover;">
+                </div>
+
                 <h4 class="section-title">Nội dung</h4>
                 <div class="p-3 bg-light rounded" th:text="${post.content}">
                     Content goes here...
                 </div>
 
                 <h4 class="section-title">Comments (<span
-                        th:text="${post.comments != null ? post.comments.size() : 0}">0</span>)</h4>
+                        th:text="${commentsPage.totalElements}">0</span>)</h4>
 
-                <div th:if="${#lists.isEmpty(post.comments)}" class="text-muted">No comments yet.</div>
+                <div th:if="${commentsPage.empty}" class="text-muted">No comments yet.</div>
 
-                <div th:each="cmt : ${post.comments}" class="comment-box">
+                <div th:each="cmt : ${commentsPage.content}" class="comment-box">
                     <div class="d-flex justify-content-between">
-                        <strong>Comment trên bài viết <span th:text="${post.id}"></span></strong>
-                        <a href="#" class="text-primary small text-decoration-none">Xóa</a>
+                        <strong>Comment #<span th:text="${cmt.id}"></span></strong>
+                        <a href="#" class="text-danger small text-decoration-none">Xóa</a>
                     </div>
                     <div class="small text-muted mb-2">
                         By: <span th:text="${cmt.user != null ? cmt.user.fullName : 'Unknown'}">User</span> ||
-                        <a href="#" class="text-primary text-decoration-none">Xóa</a>
+                        Created: <span th:text="${cmt.createdAt != null ? #dates.format(cmt.createdAt, 'dd/MM/yyyy HH:mm') : 'N/A'}"></span>
                     </div>
-                    <div class="fw-bold" th:text="${'Nội dung comment ' + cmt.id}">Header</div>
                     <div th:text="${cmt.comment}">Comment content</div>
                 </div>
 
+                <!-- Pagination Controls -->
+                <nav th:if="${commentsPage.totalPages > 1}" aria-label="Comment pagination" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item" th:classappend="${commentsPage.first} ? 'disabled'">
+                            <a class="page-link" th:href="@{/admin/posts/view/{id}(id=${post.id}, page=${commentsPage.number - 1})}" tabindex="-1">Previous</a>
+                        </li>
+                        
+                        <li class="page-item" th:each="i : ${commentsPage.totalPages > 0 ? #numbers.sequence(0, commentsPage.totalPages - 1) : {}}"
+                            th:classappend="${commentsPage.number == i} ? 'active'">
+                            <a class="page-link" th:href="@{/admin/posts/view/{id}(id=${post.id}, page=${i})}" th:text="${i + 1}">1</a>
+                        </li>
+                        
+                        <li class="page-item" th:classappend="${commentsPage.last} ? 'disabled'">
+                            <a class="page-link" th:href="@{/admin/posts/view/{id}(id=${post.id}, page=${commentsPage.number + 1})}">Next</a>
+                        </li>
+                    </ul>
+                </nav>
+
                 <!-- Add Comment Form -->
-                <form th:action="@{/posts/comment/add}" method="post" th:object="${commentDto}"
+                <form th:action="@{/admin/posts/comment/add}" method="post" th:object="${commentDto}"
                     class="mt-4 p-3 border rounded bg-light">
                     <h5 class="mb-3">Thêm comment</h5>
                     <input type="hidden" th:field="*{postId}" />
@@ -127,8 +148,11 @@
                 </form>
 
                 <div class="mt-4">
-                    <a th:href="@{/posts}" class="btn btn-success">Quay lại danh sách</a>
-                    <a th:href="@{/posts/edit/{id}(id=${post.id})}" class="btn btn-success">Sửa bài viết</a>
+                    <a th:if="${post.status == 'PUBLISHED'}" th:href="@{/blog/{id}(id=${post.id})}" class="btn btn-outline-primary me-2" target="_blank">
+                        <i class="bi bi-box-arrow-up-right me-1"></i> Xem trên Blog
+                    </a>
+                    <a th:href="@{/admin/posts}" class="btn btn-success me-2">Quay lại danh sách</a>
+                    <a th:href="@{/admin/posts/edit/{id}(id=${post.id})}" class="btn btn-success">Sửa bài viết</a>
                 </div>
 
             </div>

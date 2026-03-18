@@ -132,8 +132,4 @@ public class UserService {
     public List<User> getAllUsers() {
         return userRepo.findAll();
     }
-
-    public List<User> getUsersByManagerCourses(Integer managerId) {
-        return userRepo.findDistinctUsersByManagerId(managerId);
-    }
 }
